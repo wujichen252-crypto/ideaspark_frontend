@@ -22,10 +22,26 @@
       </div>
     </div>
   </div>
+
+  <!-- 新增内容占位区 -->
+  <section class="section-content">
+    <n-space vertical align="center" size="large">
+      <h2 class="section-title">未来功能探索</h2>
+      <p class="section-desc">此处将展示更多核心功能与业务模块，敬请期待。</p>
+      <n-divider style="width: 60px; margin: 24px auto" />
+      <div class="content-placeholder">
+        <!-- 仅作视觉占位 -->
+        <n-skeleton text :repeat="3" style="width: 300px; margin: 0 auto" />
+      </div>
+    </n-space>
+  </section>
+
+  <!-- 横向滚动模块 -->
+  <HorizontalScrollSection />
 </template>
 
 <script setup lang="ts">
-// Logic can be added here
+import HorizontalScrollSection from '@/components/HorizontalScrollSection.vue'
 </script>
 
 <style scoped>
@@ -84,5 +100,43 @@
   font-size: 1.25rem;
   margin-bottom: 2rem;
   opacity: 0.9;
+}
+
+/* 内容占位区样式 */
+.section-content {
+  min-height: 800px; /* 确保足够的高度以演示滚动 */
+  background-color: #f9f9f9; /* 浅灰背景，柔和过渡 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  text-align: center;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.section-desc {
+  font-size: 1.125rem;
+  color: #666;
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+/* 适配深色模式（可选，如果项目支持） */
+@media (prefers-color-scheme: dark) {
+  .section-content {
+    background-color: #1a1a1a;
+  }
+  .section-title {
+    color: #fff;
+  }
+  .section-desc {
+    color: #aaa;
+  }
 }
 </style>
