@@ -11,9 +11,13 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    DoubleScrollSection: typeof import('./components/DoubleScrollSection.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
     HorizontalScrollSection: typeof import('./components/HorizontalScrollSection.vue')['default']
+    IdeaSparkSection: typeof import('./components/IdeaSparkSection.vue')['default']
+    ImpactSection: typeof import('./components/ImpactSection.vue')['default']
     NAlert: typeof import('naive-ui')['NAlert']
+    NAvatar: typeof import('naive-ui')['NAvatar']
     NButton: typeof import('naive-ui')['NButton']
     NCard: typeof import('naive-ui')['NCard']
     NConfigProvider: typeof import('naive-ui')['NConfigProvider']
@@ -25,6 +29,7 @@ declare module 'vue' {
     NSkeleton: typeof import('naive-ui')['NSkeleton']
     NSpace: typeof import('naive-ui')['NSpace']
     NText: typeof import('naive-ui')['NText']
+    PrivacySection: typeof import('./components/PrivacySection.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }
