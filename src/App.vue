@@ -1,6 +1,14 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import { zhCN, dateZhCN } from 'naive-ui'
 import AppHeader from '@/layouts/AppHeader.vue'
+import { useUserStore } from '@/store'
+
+const userStore = useUserStore()
+
+onMounted(() => {
+  userStore.init()
+})
 </script>
 
 <template>
@@ -9,7 +17,7 @@ import AppHeader from '@/layouts/AppHeader.vue'
       <n-notification-provider>
         <n-dialog-provider>
           <AppHeader />
-          <main style="padding-top: var(--header-height)">
+          <main>
             <router-view />
           </main>
         </n-dialog-provider>

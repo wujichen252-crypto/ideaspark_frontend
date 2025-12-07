@@ -17,9 +17,15 @@
         <div class="hero__overlay"></div>
 
         <div class="hero__content">
-          <h1>智启未来·科技之美</h1>
-          <p>以现代、极简的设计语言，呈现电影级光影质感</p>
-          <n-button size="large" type="primary">立即探索</n-button>
+          <h1>IdeaSpark</h1>
+          <p>从灵感到落地，只需一句话</p>
+          
+          <!-- 新增“开始创作”交互按钮 -->
+          <div class="cta-link-wrapper" @click="$router.push('/login')">
+            <span class="cta-text">开始创作</span>
+            <span class="cta-arrow">→</span>
+            <div class="cta-underline"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -69,26 +75,28 @@ import ImpactSection from '@/components/ImpactSection.vue'
   z-index: 10; /* 必须高于 ImpactSection */
   background-color: #000; /* 确保不透明 */
   margin-bottom: 50vh; /* 调整为 50vh，与 ImpactSection 高度一致 */
-  width: 100vw;
-  margin-left: calc(50% - 50vw); /* 保持全宽 */
+  width: 100%; /* 改为 100% 防止溢出 */
+  /* margin-left: calc(50% - 50vw); */ /* 移除破框技巧，避免水平滚动条 */
   box-shadow: 0 10px 30px rgba(0,0,0,0.5); /* 增加阴影增强层次感 */
 }
 
 /* 破框，全宽显示，跳出上层 container 限制 */
 .hero-fullbleed {
-  width: 100vw;
-  margin-left: calc(50% - 50vw); /* 破出居中容器的常用技巧 */
+  width: 100%; /* 改为 100% */
+  /* margin-left: calc(50% - 50vw); */ /* 移除破框技巧 */
 }
 
 /* 英雄区本体（去掉父容器的 padding/宽度限制）*/
 .hero {
   position: relative;
   height: 100vh; /* 强制全屏高度 */
-  margin-top: calc(var(--header-height, 64px) * -1); /* 抵消 App.vue 的 padding-top，实现通顶 */
+  /* margin-top: calc(var(--header-height, 64px) * -1);  不再需要抵消 padding */
   overflow: hidden;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-end; /* 底部对齐 */
+  justify-content: flex-start; /* 左侧对齐 */
+  padding: 60px; /* 保持四周内边距 */
+  box-sizing: border-box; /* 关键：让 padding 包含在 height 内，防止撑大 */
 }
 
 /* 视频铺满整个 hero */
@@ -105,7 +113,13 @@ import ImpactSection from '@/components/ImpactSection.vue'
 .hero__overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.28);
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.4) 30%,
+    rgba(0, 0, 0, 0.1) 60%,
+    transparent 100%
+  );
   z-index: 1;
 }
 
@@ -113,23 +127,64 @@ import ImpactSection from '@/components/ImpactSection.vue'
 .hero__content {
   position: relative;
   z-index: 2;
-  text-align: center; /* 保持居中 */
-  max-width: 720px;
-  padding: 0 24px;
+  text-align: left; /* 改为左对齐 */
   color: #fff;
+  max-width: 800px;
+  padding: 0; /* 移除之前的 padding */
+  margin-bottom: 100px; /* 使用 margin 把内容顶上去，而不是撑大父容器 */
 }
 
-/* 标题样式微调，保持视觉层级 */
 .hero__content h1 {
-  font-size: 3.5rem;
-  margin-bottom: 1rem;
-  line-height: 1.1;
+  font-size: 4rem; /* 稍微调大一点 */
+  margin-bottom: 16px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); /* 增加文字阴影 */
 }
 
 .hero__content p {
-  font-size: 1.25rem;
-  margin-bottom: 2rem;
-  opacity: 0.9;
+  font-size: 1.5rem;
+  opacity: 0.95;
+  margin-bottom: 40px; /* 恢复 margin-bottom 给按钮留空间 */
+  font-weight: 300;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); /* 增加文字阴影 */
+}
+
+/* CTA 按钮样式 */
+.cta-link-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  position: relative;
+  padding-bottom: 4px; /* 给下划线留空间 */
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.cta-arrow {
+  transition: transform 0.3s ease;
+}
+
+.cta-underline {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: #fff;
+  transition: width 0.4s ease-out;
+}
+
+/* 悬停效果 */
+.cta-link-wrapper:hover .cta-underline {
+  width: 100%; /* 下划线从左向右延伸 */
+}
+
+.cta-link-wrapper:hover .cta-arrow {
+  transform: translateX(6px); /* 箭头向右移动 */
 }
 
 /* 内容占位区样式 */

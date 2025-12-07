@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>现代登录/注册切换页面</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <style>
+        /* 使用 CSS 变量定义主题颜色 */
+        :root {
+            --primary-color: #ff416c;
+            --secondary-color: #ff4b2b;
+            --text-color: #333;
+            --bg-color: #f6f6f6;
+            --transition-duration: 0.6s;
+        }
+
+        /* 全局样式 */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: -20px 0 50px;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        h1 {
+            font-weight: bold;
+            margin: 0;
+        }
+
+        p {
+            font-size: 14px;
+            font-weight: 100;
+            line-height: 20px;
+            letter-spacing: 0.5px;
+            margin: 20px 0 30px;
+        }
+
+        span {
+            font-size: 12px;
+        }
+
+        a {
+            color: var(--text-color);
+            font-size: 14px;
+            text-decoration: none;
+            margin: 15px 0;
+        }
+
+        /* 按钮样式 - 使用伪元素和渐变背景 */
+        button {
+            border-radius: 20px;
+            border: 1px solid var(--secondary-color);
+            background-color: var(--secondary-color);
+            color: #FFFFFF;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 12px 45px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: transform 80ms ease-in;
+            cursor: pointer;
+        }
+        
+        button:active {
+            transform: scale(0.95);
+        }
+
+        button:focus {
+            outline: none;
+        }
+
+        .ghost {
+            background-color: transparent;
+            border-color: #FFFFFF;
+        }
+
+        /* 表单样式 */
+        form {
+            background-color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 0 50px;
+            height: 100%;
+            text-align: center;
+        }
+
+        input {
+            background-color: #eee;
+            border: none;
+            padding: 12px 15px;
+            margin: 8px 0;
+            width: 100%;
+            border-radius: 5px;
+            transition: box-shadow 0.3s ease;
+        }
+        
+        input:focus {
+            box-shadow: 0 0 5px rgba(65, 127, 255, 0.5);
+            outline: none;
+        }
+
+        /* 社交图标容器 */
+        .social-container {
+            margin: 20px 0;
+        }
+
+        .social-container a {
+            border: 1px solid #DDDDDD;
+            border-radius: 50%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 5px;
+            height: 40px;
+            width: 40px;
+            transition: background-color 0.3s;
+        }
+        
+        .social-container a:hover {
+            background-color: var(--bg-color);
+        }
+
+        /* 卡片容器 */
+        .container {
+            background-color: #fff;
+            border-radius: 10px;
+            /* 使用更柔和的阴影 */
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.15), 0 10px 10px rgba(0, 0, 0, 0.12);
+            position: relative;
+            overflow: hidden;
+            width: 768px; 
+            max-width: 100%;
+            min-height: 480px;
+        }
+
+        /* 表单容器布局 */
+        .form-container {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            transition: all var(--transition-duration) ease-in-out; 
+        }
+
+        /* 登录/注册表单占据宽度 */
+        .sign-in-container {
+            left: 0;
+            width: 50%;
+            z-index: 2;
+        }
+        .sign-up-container {
+            left: 0;
+            width: 50%;
+            opacity: 0; 
+            z-index: 1;
+        }
+
+        /* *** 切换动画状态 CSS *** */
+
+        /* 激活注册状态时的CSS类 */
+        .container.right-panel-active .sign-up-container {
+            transform: translateX(100%); 
+            opacity: 1; 
+            z-index: 5;
+            animation: show var(--transition-duration); 
+        }
+
+        .container.right-panel-active .sign-in-container {
+            transform: translateX(100%); 
+        }
+
+        /* 覆盖层容器 */
+        .overlay-container {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 50%;
+            height: 100%;
+            overflow: hidden;
+            transition: transform var(--transition-duration) ease-in-out;
+            z-index: 100;
+        }
+
+        /* 激活注册状态时，覆盖层向左移动 */
+        .container.right-panel-active .overlay-container {
+            transform: translateX(-100%);
+        }
+
+        /* 覆盖层渐变背景 */
+        .overlay {
+            background: var(--primary-color);
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: 0 0;
+            color: #FFFFFF;
+            position: relative;
+            left: -100%;
+            height: 100%;
+            width: 200%;
+            transform: translateX(0);
+            transition: transform var(--transition-duration) ease-in-out;
+        }
+
+        /* 激活注册状态时，覆盖层内的内容整体向左移动 */
+        .container.right-panel-active .overlay {
+            transform: translateX(50%);
+        }
+
+        /* 覆盖层面板 */
+        .overlay-panel {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 0 40px;
+            text-align: center;
+            top: 0;
+            height: 100%;
+            width: 50%;
+            transform: translateX(0);
+            transition: transform var(--transition-duration) ease-in-out;
+        }
+
+        .overlay-left {
+            transform: translateX(-20%);
+        }
+
+        .overlay-right {
+            right: 0;
+            transform: translateX(0);
+        }
+
+        /* 激活注册状态时，面板内容向内移动 */
+        .container.right-panel-active .overlay-left {
+            transform: translateX(0);
+        }
+
+        .container.right-panel-active .overlay-right {
+            transform: translateX(20%);
+        }
+
+        /* *** 响应式设计: 针对小屏幕 *** */
+        @media (max-width: 768px) {
+            body {
+                height: auto;
+                min-height: 100vh;
+                padding: 20px 0;
+                margin: 0;
+            }
+            .container {
+                width: 90%;
+                min-height: 600px;
+            }
+            .overlay-container {
+                display: none; /* 在小屏幕上隐藏平移切换 */
+            }
+            .form-container {
+                width: 100%;
+                left: 0 !important;
+                transform: none !important;
+            }
+            
+            /* 简单的隐藏/显示切换，无动画 */
+            .sign-up-container {
+                opacity: 0;
+                z-index: 1;
+            }
+            .sign-in-container {
+                opacity: 1;
+                z-index: 5;
+            }
+            
+            .container.right-panel-active .sign-up-container {
+                opacity: 1;
+                z-index: 5;
+            }
+            .container.right-panel-active .sign-in-container {
+                opacity: 0;
+                z-index: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="container">
+        <div class="form-container sign-up-container">
+            <form action="#" id="register-form">
+                <h1>创建账号</h1>
+                <div class="social-container">
+                    <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+                </div>
+                <span>或使用邮箱注册</span>
+                <input type="text" placeholder="昵称" required />
+                <input type="email" placeholder="邮箱" required />
+                <input type="password" placeholder="密码" required />
+                <button type="submit">注册</button>
+            </form>
+        </div>
+        
+        <div class="form-container sign-in-container">
+            <form action="#" id="login-form">
+                <h1>登录</h1>
+                <div class="social-container">
+                    <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+                </div>
+                <span>或使用您的账号</span>
+                <input type="email" placeholder="邮箱" required />
+                <input type="password" placeholder="密码" required />
+                <a href="#">忘记密码?</a>
+                <button type="submit">登录</button>
+            </form>
+        </div>
+        
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-left">
+                    <h1>欢迎回来!</h1>
+                    <p>保持联系，请使用您的个人信息登录</p>
+                    <button class="ghost" id="signIn">登录</button>
+                </div>
+                <div class="overlay-panel overlay-right">
+                    <h1>你好，朋友!</h1>
+                    <p>输入您的个人信息，开始与我们一起的旅程</p>
+                    <button class="ghost" id="signUp">注册</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 获取 DOM 元素
+        const signUpButton = document.getElementById('signUp');
+        const signInButton = document.getElementById('signIn');
+        const container = document.getElementById('container');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+
+        // 1. 切换登录/注册视图的事件监听
+        signUpButton.addEventListener('click', () => {
+            // 添加 CSS 类来触发平移动画
+            container.classList.add("right-panel-active");
+        });
+
+        signInButton.addEventListener('click', () => {
+            // 移除 CSS 类来恢复初始状态
+            container.classList.remove("right-panel-active");
+        });
+
+        // 2. 表单验证和提交拦截 (高级JS应用)
+        function handleFormSubmit(event) {
+            event.preventDefault(); // 阻止表单默认提交
+            const form = event.target;
+            
+            // 简单的客户端验证示例
+            let isValid = true;
+            // 筛选出所有标记为必填的输入框
+            const inputs = form.querySelectorAll('input[required]');
+            
+            inputs.forEach(input => {
+                // 清除之前的错误样式
+                input.style.borderColor = '';
+                input.style.boxShadow = '';
+                
+                if (!input.value.trim()) {
+                    isValid = false;
+                    // 使用高级CSS技巧: 动态添加一个错误样式
+                    input.style.borderColor = 'var(--primary-color)';
+                    input.style.boxShadow = '0 0 5px rgba(255, 65, 108, 0.5)';
+                }
+            });
+
+            if (isValid) {
+                // 模拟提交成功
+                alert(`${form.id === 'login-form' ? '登录' : '注册'}成功! (实际未提交)`);
+                // console.log("表单数据:", new FormData(form));
+            } else {
+                alert("请填写所有必填字段。");
+            }
+        }
+
+        // 事件委托: 监听表单的提交事件
+        loginForm.addEventListener('submit', handleFormSubmit);
+        registerForm.addEventListener('submit', handleFormSubmit);
+
+        // 3. 输入焦点时的JS反馈
+        const allInputs = document.querySelectorAll('input');
+        allInputs.forEach(input => {
+            // 聚焦时添加蓝色阴影
+            input.addEventListener('focus', () => {
+                input.style.boxShadow = '0 0 5px rgba(65, 127, 255, 0.5)';
+                input.style.borderColor = '#ccc';
+            });
+            // 失焦时清除阴影
+            input.addEventListener('blur', () => {
+                input.style.boxShadow = '';
+                // 如果是必填项且为空，恢复错误提醒颜色
+                if (!input.value.trim() && input.hasAttribute('required')) {
+                    input.style.borderColor = 'var(--primary-color)'; 
+                }
+            });
+        });
+    </script>
+</body>
+</html>
