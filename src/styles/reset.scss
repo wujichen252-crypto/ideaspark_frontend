@@ -9,4 +9,5 @@ html, body, #app {
   height: 100%;
   width: 100%;
   overflow-x: hidden;
+  background-color: #000; /* 设置全局背景为黑色，防止缝隙透出白色 */
 }
