@@ -267,24 +267,39 @@ function copyCode(code: string) {
 </script>
 
 <style scoped lang="scss">
+@use "sass:color";
+
+/* Global Variables - Light Theme */
+$primary-color: #4ade80;
+$bg-color: #f6f5f7;
+$sidebar-bg: #ffffff;
+$chat-bg: #f9f9fb;
+$border-color: #e5e7eb;
+$text-primary: #1f2937;
+$text-secondary: #6b7280;
+$card-bg: #ffffff;
+$user-bubble-bg: #dcfce7;
+$ai-bubble-bg: #ffffff;
+
 .create-container {
   display: flex;
   height: 100vh;
-  padding-top: 80px; // Header height
-  background-color: #121212;
-  color: #e0e0e0;
+  /* padding-top: 80px;  Removed to allow sidebar/chat bg to extend to top */
+  background-color: $bg-color;
+  color: $text-primary;
 }
 
 /* Sidebar */
 .sidebar {
   width: 260px;
-  background-color: #1a1a1a;
+  padding-top: 0; /* Removed padding */
+  background-color: $sidebar-bg;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid #333;
+  border-right: 1px solid $border-color;
   
   .sidebar-header {
-    padding: 16px;
+    padding: 80px 16px 16px; /* Added top padding (64px header + 16px) */
   }
   
   .history-list {
@@ -300,16 +315,16 @@ function copyCode(code: string) {
       border-radius: 8px;
       cursor: pointer;
       transition: background 0.2s;
-      color: #aaa;
+      color: $text-secondary;
       
       &:hover {
-        background-color: #2a2a2a;
-        color: #fff;
+        background-color: #f3f4f6;
+        color: $text-primary;
       }
       
       &.active {
-        background-color: #2a2a2a;
-        color: #fff;
+        background-color: #ecfdf5; // light green bg
+        color: $primary-color;
       }
       
       .chat-title {
@@ -323,21 +338,23 @@ function copyCode(code: string) {
   
   .sidebar-footer {
     padding: 16px;
-    border-top: 1px solid #333;
+    border-top: 1px solid $border-color;
   }
 }
 
-/* Chat Area */
+/* Main Chat Area */
 .chat-area {
   flex: 1;
+  padding-top: 0; /* Removed padding to allow header bg to extend to top */
   display: flex;
   flex-direction: column;
   position: relative;
-  background-color: #121212;
+  background-color: $chat-bg;
   
   .chat-header {
-    padding: 16px 24px;
-    border-bottom: 1px solid #333;
+    padding: 80px 24px 16px; /* Added top padding (64px header + 16px) */
+    border-bottom: 1px solid $border-color;
+    background-color: #fff;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -346,6 +363,7 @@ function copyCode(code: string) {
       margin: 0;
       font-size: 18px;
       font-weight: 600;
+      color: $text-primary;
     }
   }
   
@@ -368,7 +386,7 @@ function copyCode(code: string) {
       .logo-icon {
         width: 64px;
         height: 64px;
-        background: #18a058;
+        background: $primary-color;
         border-radius: 16px;
         display: flex;
         align-items: center;
@@ -377,11 +395,13 @@ function copyCode(code: string) {
         font-weight: bold;
         color: #fff;
         margin-bottom: 24px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
       }
       
       h1 {
         margin-bottom: 40px;
         font-size: 24px;
+        color: $text-primary;
       }
       
       .suggestion-grid {
@@ -392,26 +412,29 @@ function copyCode(code: string) {
         width: 100%;
         
         .suggestion-card {
-          background: #1e1e1e;
+          background: $card-bg;
           padding: 16px;
           border-radius: 12px;
-          border: 1px solid #333;
+          border: 1px solid $border-color;
           cursor: pointer;
           transition: all 0.2s;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.05);
           
           &:hover {
-            border-color: #18a058;
-            background: #252525;
+            border-color: $primary-color;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
           }
           
           h3 {
             margin: 0 0 8px 0;
             font-size: 16px;
+            color: $text-primary;
           }
           p {
             margin: 0;
             font-size: 13px;
-            color: #888;
+            color: $text-secondary;
           }
         }
       }
@@ -431,14 +454,17 @@ function copyCode(code: string) {
         align-items: flex-end;
       }
       .text-bubble {
-        background-color: #2a2a2a;
+        background-color: $user-bubble-bg;
+        color: $text-primary;
         border-radius: 12px 0 12px 12px;
+        border: 1px solid color.adjust($user-bubble-bg, $lightness: -5%);
       }
     }
     
     &.ai {
       .text-bubble {
         background-color: transparent;
+        color: $text-primary;
         padding: 0;
       }
     }
@@ -450,13 +476,13 @@ function copyCode(code: string) {
       
       .name {
         font-size: 12px;
-        color: #666;
+        color: $text-secondary;
         margin-bottom: 4px;
       }
       
       .text-bubble {
         padding: 12px 16px;
-        background-color: #2a2a2a; // Default fallback
+        background-color: $ai-bubble-bg;
         border-radius: 0 12px 12px 12px;
         line-height: 1.6;
         white-space: pre-wrap;
@@ -472,6 +498,7 @@ function copyCode(code: string) {
           position: relative;
           border-radius: 8px;
           overflow: hidden;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
           
           .image-actions {
             position: absolute;
@@ -490,21 +517,22 @@ function copyCode(code: string) {
       }
       
       .code-block {
-        background: #1e1e1e;
+        background: #f8fafc;
         border-radius: 8px;
-        border: 1px solid #333;
+        border: 1px solid $border-color;
         overflow: hidden;
         margin-top: 8px;
         width: 100%;
         
         .code-header {
-          background: #252525;
+          background: #f1f5f9;
           padding: 8px 16px;
           display: flex;
           justify-content: space-between;
           align-items: center;
           font-size: 12px;
-          color: #888;
+          color: $text-secondary;
+          border-bottom: 1px solid $border-color;
         }
         
         pre {
@@ -513,6 +541,7 @@ function copyCode(code: string) {
           overflow-x: auto;
           font-family: 'Fira Code', monospace;
           font-size: 13px;
+          color: #333;
         }
       }
     }
@@ -537,7 +566,7 @@ function copyCode(code: string) {
     .disclaimer {
       text-align: center;
       font-size: 12px;
-      color: #444;
+      color: $text-secondary;
       margin-top: 12px;
     }
   }
@@ -551,7 +580,7 @@ function copyCode(code: string) {
   span {
     width: 6px;
     height: 6px;
-    background: #666;
+    background: $text-secondary;
     border-radius: 50%;
     animation: bounce 1.4s infinite ease-in-out;
     

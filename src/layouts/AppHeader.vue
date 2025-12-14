@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted, nextTick, watch, computed } from 'vue'
 import type { MenuOption } from 'naive-ui'
 import { useRouter, useRoute } from 'vue-router'
-import { SearchOutline, PersonOutline } from '@vicons/ionicons5'
+import { PersonOutline } from '@vicons/ionicons5'
 import gsap from 'gsap'
 
 import { useUserStore } from '@/store'
@@ -23,7 +23,7 @@ const menuOptions = computed<MenuOption[]>(() => {
   // 内部页面显示完整功能菜单
   return [
     { key: 'dashboard', label: '控制台' },
-    { key: 'market', label: '发现项目' },
+    { key: 'market', label: '项目市场' },
     { key: 'community', label: '社区动态' },
     { key: 'create', label: 'AI 工坊' }
   ]
@@ -298,11 +298,7 @@ function initAnimation() {
           @update:value="onUpdateMenu"
           class="custom-menu"
         />
-        <n-space align="center" :size="12" style="margin-left: 16px" v-if="route.path !== '/'">
-          <n-button quaternary circle>
-            <template #icon><n-icon><SearchOutline /></n-icon></template>
-          </n-button>
-
+        <n-space align="center" :size="12" style="margin-left: 52px" v-if="route.path !== '/'">
           <!-- 已登录状态：显示头像 -->
           <n-dropdown
             v-if="userStore.isLoggedIn"
@@ -346,7 +342,7 @@ function initAnimation() {
   left: 0;
   right: 0;
   z-index: 1000;
-  height: 80px;
+  height: 64px;
   display: flex;
   align-items: center;
   background: transparent;
@@ -355,7 +351,7 @@ function initAnimation() {
   transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 
   &.is-scrolled {
-    height: 60px;
+    height: 56px;
     background: rgba(24, 24, 28, 0.95);
     backdrop-filter: blur(20px);
     /* border-bottom: 1px solid rgba(255, 255, 255, 0.08); 移除边框以消除“小白缝” */
@@ -372,7 +368,7 @@ function initAnimation() {
   width: 100%;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;

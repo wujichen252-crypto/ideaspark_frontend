@@ -95,12 +95,12 @@ import { HeartOutline, ChatbubbleOutline, ShareSocialOutline } from '@vicons/ion
 .community-container {
   min-height: 100vh;
   background-color: #f5f7fa;
-  padding-top: 80px;
+  padding-top: 0;
 }
 
 .header-section {
   background: #fff;
-  padding: 40px 0;
+  padding: 104px 0 40px;
   text-align: center;
   margin-bottom: 24px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);

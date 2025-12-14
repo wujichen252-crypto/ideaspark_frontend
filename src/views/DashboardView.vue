@@ -111,14 +111,14 @@ const userStore = useUserStore()
 .dashboard-container {
   min-height: 100vh;
   background-color: #f5f7fa;
-  padding-top: 80px; /* Header height */
+  padding-top: 0; /* Removed padding to allow banner to extend to top */
 }
 
 .welcome-banner {
   background: linear-gradient(135deg, #18a058 0%, #2080f0 100%);
   color: #fff;
-  padding: 40px 24px;
-  margin-bottom: 32px;
+  padding: 104px 24px 40px; /* Added top padding to account for fixed header (64px + 40px) */
+  margin-bottom: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -149,7 +149,7 @@ const userStore = useUserStore()
 .dashboard-content {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 24px 40px;
+  padding: 24px 24px 40px;
 }
 
 .stat-card {
