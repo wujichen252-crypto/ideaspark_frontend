@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted, nextTick, watch, computed } from 'vue'
 import type { MenuOption } from 'naive-ui'
 import { useRouter, useRoute } from 'vue-router'
-import { PersonOutline } from '@vicons/ionicons5'
+import { PersonOutline, SearchOutline } from '@vicons/ionicons5'
 import gsap from 'gsap'
 
 import { useUserStore } from '@/store'
@@ -34,7 +34,7 @@ watch(() => route.path, (path) => {
   if (path === '/dashboard') activeKey.value = 'dashboard'
   else if (path === '/market') activeKey.value = 'market'
   else if (path === '/community') activeKey.value = 'community'
-  else if (path === '/create') activeKey.value = 'create'
+  else if (path.startsWith('/ai') || path === '/create') activeKey.value = 'create'
   else activeKey.value = null
 }, { immediate: true })
 
@@ -55,7 +55,7 @@ function onUpdateMenu(key: string) {
   if (key === 'dashboard') router.push('/dashboard')
   if (key === 'market') router.push('/market')
   if (key === 'community') router.push('/community')
-  if (key === 'create') router.push('/create')
+  if (key === 'create') router.push('/ai/workshop')
 }
 
 /**
@@ -224,73 +224,72 @@ function initAnimation() {
     aria-label="顶部导航栏"
   >
     <div class="app-header__content">
-      <!-- Logo 区域容器 -->
-      <div class="brand-logo" @click="onUpdateMenu('home')">
+      <!-- 1. Left: Logo -->
+      <div class="header-left">
+        <div class="brand-logo" @click="onUpdateMenu('home')">
+          <!-- 粒子层 -->
+          <div class="particles-container">
+            <div
+              v-for="i in particles"
+              :key="i"
+              class="energy-particle"
+              :style="{
+                top: `${Math.random() * 40}px`,
+                left: `${Math.random() * 150 + 50}px`,
+                backgroundColor: Math.random() > 0.5 ? '#4ADE80' : '#FFFFFF'
+              }"
+            ></div>
+          </div>
 
-        <!-- 粒子层 (仅在动画时可见) -->
-        <div class="particles-container">
-          <div
-            v-for="i in particles"
-            :key="i"
-            class="energy-particle"
-            :style="{
-              top: `${Math.random() * 40}px`,
-              left: `${Math.random() * 150 + 50}px`,
-              backgroundColor: Math.random() > 0.5 ? '#4ADE80' : '#FFFFFF'
-            }"
-          ></div>
-        </div>
+          <!-- 滚动后 Logo -->
+          <div class="scrolled-logo-container">
+             <svg class="art-pattern" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <mask id="hollow-mask">
+                  <rect x="0" y="0" width="80" height="80" fill="white" />
+                  <text
+                    x="40" y="53"
+                    text-anchor="middle"
+                    font-family="'Orbitron', sans-serif"
+                    font-weight="900"
+                    font-size="30"
+                    fill="black"
+                    letter-spacing="1"
+                    class="is-text"
+                  >IS</text>
+                </mask>
+              </defs>
+              <rect
+                x="15" y="15" width="50" height="50" rx="8"
+                fill="#4ADE80"
+                mask="url(#hollow-mask)"
+                class="solid-square"
+              />
+            </svg>
+          </div>
 
-        <!-- 1. 滚动后的新图案 (绝对定位) -->
-        <div class="scrolled-logo-container">
-           <svg class="art-pattern" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <mask id="hollow-mask">
-                <rect x="0" y="0" width="80" height="80" fill="white" />
-                <text
-                  x="40" y="53"
-                  text-anchor="middle"
-                  font-family="'Orbitron', sans-serif"
-                  font-weight="900"
-                  font-size="30"
-                  fill="black"
-                  letter-spacing="1"
-                  class="is-text"
-                >IS</text>
-              </mask>
-            </defs>
-            <rect
-              x="15" y="15" width="50" height="50" rx="8"
-              fill="#4ADE80"
-              mask="url(#hollow-mask)"
-              class="solid-square"
-            />
-          </svg>
-        </div>
-
-        <!-- 2. 初始状态的内容 (相对定位) -->
-        <div class="initial-logo-container">
-          <div class="logo-icon-wrapper">
-            <div class="logo-icon">
-              <div class="logo-spark"></div>
+          <!-- 初始 Logo -->
+          <div class="initial-logo-container">
+            <div class="logo-icon-wrapper">
+              <div class="logo-icon">
+                <div class="logo-spark"></div>
+              </div>
+            </div>
+            <div class="logo-content">
+              <div class="logo-title">
+                <span class="logo-title-char">意</span>
+                <span class="logo-title-char">念</span>
+                <span class="logo-title-char">方</span>
+                <span class="logo-title-char">舟</span>
+              </div>
+              <div class="logo-subtitle">IDEASPARK</div>
             </div>
           </div>
-          <div class="logo-content">
-            <!-- 将文字拆分为单独的字符以便动画 -->
-            <div class="logo-title">
-              <span class="logo-title-char">意</span>
-              <span class="logo-title-char">念</span>
-              <span class="logo-title-char">方</span>
-              <span class="logo-title-char">舟</span>
-            </div>
-            <div class="logo-subtitle">IDEASPARK</div>
-          </div>
         </div>
-
       </div>
 
-      <!-- 导航菜单 -->
-      <div class="nav-container">
+      <!-- 2. Center: Menu -->
+      <div class="header-center">
         <n-menu
           mode="horizontal"
           :options="menuOptions"
@@ -298,10 +297,19 @@ function initAnimation() {
           @update:value="onUpdateMenu"
           class="custom-menu"
         />
-        <n-space align="center" :size="12" style="margin-left: 52px" v-if="route.path !== '/'">
-          <!-- 已登录状态：显示头像 -->
+      </div>
+
+      <!-- 3. Right: User Actions -->
+      <div class="header-right">
+        <n-space align="center" :size="16" v-if="route.path !== '/'">
+          <n-button circle quaternary class="icon-btn">
+             <template #icon><n-icon><SearchOutline /></n-icon></template>
+          </n-button>
+          
+          <!-- 已登录状态 -->
           <n-dropdown
             v-if="userStore.isLoggedIn"
+            trigger="hover"
             :options="[
               { label: '个人中心', key: 'profile' },
               { label: '退出登录', key: 'logout' }
@@ -314,20 +322,21 @@ function initAnimation() {
               }
             }"
           >
-            <n-avatar
-              round
-              size="small"
-              :src="userStore.userInfo?.avatar"
-              style="cursor: pointer"
-            />
+            <div class="user-avatar-wrapper">
+              <n-avatar
+                round
+                size="small"
+                :src="userStore.userInfo?.avatar"
+                style="cursor: pointer;"
+              />
+              <span class="username ml-2">{{ userStore.userInfo?.username }}</span>
+            </div>
           </n-dropdown>
 
-          <!-- 未登录状态：显示图标 -->
-          <n-button v-else quaternary circle @click="userStore.isLoggedIn ? router.push('/dashboard') : router.push('/login')">
-             <template #icon>
-               <n-icon v-if="route.path === '/'"><PersonOutline /></n-icon>
-               <n-icon v-else><PersonOutline /></n-icon>
-             </template>
+          <!-- 未登录状态 -->
+          <n-button v-else quaternary class="login-btn" @click="router.push('/login')">
+             <template #icon><n-icon><PersonOutline /></n-icon></template>
+             登录 / 注册
           </n-button>
         </n-space>
       </div>
@@ -346,35 +355,105 @@ function initAnimation() {
   display: flex;
   align-items: center;
   background: transparent;
-  /* border-bottom: 1px solid rgba(255, 255, 255, 0); */
   border-bottom: none;
-  transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
+  /* 滚动状态 / 内部页面状态 (暗灰色主题) */
   &.is-scrolled {
-    height: 56px;
-    background: rgba(24, 24, 28, 0.95);
+    height: 64px; /* 保持 64px 高度，与页面 padding-top 对齐 */
+    background: rgba(24, 24, 28, 0.98); /* 略微增加不透明度 */
     backdrop-filter: blur(20px);
-    /* border-bottom: 1px solid rgba(255, 255, 255, 0.08); 移除边框以消除“小白缝” */
-    border-bottom: none;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: none; /* 移除阴影，避免与下方内容头部重叠产生视觉脏感 */
 
     .app-header__content {
-      padding-left: 12px;
+      max-width: 100%; /* 全宽显示，适应控制台等全屏布局 */
+      padding: 0 24px;
+    }
+
+    /* Logo 适配 */
+    .logo-title {
+      color: #f0f0f0; /* 浅色文字 */
+    }
+    
+    /* 菜单适配 */
+    :deep(.custom-menu) {
+      .n-menu-item-content-header {
+        color: rgba(255, 255, 255, 0.85) !important;
+      }
+      .n-menu-item-content:hover .n-menu-item-content-header,
+      .n-menu-item-content--selected .n-menu-item-content-header {
+        color: #4ADE80 !important;
+      }
+      
+      /* Hover 背景调整 */
+      .n-menu-item-content:hover::before {
+        background-color: rgba(255, 255, 255, 0.08) !important;
+      }
+    }
+
+    /* 右侧图标/文字适配 */
+    .icon-btn {
+      color: #fff;
+      &:hover { background-color: rgba(255,255,255,0.1) !important; }
+    }
+    
+    .login-btn {
+      color: #fff !important;
+      &:hover { color: #4ADE80 !important; }
+    }
+
+    .user-avatar-wrapper {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255,255,255,0.05);
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      
+      .n-avatar {
+        border: 1px solid rgba(255,255,255,0.2) !important;
+      }
+
+      .username {
+        color: #fff;
+      }
     }
   }
 }
 
 .app-header__content {
   width: 100%;
-  max-width: 1280px;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 0 32px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 100%;
   position: relative;
-  transition: padding-left 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: all 0.3s ease;
+}
+
+/* ... 保持原有样式不变 ... */
+.header-left {
+  flex: 0 0 240px;
+  display: flex;
+  align-items: center;
+}
+
+.header-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  height: 100%;
+}
+
+.header-right {
+  flex: 0 0 240px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 .brand-logo {
@@ -387,8 +466,7 @@ function initAnimation() {
   width: 200px;
 }
 
-/* --- 容器管理 --- */
-
+/* ... Container Management ... */
 .initial-logo-container {
   display: flex;
   align-items: center;
@@ -398,7 +476,6 @@ function initAnimation() {
   transform: translateY(-50%);
   transform-origin: left center;
   width: 100%;
-  /* 移除 CSS transition/opacity，交由 GSAP 控制 */
 }
 
 .scrolled-logo-container {
@@ -408,7 +485,6 @@ function initAnimation() {
   margin-top: -25px;
   width: 50px;
   height: 50px;
-  /* 初始由 GSAP 设为不可见 (autoAlpha: 0) */
   opacity: 0;
   visibility: hidden;
   display: flex;
@@ -423,7 +499,7 @@ function initAnimation() {
   }
 }
 
-/* --- 粒子层 --- */
+/* ... Particles ... */
 .particles-container {
   position: absolute;
   top: 0;
@@ -443,8 +519,7 @@ function initAnimation() {
   opacity: 0;
 }
 
-/* --- 初始 Logo 组件样式 --- */
-
+/* ... Logo Components ... */
 .logo-icon-wrapper {
   width: 24px;
   height: 24px;
@@ -496,14 +571,15 @@ function initAnimation() {
 .logo-title {
   font-size: 18px;
   font-weight: 900;
-  color: #f0f0f0;
+  color: #f0f0f0; /* Default dark mode / home page */
   letter-spacing: 2px;
   font-family: 'Orbitron', system-ui, sans-serif;
-  display: flex; /* Flex 布局让字符横向排列 */
+  display: flex;
+  transition: color 0.3s ease;
 }
 
 .logo-title-char {
-  display: inline-block; /* 允许 transform */
+  display: inline-block;
   margin-right: 1px;
 }
 
@@ -518,13 +594,7 @@ function initAnimation() {
   font-family: 'Montserrat', sans-serif;
 }
 
-/* --- 导航菜单样式 --- */
-
-.nav-container {
-  display: flex;
-  align-items: center;
-}
-
+/* ... Menu Styles ... */
 :deep(.custom-menu) {
   --n-item-text-color-active: #ffffff !important;
   --n-item-text-color-active-hover: #4ADE80 !important;
@@ -534,30 +604,40 @@ function initAnimation() {
   --n-item-icon-color-active-hover: #4ADE80 !important;
 
   background-color: transparent !important;
+  display: flex;
+  align-items: center;
 
   .n-menu-item-content {
-    padding: 0 12px !important;
+    padding: 0 20px !important;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
 
     &:hover::before {
-      background-color: rgba(255, 255, 255, 0.05) !important;
-      border-radius: 4px;
+      background-color: rgba(255, 255, 255, 0.08) !important;
+      border-radius: 20px;
     }
 
     &::before {
       background-color: transparent !important;
+      left: 4px;
+      right: 4px;
+      transition: background-color 0.3s ease;
     }
   }
 
   .n-menu-item-content-header {
     font-weight: 500;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     font-size: 15px;
     transition: all 0.3s ease;
-    color: #ffffff !important;
+    color: rgba(255, 255, 255, 0.85) !important;
   }
 
   .n-menu-item-content--selected .n-menu-item-content-header {
     color: #ffffff !important;
+    font-weight: 600;
   }
 
   .n-menu-item-content:hover .n-menu-item-content-header,
@@ -565,4 +645,50 @@ function initAnimation() {
     color: #4ADE80 !important;
   }
 }
+
+.user-avatar-wrapper {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px 4px 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 30px;
+  transition: all 0.3s;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .username {
+    color: #fff;
+    font-size: 14px;
+    margin-right: 8px;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: color 0.3s;
+  }
+}
+
+.login-btn {
+  color: #fff !important;
+  font-weight: 500;
+  transition: color 0.3s;
+  
+  &:hover {
+    color: #4ADE80 !important;
+  }
+}
+
+.icon-btn {
+  color: #fff; /* Default color */
+  transition: color 0.3s;
+  &:hover {
+    background-color: rgba(255,255,255,0.1) !important;
+  }
+}
+
+.ml-2 { margin-left: 8px; }
+
 </style>

@@ -120,7 +120,7 @@
 
       <n-grid :x-gap="24" :y-gap="24" cols="1 s:2 m:3 l:3" responsive="screen">
         <n-grid-item v-for="item in filteredProjectList" :key="item.id">
-          <div class="project-card" @click="router.push({ name: 'ProjectDetail', params: { id: item.id } })">
+          <div class="project-card" @click="goToProject(item.id)">
             <div class="card-thumb" :style="{ backgroundImage: `url(${item.cover})` }">
               <div class="card-overlay">
                 <n-button quaternary circle color="#fff" @click.stop>
@@ -131,7 +131,7 @@
             <div class="card-body">
               <h3 class="card-title">{{ item.title }}</h3>
               <div class="card-meta">
-                <span class="author">
+                <span class="author" @click.stop="router.push(`/user/${item.authorId}`)" style="cursor: pointer">
                   <n-avatar round size="small" :src="item.avatar" />
                   {{ item.author }}
                 </span>
@@ -168,6 +168,15 @@ const sortValue = ref('default')
 const categoryValue = ref('all')
 const creatorsScrollRef = ref<HTMLElement | null>(null)
 
+/**
+ * 跳转到项目详情页
+ * @param id 项目ID
+ */
+const goToProject = (id: number | string) => {
+  console.log('Navigating to project:', id)
+  router.push(`/project/${id}`)
+}
+
 const categoryOptions = [
   { label: '全部分类', value: 'all' },
   { label: '前端开发', value: 'frontend' },
@@ -201,6 +210,7 @@ const allProjects = Array.from({ length: 12 }).map((_, i) => {
     id: i,
     title: `${titles[i % titles.length]} V${i + 1}`,
     author: `Creator_${i}`,
+    authorId: i,
     avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${i}`,
     cover: `https://picsum.photos/seed/${i + 100}/600/400`,
     likes: Math.floor(Math.random() * 1000),

@@ -55,7 +55,7 @@
                 v-for="item in displayUserInfo.projects" 
                 :key="item.id" 
                 class="project-card"
-                @click="router.push(`/project/${item.id}`)"
+                @click="goToProject(item.id)"
               >
                 <div class="card-thumb" :style="{ backgroundImage: `url(${item.cover})` }">
                   <div class="card-overlay"></div>
@@ -91,7 +91,7 @@
                 v-for="item in displayUserInfo.starredProjects"
                 :key="item.id"
                 class="project-card"
-                @click="router.push(`/project/${item.id}`)"
+                @click="goToProject(item.id)"
               >
                 <div class="card-thumb" :style="{ backgroundImage: `url(${item.cover})` }">
                   <div class="card-overlay"></div>
@@ -148,6 +148,14 @@ import { useUserStore } from '@/store'
 const router = useRouter()
 const userStore = useUserStore()
 
+/**
+ * 跳转到项目详情页
+ * @param id 项目ID
+ */
+const goToProject = (id: string | number) => {
+  router.push(`/project/${id}`)
+}
+
 // 合并 store 数据与 mock 数据，确保展示效果
 const displayUserInfo = computed(() => {
   const storeUser = userStore.userInfo || {}
@@ -167,43 +175,21 @@ const displayUserInfo = computed(() => {
       followers: 0,
       following: 0
     },
-    projects: [
-      {
-        id: '101',
-        title: '示例项目：个人博客',
-        desc: '这是一个使用 Vue 3 和 Vite 构建的个人博客系统。',
-        cover: 'https://picsum.photos/seed/p101/400/300',
-        views: '1.2k',
-        likes: 120
-      }
-    ],
-    starredProjects: [
-      {
-        id: '201',
-        title: '优秀的开源库',
-        desc: '这是一个值得收藏的工具库，提供了丰富的功能。',
-        cover: 'https://picsum.photos/seed/p201/400/300',
-        views: '3.4k',
-        likes: 890
-      },
-       {
-        id: '202',
-        title: '灵感集合',
-        desc: 'UI 设计灵感来源，色彩搭配参考。',
-        cover: 'https://picsum.photos/seed/p202/400/300',
-        views: '5.6k',
-        likes: 1200
-      }
-    ]
+    projects: [] as any[], // Add type annotation
+    starredProjects: [] as any[] // Add starredProjects
   }
+
+  // Safe access helper
+  const getStats = (user: any) => user.stats || {}
+  const getProjects = (user: any) => user.projects || []
+  const getStarred = (user: any) => user.starredProjects || []
 
   return {
     ...defaultUser,
     ...storeUser,
-    // 如果 storeUser 里有 stats 但不完整，这里做一个简单的合并
-    stats: { ...defaultUser.stats, ...(storeUser.stats || {}) },
-    // 如果 storeUser 里有 projects，覆盖默认的
-    projects: storeUser.projects || defaultUser.projects
+    stats: { ...defaultUser.stats, ...getStats(storeUser) },
+    projects: getProjects(storeUser).length ? getProjects(storeUser) : defaultUser.projects,
+    starredProjects: getStarred(storeUser).length ? getStarred(storeUser) : defaultUser.starredProjects
   }
 })
 </script>

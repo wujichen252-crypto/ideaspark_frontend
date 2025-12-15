@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, RouterView } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 
 const routes: RouteRecordRaw[] = [
@@ -18,9 +18,68 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/MarketView.vue')
   },
   {
+    path: '/ai',
+    component: RouterView,
+    children: [
+      {
+        path: '',
+        redirect: 'workshop'
+      },
+      {
+        path: 'intro',
+        name: 'AiLanding',
+        component: () => import('@/views/ai/AiLandingPage.vue')
+      },
+      {
+        path: 'workshop',
+        name: 'AiWorkshop',
+        component: () => import('@/views/ai/components/WorkshopDashboard.vue')
+      },
+      {
+        path: 'workshop/start',
+        name: 'AiProjectCreate',
+        component: () => import('@/views/ai/project/AiProjectCreate.vue')
+      },
+      {
+        path: 'workshop/project/:id',
+        component: () => import('@/views/ai/project/AiProjectLayout.vue'),
+        children: [
+          {
+            path: '',
+            redirect: { name: 'AiProjectHome' }
+          },
+          {
+            path: 'board',
+            name: 'AiProjectBoard',
+            component: () => import('@/views/ai/project/AiProjectBoard.vue')
+          },
+          {
+            path: 'workbench',
+            name: 'AiProjectWorkbench',
+            component: () => import('@/views/ai/project/AiProjectWorkbench.vue')
+          },
+          {
+            path: 'home',
+            name: 'AiProjectHome',
+            component: () => import('@/views/ai/project/AiProjectHome.vue')
+          },
+          {
+            path: 'settings',
+            name: 'AiProjectSettings',
+            component: () => import('@/views/ai/project/AiProjectSettings.vue')
+          }
+        ]
+      },
+      {
+        path: 'chat',
+        name: 'AiChat',
+        component: () => import('@/views/ai/AiChatView.vue')
+      }
+    ]
+  },
+  {
     path: '/create',
-    name: 'Create',
-    component: () => import('@/views/CreateView.vue')
+    redirect: '/ai/workshop/start'
   },
   {
     path: '/community',

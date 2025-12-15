@@ -62,7 +62,7 @@
                 v-for="item in userData.projects" 
                 :key="item.id" 
                 class="project-card"
-                @click="router.push(`/project/${item.id}`)"
+                @click="goToProject(item.id)"
               >
                 <div class="card-thumb" :style="{ backgroundImage: `url(${item.cover})` }">
                   <div class="card-overlay"></div>
@@ -119,6 +119,14 @@ import {
 const route = useRoute()
 const router = useRouter()
 // const userId = route.params.id // 实际开发中用于API请求
+
+/**
+ * 跳转到项目详情页
+ * @param id 项目ID
+ */
+const goToProject = (id: string | number) => {
+  router.push(`/project/${id}`)
+}
 
 // 模拟用户数据
 const userData = ref({
@@ -193,7 +201,7 @@ onMounted(() => {
 .profile-content {
   max-width: 1000px;
   margin: 0 auto;
-  margin-top: 60px;
+  margin-top: 24px;
   padding: 0 24px;
   position: relative;
   z-index: 1;
