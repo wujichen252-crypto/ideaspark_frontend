@@ -1,7 +1,7 @@
 <template>
   <div class="profile-container">
     <!-- 顶部背景图 -->
-    <div class="profile-cover" :style="{ backgroundImage: `url(${displayUserInfo.cover})` }"></div>
+    <div class="profile-cover" :style="{ backgroundImage: `url(${userData.cover})` }"></div>
 
     <div class="profile-content">
       <div class="profile-header">
@@ -9,38 +9,45 @@
           <n-avatar
             round
             :size="120"
-            :src="displayUserInfo.avatar"
+            :src="userData.avatar"
             class="user-avatar"
           />
         </div>
         
         <div class="user-details">
           <div class="name-row">
-            <h1 class="username">{{ displayUserInfo.username }}</h1>
-            <n-tag type="success" size="small" round bordered>{{ displayUserInfo.role }}</n-tag>
+            <h1 class="username">{{ userData.username }}</h1>
+            <n-tag type="info" size="small" round bordered>{{ userData.role }}</n-tag>
           </div>
-          <p class="bio">{{ displayUserInfo.bio }}</p>
+          <p class="bio">{{ userData.bio }}</p>
           
           <div class="stats-row">
             <div class="stat-item">
-              <span class="count">{{ displayUserInfo.stats.likes }}</span>
+              <span class="count">{{ userData.stats.likes }}</span>
               <span class="label">获赞</span>
             </div>
             <div class="stat-item">
-              <span class="count">{{ displayUserInfo.stats.followers }}</span>
+              <span class="count">{{ userData.stats.followers }}</span>
               <span class="label">粉丝</span>
             </div>
             <div class="stat-item">
-              <span class="count">{{ displayUserInfo.stats.following }}</span>
+              <span class="count">{{ userData.stats.following }}</span>
               <span class="label">关注</span>
             </div>
           </div>
         </div>
 
         <div class="action-buttons">
-          <n-button type="primary" round ghost>编辑资料</n-button>
+          <n-button type="primary" round>
+            <template #icon><n-icon :component="AddOutline" /></template>
+            关注
+          </n-button>
+          <n-button round secondary>
+            <template #icon><n-icon :component="ChatbubbleOutline" /></template>
+            私信
+          </n-button>
           <n-button circle secondary>
-            <template #icon><n-icon :component="SettingsOutline" /></template>
+            <template #icon><n-icon :component="ShareSocialOutline" /></template>
           </n-button>
         </div>
       </div>
@@ -49,10 +56,10 @@
 
       <div class="profile-tabs">
         <n-tabs type="line" animated size="large">
-          <n-tab-pane name="projects" :tab="`我的项目 (${displayUserInfo.projects.length})`">
-            <div class="projects-grid" v-if="displayUserInfo.projects.length > 0">
+          <n-tab-pane name="projects" :tab="`公开项目 (${userData.projects.length})`">
+            <div class="projects-grid" v-if="userData.projects.length > 0">
               <div 
-                v-for="item in displayUserInfo.projects" 
+                v-for="item in userData.projects" 
                 :key="item.id" 
                 class="project-card"
                 @click="router.push(`/project/${item.id}`)"
@@ -69,62 +76,26 @@
                   </div>
                 </div>
               </div>
-              <!-- 添加新项目卡片 -->
-              <div class="add-project-card" @click="router.push('/create')">
-                <n-icon :component="AddOutline" size="48" color="#d1d5db" />
-                <span class="add-text">创建新项目</span>
-              </div>
             </div>
             <div class="empty-state" v-else>
-              <n-empty description="暂无项目">
-                <template #extra>
-                  <n-button size="small" type="primary" @click="router.push('/create')">
-                    创建新项目
-                  </n-button>
-                </template>
-              </n-empty>
+              <n-empty description="该用户暂无公开项目" />
             </div>
           </n-tab-pane>
-          <n-tab-pane name="stars" :tab="`收藏夹 (${displayUserInfo.starredProjects.length})`">
-            <div class="projects-grid" v-if="displayUserInfo.starredProjects.length > 0">
-               <div
-                v-for="item in displayUserInfo.starredProjects"
-                :key="item.id"
-                class="project-card"
-                @click="router.push(`/project/${item.id}`)"
-              >
-                <div class="card-thumb" :style="{ backgroundImage: `url(${item.cover})` }">
-                  <div class="card-overlay"></div>
-                </div>
-                <div class="card-content">
-                  <h3 class="card-title">{{ item.title }}</h3>
-                  <p class="card-desc">{{ item.desc }}</p>
-                  <div class="card-meta">
-                    <span class="meta-item"><n-icon :component="EyeOutline" /> {{ item.views }}</span>
-                    <span class="meta-item"><n-icon :component="HeartOutline" /> {{ item.likes }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="empty-state" v-else>
-              <n-empty description="还没有收藏任何内容" />
-            </div>
-          </n-tab-pane>
-          <n-tab-pane name="about" tab="关于我">
+          <n-tab-pane name="about" tab="详细资料">
             <div class="about-content">
               <div class="info-group">
-                <h3>个人介绍</h3>
-                <p>{{ displayUserInfo.description || '暂无详细介绍' }}</p>
+                <h3>关于我</h3>
+                <p>{{ userData.description }}</p>
               </div>
-              <div class="info-group" v-if="displayUserInfo.techStack && displayUserInfo.techStack.length">
+              <div class="info-group">
                 <h3>技术栈</h3>
                 <div class="tech-tags">
-                  <n-tag v-for="tech in displayUserInfo.techStack" :key="tech" size="small" round>{{ tech }}</n-tag>
+                  <n-tag v-for="tech in userData.techStack" :key="tech" size="small" round>{{ tech }}</n-tag>
                 </div>
               </div>
               <div class="info-group">
                 <h3>加入时间</h3>
-                <p>{{ displayUserInfo.joinDate || '未知' }}</p>
+                <p>{{ userData.joinDate }}</p>
               </div>
             </div>
           </n-tab-pane>
@@ -135,76 +106,66 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { 
-  SettingsOutline, 
-  AddOutline,
+  AddOutline, 
+  ChatbubbleOutline, 
+  ShareSocialOutline,
   EyeOutline,
   HeartOutline
 } from '@vicons/ionicons5'
-import { useUserStore } from '@/store'
 
+const route = useRoute()
 const router = useRouter()
-const userStore = useUserStore()
+// const userId = route.params.id // 实际开发中用于API请求
 
-// 合并 store 数据与 mock 数据，确保展示效果
-const displayUserInfo = computed(() => {
-  const storeUser = userStore.userInfo || {}
-  
-  // 默认 Mock 数据
-  const defaultUser = {
-    username: '我的用户名',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Me',
-    role: '开发者',
-    bio: '编程改变世界，代码创造未来。',
-    cover: 'https://picsum.photos/seed/my_cover/1200/400',
-    description: '这是一段关于我的详细介绍。我是一名热爱技术的开发者，喜欢探索新的领域。',
-    joinDate: '2024-01-01',
-    techStack: ['Vue 3', 'TypeScript', 'Node.js'],
-    stats: {
-      likes: 0,
-      followers: 0,
-      following: 0
+// 模拟用户数据
+const userData = ref({
+  id: '1',
+  username: 'TechMaster',
+  avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=TechMaster',
+  role: '资深开发者',
+  bio: '热爱开源，专注于 Vue3 生态与 AI 应用开发。',
+  cover: 'https://picsum.photos/seed/user_cover/1200/400',
+  description: '全栈开发工程师，拥有 5 年前端开发经验，3 年后端开发经验。热衷于探索新技术，分享技术心得。',
+  joinDate: '2022-05-12',
+  techStack: ['Vue 3', 'React', 'Node.js', 'Python', 'TensorFlow'],
+  stats: {
+    likes: '12.5k',
+    followers: '3,240',
+    following: '128'
+  },
+  projects: [
+    {
+      id: '1',
+      title: 'AI 创意生成器',
+      desc: '基于大模型的创意辅助工具，一键生成营销文案。',
+      cover: 'https://picsum.photos/seed/p1/400/300',
+      views: '12.5k',
+      likes: 864
     },
-    projects: [
-      {
-        id: '101',
-        title: '示例项目：个人博客',
-        desc: '这是一个使用 Vue 3 和 Vite 构建的个人博客系统。',
-        cover: 'https://picsum.photos/seed/p101/400/300',
-        views: '1.2k',
-        likes: 120
-      }
-    ],
-    starredProjects: [
-      {
-        id: '201',
-        title: '优秀的开源库',
-        desc: '这是一个值得收藏的工具库，提供了丰富的功能。',
-        cover: 'https://picsum.photos/seed/p201/400/300',
-        views: '3.4k',
-        likes: 890
-      },
-       {
-        id: '202',
-        title: '灵感集合',
-        desc: 'UI 设计灵感来源，色彩搭配参考。',
-        cover: 'https://picsum.photos/seed/p202/400/300',
-        views: '5.6k',
-        likes: 1200
-      }
-    ]
-  }
+    {
+      id: '2',
+      title: 'Vue3 Admin Pro',
+      desc: '开箱即用的中后台管理系统模板，集成最新技术栈。',
+      cover: 'https://picsum.photos/seed/p2/400/300',
+      views: '8.2k',
+      likes: 520
+    },
+    {
+      id: '3',
+      title: 'DataV 可视化大屏',
+      desc: '基于 ECharts 的数据可视化大屏解决方案。',
+      cover: 'https://picsum.photos/seed/p3/400/300',
+      views: '5.6k',
+      likes: 330
+    }
+  ]
+})
 
-  return {
-    ...defaultUser,
-    ...storeUser,
-    // 如果 storeUser 里有 stats 但不完整，这里做一个简单的合并
-    stats: { ...defaultUser.stats, ...(storeUser.stats || {}) },
-    // 如果 storeUser 里有 projects，覆盖默认的
-    projects: storeUser.projects || defaultUser.projects
-  }
+onMounted(() => {
+  window.scrollTo(0, 0)
 })
 </script>
 
@@ -232,7 +193,7 @@ const displayUserInfo = computed(() => {
 .profile-content {
   max-width: 1000px;
   margin: 0 auto;
-  margin-top: 60px; /* 关键调整：正值 margin 避免重叠 */
+  margin-top: 60px;
   padding: 0 24px;
   position: relative;
   z-index: 1;
@@ -267,6 +228,7 @@ const displayUserInfo = computed(() => {
         font-size: 2.2rem;
         font-weight: 800;
         color: #1f2937;
+        text-shadow: 0 2px 4px rgba(255,255,255,0.8);
       }
     }
     
@@ -375,36 +337,6 @@ const displayUserInfo = computed(() => {
         gap: 4px;
       }
     }
-  }
-}
-
-.add-project-card {
-  background: #f9fafb;
-  border: 2px dashed #d1d5db;
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 280px; /* 匹配项目卡片高度 */
-  cursor: pointer;
-  transition: all 0.3s ease;
-  gap: 12px;
-
-  &:hover {
-    border-color: #6366f1; /* 主题色 */
-    background: #eff6ff;
-    
-    .add-text {
-      color: #6366f1;
-    }
-  }
-
-  .add-text {
-    font-size: 14px;
-    font-weight: 600;
-    color: #6b7280;
-    transition: color 0.3s ease;
   }
 }
 

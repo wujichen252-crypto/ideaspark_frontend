@@ -120,10 +120,10 @@
 
       <n-grid :x-gap="24" :y-gap="24" cols="1 s:2 m:3 l:3" responsive="screen">
         <n-grid-item v-for="item in filteredProjectList" :key="item.id">
-          <div class="project-card">
+          <div class="project-card" @click="router.push({ name: 'ProjectDetail', params: { id: item.id } })">
             <div class="card-thumb" :style="{ backgroundImage: `url(${item.cover})` }">
               <div class="card-overlay">
-                <n-button quaternary circle color="#fff">
+                <n-button quaternary circle color="#fff" @click.stop>
                   <template #icon><n-icon :component="HeartOutline" /></template>
                 </n-button>
               </div>
@@ -158,8 +158,10 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { SearchOutline, HeartOutline, Heart, ChevronForwardOutline, ChevronBackOutline, ArrowForwardOutline } from '@vicons/ionicons5'
 
+const router = useRouter()
 const searchQuery = ref('')
 const page = ref(1)
 const sortValue = ref('default')
