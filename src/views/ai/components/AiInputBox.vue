@@ -108,6 +108,7 @@ function onSelectPrompt(val: string) {
   max-width: 900px;
   margin: 0 auto;
   width: 100%;
+  box-sizing: border-box;
   
   /* Mini 模式适配 */
   &.mini {

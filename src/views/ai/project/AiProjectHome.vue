@@ -52,7 +52,7 @@
             <n-timeline>
               <n-timeline-item type="success" title="项目初始化" :time="formatDate(store.projectInfo.updatedAt)" content="创建了项目并完成了基础配置。" />
               <n-timeline-item type="info" title="进入构思阶段" :time="formatDate(store.projectInfo.updatedAt + 100000)" content="AI 助手协助梳理了核心功能点。" />
-              <n-timeline-item v-if="store.currentStage !== 'idea'" type="warning" title="进入规划阶段" :time="formatDate(Date.now())" content="开始设计技术架构与数据结构。" />
+              <n-timeline-item v-if="store.currentModule !== 'idea'" type="warning" title="进入规划阶段" :time="formatDate(Date.now())" content="开始设计产品方案与细节。" />
             </n-timeline>
           </n-card>
         </n-grid-item>
@@ -76,13 +76,13 @@
               <div class="stage-info mt-4">
                 <div class="stage-badge">
                   <span class="dot"></span>
-                  {{ store.currentStageData.label }}
+                  {{ store.currentModuleData.label }}
                 </div>
-                <p class="stage-desc">{{ store.currentStageData.description }}</p>
+                <p class="stage-desc">{{ store.currentModuleData.description }}</p>
               </div>
             </div>
             
-            <n-button type="primary" block size="large" class="mt-6" @click="router.push({ name: 'AiProjectBoard' })">
+            <n-button type="primary" block size="large" class="mt-6" @click="router.push({ name: 'AiProjectWorkbench' })">
               进入工作台
               <template #icon>
                 <n-icon><ArrowForward /></n-icon>
@@ -111,7 +111,7 @@
           <n-card title="产出物概览" class="sidebar-card mt-4" size="small" :bordered="false">
             <n-empty description="暂无产出物" v-if="!hasArtifacts" size="small">
               <template #extra>
-                <n-button text type="primary" size="small" @click="router.push({ name: 'AiProjectBoard' })">去生成</n-button>
+                <n-button text type="primary" size="small" @click="router.push({ name: 'AiProjectWorkbench' })">去生成</n-button>
               </template>
             </n-empty>
             <div v-else>
@@ -142,10 +142,8 @@ const store = useAiWorkshopStore()
 
 // 计算进度百分比
 const progressPercentage = computed(() => {
-  const total = store.stageOrder.length
-  const current = store.stageOrder.indexOf(store.currentStage)
-  // 简单的进度计算：当前阶段索引 / 总阶段数，或者根据 checklist 完成度
-  // 这里结合 checklist 完成度会更准确，但简单起见先用阶段
+  const total = store.moduleOrder.length
+  const current = store.moduleOrder.indexOf(store.currentModule)
   const baseProgress = (current / total) * 100
   return Math.round(baseProgress)
 })
@@ -172,7 +170,7 @@ const statusLabel = computed(() => {
 
 // 是否有产出物
 const hasArtifacts = computed(() => {
-  return Object.values(store.stages).some(s => s.artifacts && s.artifacts.length > 0)
+  return Object.values(store.modules).some(s => s.artifacts && s.artifacts.length > 0)
 })
 
 /**

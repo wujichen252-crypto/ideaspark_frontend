@@ -77,6 +77,7 @@
               :bordered="false" 
               class="post-card mb-6"
               hoverable
+              @click="goToPost(post.id)"
             >
               <template #header>
                 <div class="post-header">
@@ -114,17 +115,17 @@
 
               <template #action>
                 <div class="post-footer">
-                  <n-button text class="action-btn" :class="{ active: post.isLiked }">
+                  <n-button text class="action-btn" :class="{ active: post.isLiked }" @click.stop>
                     <template #icon>
                       <n-icon :component="post.isLiked ? Heart : HeartOutline" />
                     </template>
                     {{ post.stats.likes }}
                   </n-button>
-                  <n-button text class="action-btn">
+                  <n-button text class="action-btn" @click.stop>
                     <template #icon><n-icon :component="ChatbubbleOutline" /></template>
                     {{ post.stats.comments }}
                   </n-button>
-                  <n-button text class="action-btn">
+                  <n-button text class="action-btn" @click.stop>
                     <template #icon><n-icon :component="ShareSocialOutline" /></template>
                     分享
                   </n-button>
@@ -217,6 +218,7 @@
 
 <script setup lang="ts">
 import { ref, h } from 'vue'
+import { useRouter } from 'vue-router'
 import { NIcon } from 'naive-ui'
 import type { MenuOption } from 'naive-ui'
 import { 
@@ -237,8 +239,12 @@ import { useUserStore } from '@/store'
 
 const userStore = useUserStore()
 const loading = ref(false)
+const router = useRouter()
 
-// 渲染图标辅助函数
+/**
+ * 渲染侧边栏菜单图标
+ * @param icon 图标组件
+ */
 function renderIcon(icon: any) {
   return () => h(NIcon, null, { default: () => h(icon) })
 }
@@ -251,18 +257,28 @@ const menuOptions: MenuOption[] = [
   { label: '技术问答', key: 'qa', icon: renderIcon(CodeWorkingOutline) },
 ]
 
+/**
+ * 处理左侧菜单切换
+ * @param key 菜单项标识
+ */
 function handleMenuSelect(key: string) {
   console.log('Selected:', key)
 }
 
-// 模拟数据：我的圈子
+/**
+ * 跳转到社区动态详情页
+ * @param id 动态ID
+ */
+function goToPost(id: number) {
+  router.push(`/community/post/${id}`)
+}
+
 const myGroups = [
   { id: 1, name: 'Vue.js 爱好者', icon: 'https://api.dicebear.com/7.x/identicon/svg?seed=Vue' },
   { id: 2, name: 'AI 绘画交流', icon: 'https://api.dicebear.com/7.x/identicon/svg?seed=AI' },
   { id: 3, name: '前端面试题', icon: 'https://api.dicebear.com/7.x/identicon/svg?seed=Job' }
 ]
 
-// 模拟数据：动态列表
 const posts = ref([
   {
     id: 1,

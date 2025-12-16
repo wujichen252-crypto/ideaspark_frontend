@@ -232,16 +232,16 @@ const projectData = ref<ProjectDetail>({
       <li>🚀 极速响应：基于流式传输，实时生成内容</li>
       <li>🎨 界面优雅：精心设计的 UI/UX，操作简单直观</li>
       <li>🧩 模板丰富：内置 50+ 种常用创作场景模板</li>
-      <li>🔒 安全隐私：本地存储 API Key，保护用户隐私</li>
+      <li>🔒 安全隐私：你的想法完全私有，数据安全存储</li>
     </ul>
   `,
   features: [
-    { title: '多模型支持', desc: '支持 GPT-4, Claude 2 等主流模型' },
-    { title: '一键导出', desc: '支持 Markdown, PDF, PNG 等多种格式导出' },
-    { title: '智能纠错', desc: '内置文本润色与语法检查功能' },
-    { title: '团队协作', desc: '支持多人实时协作编辑与分享' }
+    { title: 'AI 智能引导', desc: '全程陪伴式指导，从想法到落地' },
+    { title: '一键导出', desc: '支持 PDF, 图片等多种格式导出' },
+    { title: '行动清单', desc: '自动生成可执行的任务列表' },
+    { title: '灵感激发', desc: '打破思维定势，提供多维度建议' }
   ],
-  techStack: ['Vue 3', 'TypeScript', 'Vite', 'Pinia', 'Naive UI', 'TailwindCSS', 'OpenAI API'],
+  techStack: ['商业画布', '思维导图', '行动清单', 'SWOT分析', '用户画像', '竞品分析'],
   license: 'MIT',
   version: '2.0.1',
   lastUpdate: '2小时前'

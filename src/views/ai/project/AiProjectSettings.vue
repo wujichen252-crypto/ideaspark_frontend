@@ -1,7 +1,14 @@
 <template>
-  <div class="ai-project-settings">
+  <div class="ai-project-settings" :class="{ embedded }">
+    <div class="settings-header-bar" v-if="!embedded">
+      <n-page-header @back="handleBack">
+        <template #title>
+          <span class="page-title">项目设置</span>
+        </template>
+      </n-page-header>
+    </div>
     <div class="settings-container">
-      <div class="settings-sidebar">
+      <div class="settings-sidebar" v-if="!embedded">
         <div class="sidebar-title">项目设置</div>
         <n-menu
           v-model:value="activeKey"
@@ -14,7 +21,7 @@
         <div class="content-wrapper">
           <!-- 基础设置 -->
           <div v-show="activeKey === 'general'" class="settings-section">
-            <h2 class="section-title">基础设置</h2>
+            <h2 class="section-title">项目信息</h2>
             <n-card :bordered="false" class="settings-card">
               <n-form
                 ref="formRef"
@@ -26,11 +33,11 @@
               >
                 <n-grid :cols="24" :x-gap="24">
                   <n-form-item-gi :span="12" label="项目名称" path="name">
-                    <n-input v-model:value="formModel.name" placeholder="请输入项目名称" />
+                    <n-input v-model:value="formModel.name" placeholder="给你的想法起个名字" />
                   </n-form-item-gi>
                   
-                  <n-form-item-gi :span="12" label="项目分类" path="category">
-                    <n-select v-model:value="formModel.category" :options="typeOptions" placeholder="选择项目分类" />
+                  <n-form-item-gi :span="12" label="项目类型" path="category">
+                    <n-select v-model:value="formModel.category" :options="typeOptions" placeholder="选择项目类型" />
                   </n-form-item-gi>
 
                   <n-form-item-gi :span="24" label="封面图片" path="cover">
@@ -49,11 +56,11 @@
                     </div>
                   </n-form-item-gi>
 
-                  <n-form-item-gi :span="24" label="项目简介" path="description">
+                  <n-form-item-gi :span="24" label="一句话简介" path="description">
                     <n-input
                       v-model:value="formModel.description"
                       type="textarea"
-                      placeholder="简短描述项目的主要目标..."
+                      placeholder="简短描述你想做什么..."
                       :autosize="{ minRows: 3, maxRows: 5 }"
                     />
                   </n-form-item-gi>
@@ -65,7 +72,7 @@
                     />
                   </n-form-item-gi>
                   
-                  <n-form-item-gi :span="12" label="进度 (%)" path="progress">
+                  <n-form-item-gi :span="12" label="完成度 (%)" path="progress">
                     <n-input-number v-model:value="formModel.progress" :min="0" :max="100" />
                   </n-form-item-gi>
                 </n-grid>
@@ -77,27 +84,27 @@
             </n-card>
           </div>
 
-          <!-- 高级配置 -->
+          <!-- 更多选项 -->
           <div v-show="activeKey === 'advanced'" class="settings-section">
-            <h2 class="section-title">高级配置</h2>
+            <h2 class="section-title">更多选项</h2>
             <n-card :bordered="false" class="settings-card">
               <n-form label-placement="top">
                 <n-grid :cols="24" :x-gap="24">
-                  <n-form-item-gi :span="24" label="可见性设置">
+                  <n-form-item-gi :span="24" label="谁可以看到这个项目">
                     <n-card :bordered="true" size="small" class="visibility-card">
                       <n-space vertical>
                         <n-radio-group v-model:value="formModel.visibility" name="visibility">
                           <n-space vertical>
                             <n-radio value="public">
                               <div class="radio-content">
-                                <div class="radio-title">公开项目 (Public)</div>
-                                <div class="radio-desc">任何人都可以查看此项目，项目将出现在探索广场。</div>
+                                <div class="radio-title">公开 (Public)</div>
+                                <div class="radio-desc">所有人可见，适合展示你的成果。</div>
                               </div>
                             </n-radio>
                             <n-radio value="private">
                               <div class="radio-content">
-                                <div class="radio-title">私有项目 (Private)</div>
-                                <div class="radio-desc">只有你和受邀的团队成员可以访问此项目。</div>
+                                <div class="radio-title">私密 (Private)</div>
+                                <div class="radio-desc">只有你自己可见，适合正在孵化的想法。</div>
                               </div>
                             </n-radio>
                           </n-space>
@@ -106,12 +113,12 @@
                     </n-card>
                   </n-form-item-gi>
 
-                  <n-form-item-gi :span="24" label="权限设置">
+                  <n-form-item-gi :span="24" label="复制设置">
                     <n-space vertical class="w-full">
                       <div class="setting-item">
                         <div class="setting-info">
-                          <div class="setting-label">允许复刻 (Forking)</div>
-                          <div class="setting-desc">允许其他用户基于此项目创建副本。</div>
+                          <div class="setting-label">允许他人复制模版</div>
+                          <div class="setting-desc">允许其他人基于你的项目结构创建一个新项目。</div>
                         </div>
                         <n-switch v-model:value="formModel.allowFork" />
                       </div>
@@ -121,10 +128,10 @@
 
                 <n-divider />
 
-                <n-form-item label="技术栈">
+                <n-form-item label="关键资源 / 核心要素">
                   <n-dynamic-tags v-model:value="formModel.techStack" />
                   <template #feedback>
-                    输入技术栈名称并回车，例如：Vue 3, TypeScript, Vite
+                    输入项目需要的关键资源并回车，例如：启动资金, 场地, 合作伙伴, 拍摄设备
                   </template>
                 </n-form-item>
 
@@ -148,9 +155,9 @@
             </n-card>
           </div>
 
-          <!-- 危险区域 -->
+          <!-- 项目管理 -->
           <div v-show="activeKey === 'danger'" class="settings-section">
-            <h2 class="section-title text-error">危险区域</h2>
+            <h2 class="section-title text-error">项目管理</h2>
             <n-card :bordered="false" class="settings-card danger-zone">
               <div class="danger-item">
                 <div class="danger-info">
@@ -169,21 +176,27 @@
 
 <script setup lang="ts">
 import { ref, watch, h } from 'vue'
-import { useMessage, useDialog, NIcon, type UploadCustomRequestOptions } from 'naive-ui'
+import { useMessage, useDialog, NIcon, type UploadCustomRequestOptions, type FormInst } from 'naive-ui'
 import { useRouter } from 'vue-router'
 import { useAiWorkshopStore } from '@/store/modules/aiWorkshop'
 import { 
   SettingsOutline, BuildOutline, WarningOutline 
 } from '@vicons/ionicons5'
 
+defineProps<{ embedded?: boolean }>()
+
 const router = useRouter()
 const message = useMessage()
 const dialog = useDialog()
 const store = useAiWorkshopStore()
 
+const handleBack = () => {
+  router.back()
+}
+
 const activeKey = ref('general')
 const saving = ref(false)
-const formRef = ref(null)
+const formRef = ref<FormInst | null>(null)
 
 // Menu Options
 function renderIcon(icon: any) {
@@ -192,17 +205,17 @@ function renderIcon(icon: any) {
 
 const menuOptions = [
   {
-    label: '基础设置',
+    label: '项目信息',
     key: 'general',
     icon: renderIcon(SettingsOutline)
   },
   {
-    label: '高级配置',
+    label: '更多选项',
     key: 'advanced',
     icon: renderIcon(BuildOutline)
   },
   {
-    label: '危险区域',
+    label: '项目管理',
     key: 'danger',
     icon: renderIcon(WarningOutline)
   }
@@ -238,11 +251,11 @@ const rules = {
 
 // Options
 const typeOptions = [
-  { label: '代码开发', value: '代码开发' },
-  { label: '视觉设计', value: '视觉设计' },
-  { label: '文案创作', value: '文案创作' },
-  { label: '数据分析', value: '数据分析' },
-  { label: '其他', value: '其他' }
+  { label: 'SaaS 产品', value: 'SaaS 产品' },
+  { label: 'APP / 小程序', value: 'APP / 小程序' },
+  { label: '内容产品', value: '内容产品' },
+  { label: '工具型产品', value: '工具型产品' },
+  { label: '其他项目', value: '其他项目' }
 ]
 
 const statusOptions = [
@@ -306,26 +319,35 @@ const handleUploadCover = async ({ file, onFinish, onError }: UploadCustomReques
 }
 
 const handleSave = async () => {
-  saving.value = true
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 600))
+  if (!formRef.value) return
   
-  store.setProjectInfo({
-    name: formModel.value.name,
-    category: formModel.value.category,
-    description: formModel.value.description,
-    cover: formModel.value.cover,
-    status: formModel.value.status as any,
-    progress: formModel.value.progress,
-    techStack: formModel.value.techStack,
-    tags: formModel.value.tags,
-    detailedDescription: formModel.value.detailedDescription,
-    visibility: formModel.value.visibility as any,
-    allowFork: formModel.value.allowFork
-  })
-  
-  message.success('设置已保存')
-  saving.value = false
+  try {
+    await formRef.value.validate()
+    
+    saving.value = true
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 600))
+    
+    store.setProjectInfo({
+      name: formModel.value.name,
+      category: formModel.value.category,
+      description: formModel.value.description,
+      cover: formModel.value.cover,
+      status: formModel.value.status as any,
+      progress: formModel.value.progress,
+      techStack: formModel.value.techStack,
+      tags: formModel.value.tags,
+      detailedDescription: formModel.value.detailedDescription,
+      visibility: formModel.value.visibility as any,
+      allowFork: formModel.value.allowFork
+    })
+    
+    message.success('设置已保存')
+  } catch (errors) {
+    message.error('请检查表单填写是否正确')
+  } finally {
+    saving.value = false
+  }
 }
 
 const handleDelete = () => {
@@ -347,10 +369,17 @@ const handleDelete = () => {
 
 <style scoped lang="scss">
 .ai-project-settings {
-  height: 100%;
+  height: 100vh;
   background-color: #f5f7fa;
   display: flex;
   flex-direction: column;
+}
+
+.settings-header-bar {
+  background: #fff;
+  border-bottom: 1px solid #eef0f5;
+  padding: 12px 24px;
+  flex-shrink: 0;
 }
 
 .settings-container {
@@ -361,7 +390,7 @@ const handleDelete = () => {
   width: 100%;
   padding: 24px;
   gap: 24px;
-  height: 100%;
+  overflow: hidden; /* Prevent double scrollbar */
   box-sizing: border-box;
 }
 
@@ -528,5 +557,32 @@ const handleDelete = () => {
   font-size: 12px;
   color: #999;
   margin-top: 4px;
+}
+
+.ai-project-settings.embedded {
+  height: 100%;
+  background: transparent;
+
+  .settings-container {
+    height: 100%;
+    padding: 0;
+  }
+  
+  .settings-content {
+    height: auto;
+    overflow: visible;
+    padding: 0;
+  }
+  
+  .content-wrapper {
+    padding: 0;
+    max-width: 800px;
+    margin: 0;
+  }
+  
+  .settings-card {
+    box-shadow: none;
+    border: 1px solid #eee;
+  }
 }
 </style>

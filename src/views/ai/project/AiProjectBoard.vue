@@ -2,8 +2,7 @@
   <div class="ai-project-board-kanban">
     <div class="board-header">
       <div class="header-left">
-        <h2>任务看板</h2>
-        <span class="subtitle">项目全生命周期任务管理</span>
+        <!-- 标题已在父组件展示 -->
       </div>
       <div class="header-right">
         <n-button-group>
@@ -20,16 +19,16 @@
 
     <div class="kanban-container custom-scrollbar">
       <div 
-        v-for="stageKey in stageOrder" 
-        :key="stageKey" 
+        v-for="moduleKey in moduleOrder.filter(k => k !== 'home')" 
+        :key="moduleKey" 
         class="kanban-column"
       >
-        <div class="column-header" :class="stageKey">
+        <div class="column-header" :class="moduleKey">
           <div class="header-title">
-            <span class="stage-name">{{ stages[stageKey].label }}</span>
-            <n-badge :value="stages[stageKey].checklist.length" type="info" />
+            <span class="stage-name">{{ modules[moduleKey].label }}</span>
+            <n-badge :value="modules[moduleKey].checklist.length" type="info" />
           </div>
-          <n-button circle size="tiny" secondary @click="openAddModal(stageKey)">
+          <n-button circle size="tiny" secondary @click="openAddModal(moduleKey)">
             <template #icon><n-icon><Add /></n-icon></template>
           </n-button>
         </div>
@@ -38,25 +37,25 @@
           <!-- 进度条 -->
           <n-progress 
             type="line" 
-            :percentage="calculateProgress(stageKey)" 
+            :percentage="calculateProgress(moduleKey)" 
             :height="4" 
             :show-indicator="false"
             class="mb-3"
-            :color="getStageColor(stageKey)"
+            :color="getStageColor(moduleKey)"
           />
 
           <!-- 任务列表 -->
           <div 
-            v-for="item in stages[stageKey].checklist" 
+            v-for="item in modules[moduleKey].checklist" 
             :key="item.id" 
             class="kanban-card"
             :class="{ completed: item.completed }"
-            @click="openEditModal(stageKey, item)"
+            @click="openEditModal(moduleKey, item)"
           >
             <div class="card-header">
               <n-checkbox 
                 :checked="item.completed" 
-                @update:checked="(v) => handleToggle(stageKey, item.id, v)"
+                @update:checked="(v) => handleToggle(moduleKey, item.id, v)"
                 @click.stop
               />
               <n-tag 
@@ -87,7 +86,7 @@
             </div>
           </div>
           
-          <div class="add-card-btn" @click="openAddModal(stageKey)">
+          <div class="add-card-btn" @click="openAddModal(moduleKey)">
             <n-icon><Add /></n-icon> 添加任务
           </div>
         </div>
@@ -134,7 +133,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useAiWorkshopStore, type ProjectStage, type StageChecklistItem } from '@/store/modules/aiWorkshop'
+import { useAiWorkshopStore, type ProjectModule, type StageChecklistItem } from '@/store/modules/aiWorkshop'
 import { 
   Add, FilterOutline, EllipsisHorizontal, 
   DocumentTextOutline
@@ -142,14 +141,14 @@ import {
 import { useMessage } from 'naive-ui'
 
 const store = useAiWorkshopStore()
-const { stages } = storeToRefs(store)
-const { stageOrder } = store
+const { modules } = storeToRefs(store)
+const { moduleOrder } = store
 const message = useMessage()
 
 // Modal State
 const showModal = ref(false)
 const isEditing = ref(false)
-const currentStage = ref<ProjectStage>('idea')
+const currentModuleKey = ref<ProjectModule>('idea')
 const currentTaskId = ref<string>('')
 const formModel = ref<{
   label: string
@@ -166,14 +165,16 @@ const formModel = ref<{
 })
 
 // Helpers
-const getStageColor = (stage: string) => {
+const getStageColor = (module: string) => {
   const map: Record<string, string> = {
     idea: '#f0a020',
-    plan: '#2080f0',
-    execute: '#18a058',
-    optimize: '#d03050'
+    product: '#2080f0',
+    brand: '#8a2be2',
+    ui: '#ff69b4',
+    feasibility: '#d03050',
+    docs: '#18a058'
   }
-  return map[stage] || '#999'
+  return map[module] || '#999'
 }
 
 const getPriorityType = (p: string) => {
@@ -187,8 +188,8 @@ const getPriorityLabel = (p: string) => {
   return map[p] || p
 }
 
-const calculateProgress = (stageKey: ProjectStage) => {
-  const list = stages.value[stageKey].checklist
+const calculateProgress = (moduleKey: ProjectModule) => {
+  const list = modules.value[moduleKey].checklist
   if (!list.length) return 0
   const completed = list.filter(i => i.completed).length
   return Math.round((completed / list.length) * 100)
@@ -199,12 +200,12 @@ const formatDate = (ts: number) => {
 }
 
 // Actions
-const handleToggle = (stageKey: ProjectStage, id: string, checked: boolean) => {
-  store.toggleChecklistItem(stageKey, id)
+const handleToggle = (moduleKey: ProjectModule, id: string, checked: boolean) => {
+  store.toggleChecklistItem(moduleKey, id)
 }
 
-const openAddModal = (stageKey: ProjectStage) => {
-  currentStage.value = stageKey
+const openAddModal = (moduleKey: ProjectModule) => {
+  currentModuleKey.value = moduleKey
   isEditing.value = false
   formModel.value = {
     label: '',
@@ -216,8 +217,8 @@ const openAddModal = (stageKey: ProjectStage) => {
   showModal.value = true
 }
 
-const openEditModal = (stageKey: ProjectStage, item: StageChecklistItem) => {
-  currentStage.value = stageKey
+const openEditModal = (moduleKey: ProjectModule, item: StageChecklistItem) => {
+  currentModuleKey.value = moduleKey
   currentTaskId.value = item.id
   isEditing.value = true
   formModel.value = {
@@ -245,17 +246,17 @@ const handleSave = () => {
   }
 
   if (isEditing.value) {
-    store.updateTask(currentStage.value, currentTaskId.value, taskData)
+    store.updateTask(currentModuleKey.value, currentTaskId.value, taskData)
     message.success('任务已更新')
   } else {
-    store.addTask(currentStage.value, taskData)
+    store.addTask(currentModuleKey.value, taskData)
     message.success('任务已添加')
   }
   showModal.value = false
 }
 
 const handleDelete = () => {
-  store.deleteTask(currentStage.value, currentTaskId.value)
+  store.deleteTask(currentModuleKey.value, currentTaskId.value)
   message.success('任务已删除')
   showModal.value = false
 }
@@ -299,32 +300,37 @@ const handleDelete = () => {
   overflow-y: hidden;
   padding: 24px;
   display: flex;
-  gap: 20px;
-  align-items: flex-start; // Prevent stretching
+  gap: 24px; /* Increased gap */
+  align-items: flex-start;
+  padding-right: 48px; /* Add padding to right to prevent cut-off */
   
   &.custom-scrollbar {
     &::-webkit-scrollbar {
-      height: 8px;
+      height: 10px; /* Slightly larger scrollbar */
       width: 8px;
     }
     &::-webkit-scrollbar-thumb {
       background: #ccc;
-      border-radius: 4px;
+      border-radius: 5px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
     }
   }
 }
 
 .kanban-column {
-  width: 300px;
-  min-width: 300px;
-  background: #ebecf0;
-  border-radius: 8px;
+  width: 320px; /* Slightly wider columns */
+  min-width: 320px;
+  background: #f4f5f7; /* Softer background */
+  border-radius: 12px; /* Softer corners */
   display: flex;
   flex-direction: column;
   max-height: 100%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* Subtle shadow */
   
   .column-header {
-    padding: 12px 16px;
+    padding: 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -335,11 +341,12 @@ const handleDelete = () => {
       display: flex;
       align-items: center;
       gap: 8px;
+      font-size: 15px;
     }
   }
 
   .column-content {
-    padding: 0 8px 8px 8px;
+    padding: 0 12px 12px 12px; /* Increased padding */
     overflow-y: auto;
     flex: 1;
     
@@ -355,50 +362,53 @@ const handleDelete = () => {
 
 .kanban-card {
   background: #fff;
-  border-radius: 6px;
-  padding: 10px;
-  margin-bottom: 8px;
+  border-radius: 8px; /* Softer corners */
   box-shadow: 0 1px 2px rgba(9, 30, 66, 0.25);
+  padding: 12px;
+  margin-bottom: 12px; /* Increased spacing between cards */
   cursor: pointer;
   transition: all 0.2s;
-  
+  border: 1px solid transparent;
+
   &:hover {
-    background: #f4f5f7;
+    background-color: #fafbfc;
+    box-shadow: 0 2px 4px rgba(9, 30, 66, 0.3);
   }
   
   &.completed {
     opacity: 0.7;
-    background: #f8f9fa;
+    background-color: #f8f9fa;
+    
+    .card-title {
+      text-decoration: line-through;
+      color: #888;
+    }
   }
-  
+
   .card-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
   }
-  
+
   .card-title {
     font-size: 14px;
     color: #172b4d;
+    line-height: 1.5;
     margin-bottom: 8px;
-    line-height: 1.4;
-    word-break: break-word;
-    
-    &.line-through {
-      text-decoration: line-through;
-      color: #6b778c;
-    }
+    font-weight: 500;
   }
-  
+
   .card-meta {
     display: flex;
-    align-items: center;
-    font-size: 12px;
-    color: #5e6c84;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
     
     .due-date {
-      color: #d04437;
+      font-size: 12px;
+      color: #5e6c84;
     }
   }
 }

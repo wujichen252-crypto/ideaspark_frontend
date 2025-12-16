@@ -131,24 +131,35 @@
               </n-grid-item>
               <n-grid-item>
                 <n-card title="待办事项" :bordered="false" class="todo-card">
+                   <template #header-extra>
+                     <n-button text type="primary" size="small" @click="clearCompleted">
+                       清理已完成
+                     </n-button>
+                   </template>
                    <n-list>
-                    <n-list-item>
-                      <template #prefix><n-checkbox /></template>
-                      <span class="todo-text">回复 @DesignMaster 的评论</span>
-                    </n-list-item>
-                    <n-list-item>
-                      <template #prefix><n-checkbox :default-checked="true" /></template>
-                      <span class="todo-text done">更新 "Vue3 Admin" 项目文档</span>
-                    </n-list-item>
-                    <n-list-item>
-                      <template #prefix><n-checkbox /></template>
-                      <span class="todo-text">审核新成员加入申请</span>
-                    </n-list-item>
-                    <n-list-item>
-                      <template #prefix><n-checkbox /></template>
-                      <span class="todo-text">准备下周的分享会 PPT</span>
+                    <n-list-item v-for="todo in todoList" :key="todo.id">
+                      <template #prefix>
+                        <n-checkbox v-model:checked="todo.done" />
+                      </template>
+                      <span class="todo-text" :class="{ done: todo.done }">{{ todo.text }}</span>
+                      <template #suffix>
+                        <n-button text type="error" size="tiny" class="delete-btn" @click="removeTodo(todo.id)">
+                          <n-icon><TrashOutline /></n-icon>
+                        </n-button>
+                      </template>
                     </n-list-item>
                    </n-list>
+                   <div class="add-todo-box">
+                     <n-input 
+                       v-model:value="newTodo" 
+                       placeholder="添加新待办..." 
+                       size="small" 
+                       @keyup.enter="addTodo" 
+                     />
+                     <n-button type="primary" size="small" :disabled="!newTodo.trim()" @click="addTodo">
+                       <template #icon><n-icon><AddOutline /></n-icon></template>
+                     </n-button>
+                   </div>
                 </n-card>
               </n-grid-item>
             </n-grid>
@@ -158,15 +169,28 @@
           <div v-else-if="activeKey === 'projects'" class="view-projects">
             <n-card title="项目管理" :bordered="false">
               <template #header-extra>
-                <n-input-group>
-                   <n-input placeholder="搜索项目..." size="small" />
-                   <n-button type="primary" size="small">搜索</n-button>
-                </n-input-group>
+                <div style="display: flex; gap: 12px;">
+                  <n-input placeholder="搜索项目..." size="small" style="width: 200px;">
+                    <template #prefix><n-icon><Search /></n-icon></template>
+                  </n-input>
+                  <n-button type="primary" size="small" @click="$router.push('/create')">
+                    <template #icon><n-icon><AddOutline /></n-icon></template>
+                    新建
+                  </n-button>
+                </div>
               </template>
+              
+              <n-tabs type="line" animated v-model:value="projectTab">
+                <n-tab-pane name="all" tab="全部项目" />
+                <n-tab-pane name="published" tab="已发布" />
+                <n-tab-pane name="draft" tab="草稿箱" />
+                <n-tab-pane name="reviewing" tab="审核中" />
+              </n-tabs>
+
               <n-data-table
                 :columns="projectColumns"
-                :data="projectData"
-                :pagination="{ pageSize: 5 }"
+                :data="filteredProjects"
+                :pagination="{ pageSize: 10 }"
                 :bordered="false"
               />
             </n-card>
@@ -174,6 +198,51 @@
 
           <!-- 3. 数据分析 (Analytics) -->
           <div v-else-if="activeKey === 'analytics'" class="view-analytics">
+             <div class="analytics-header mb-6" style="display: flex; justify-content: space-between; align-items: center;">
+               <h2 style="margin: 0; font-size: 20px;">用户行为分析</h2>
+               <n-select v-model:value="analyticsRange" :options="analyticsRanges" style="width: 140px;" size="small" />
+             </div>
+
+             <!-- KPI Cards -->
+             <n-grid :x-gap="16" :y-gap="16" cols="1 s:2 m:4" responsive="screen" class="mb-6">
+                <n-grid-item>
+                  <n-card size="small" :bordered="false">
+                    <n-statistic label="活跃用户数" value="18,930">
+                      <template #prefix><n-icon color="#2080f0"><EyeOutline /></n-icon></template>
+                      <template #suffix><span style="font-size: 12px; color: #18a058;">+8.3%</span></template>
+                    </n-statistic>
+                  </n-card>
+                </n-grid-item>
+                <n-grid-item>
+                  <n-card size="small" :bordered="false">
+                    <n-statistic label="新增用户数" value="3,201">
+                       <template #prefix><n-icon color="#8a2be2"><CubeOutline /></n-icon></template>
+                       <template #suffix><span style="font-size: 12px; color: #18a058;">+5.0%</span></template>
+                    </n-statistic>
+                  </n-card>
+                </n-grid-item>
+                <n-grid-item>
+                  <n-card size="small" :bordered="false">
+                    <n-statistic label="平均访问深度" value="3.2 页/次">
+                       <template #prefix><n-icon color="#f0a020"><StatsChartOutline /></n-icon></template>
+                    </n-statistic>
+                  </n-card>
+                </n-grid-item>
+                <n-grid-item>
+                  <n-card size="small" :bordered="false">
+                    <n-statistic label="复访率" value="42.7%">
+                       <template #prefix><n-icon color="#d03050"><TrendingDownOutline /></n-icon></template>
+                       <template #suffix><span style="font-size: 12px; color: #18a058;">+2.1%</span></template>
+                    </n-statistic>
+                  </n-card>
+                </n-grid-item>
+             </n-grid>
+
+             <!-- Main Trend Chart -->
+             <n-card title="用户活跃趋势" :bordered="false" class="mb-6">
+               <div ref="analyticsLineChartRef" style="width: 100%; height: 350px;"></div>
+             </n-card>
+
              <n-grid :x-gap="16" :y-gap="16" cols="1 m:2">
                 <n-grid-item>
                   <n-card title="访问来源" :bordered="false">
@@ -191,6 +260,20 @@
            <!-- 4. 设置 (Settings) -->
           <div v-else-if="activeKey === 'settings'" class="view-settings">
             <n-grid :x-gap="24" :y-gap="24" cols="1 l:2" responsive="screen">
+              <!-- Profile Card -->
+              <n-grid-item span="1 l:2">
+                <n-card :bordered="false">
+                  <div style="display: flex; align-items: center; gap: 24px;">
+                    <n-avatar :size="80" :src="userStore.userInfo?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Console'" />
+                    <div style="flex: 1;">
+                      <h3 style="margin: 0 0 8px 0; font-size: 18px;">{{ userStore.userInfo?.username || '创造者' }}</h3>
+                      <p style="margin: 0 0 16px 0; color: #666;">全栈开发者 / AI 爱好者</p>
+                      <n-button size="small">更换头像</n-button>
+                    </div>
+                  </div>
+                </n-card>
+              </n-grid-item>
+
               <n-grid-item>
                 <n-card title="偏好设置" :bordered="false">
                   <n-form label-placement="left" label-width="auto" class="mt-4">
@@ -226,11 +309,29 @@
                 </n-card>
               </n-grid-item>
 
-               <n-grid-item>
+               <n-grid-item span="1 l:2">
                 <n-card title="账户安全" :bordered="false">
-                   <div style="display: flex; gap: 12px; align-items: center;">
+                   <div style="display: flex; gap: 12px; align-items: center; padding: 12px 0;">
+                     <div style="flex: 1;">
+                        <div style="font-weight: 500; margin-bottom: 4px;">登录密码</div>
+                        <div style="color: #999; font-size: 12px;">建议定期修改密码以保护账户安全</div>
+                     </div>
                      <n-button>修改密码</n-button>
-                     <n-button type="warning" ghost>绑定手机</n-button>
+                   </div>
+                   <n-divider style="margin: 12px 0;" />
+                   <div style="display: flex; gap: 12px; align-items: center; padding: 12px 0;">
+                     <div style="flex: 1;">
+                        <div style="font-weight: 500; margin-bottom: 4px;">手机绑定</div>
+                        <div style="color: #999; font-size: 12px;">已绑定：138****8888</div>
+                     </div>
+                     <n-button type="warning" ghost>换绑手机</n-button>
+                   </div>
+                   <n-divider style="margin: 12px 0;" />
+                   <div style="display: flex; gap: 12px; align-items: center; padding: 12px 0;">
+                     <div style="flex: 1;">
+                        <div style="font-weight: 500; margin-bottom: 4px; color: #d03050;">注销账号</div>
+                        <div style="color: #999; font-size: 12px;">注销后无法恢复，请谨慎操作</div>
+                     </div>
                      <n-button type="error" ghost>注销账号</n-button>
                    </div>
                 </n-card>
@@ -250,7 +351,8 @@ import { useUserStore } from '@/store'
 import { 
   NIcon, NTag, NButton, NAvatar, 
   NGrid, NGridItem, NCard, NForm, NFormItem, 
-  NInput, NSelect, NSwitch, NList, NListItem, NThing 
+  NInput, NSelect, NSwitch, NList, NListItem, NThing,
+  NTabs, NTabPane, NStatistic, NDivider
 } from 'naive-ui'
 import type { MenuOption, DataTableColumns } from 'naive-ui'
 import * as echarts from 'echarts'
@@ -268,12 +370,56 @@ import {
   TrendingUpOutline,
   TrendingDownOutline,
   CreateOutline,
-  TrashOutline
+  TrashOutline,
+  Search
 } from '@vicons/ionicons5'
 
 const userStore = useUserStore()
 const collapsed = ref(false)
 const activeKey = ref('overview')
+
+// --- Analytics Data ---
+const analyticsRange = ref('week')
+const analyticsRanges = [
+  { label: '最近7天', value: 'week' },
+  { label: '最近30天', value: 'month' },
+  { label: '今年', value: 'year' }
+]
+
+// --- Projects Data ---
+const projectTab = ref('all') // all, published, draft
+interface TodoItem {
+  id: number
+  text: string
+  done: boolean
+}
+
+const todoList = ref<TodoItem[]>([
+  { id: 1, text: '回复 @DesignMaster 的评论', done: false },
+  { id: 2, text: '更新 "Vue3 Admin" 项目文档', done: true },
+  { id: 3, text: '审核新成员加入申请', done: false },
+  { id: 4, text: '准备下周的分享会 PPT', done: false }
+])
+
+const newTodo = ref('')
+
+const addTodo = () => {
+  if (!newTodo.value.trim()) return
+  todoList.value.push({
+    id: Date.now(),
+    text: newTodo.value,
+    done: false
+  })
+  newTodo.value = ''
+}
+
+const removeTodo = (id: number) => {
+  todoList.value = todoList.value.filter(t => t.id !== id)
+}
+
+const clearCompleted = () => {
+  todoList.value = todoList.value.filter(t => !t.done)
+}
 
 // 系统设置数据
 const systemSettings = ref({
@@ -315,6 +461,7 @@ function handleMenuUpdate(key: string) {
 const trafficChartRef = ref<HTMLElement | null>(null)
 const pieChartRef = ref<HTMLElement | null>(null)
 const barChartRef = ref<HTMLElement | null>(null)
+const analyticsLineChartRef = ref<HTMLElement | null>(null)
 
 // 初始化图表
 const initCharts = () => {
@@ -351,6 +498,36 @@ const initCharts = () => {
   
   if (activeKey.value === 'analytics') {
      nextTick(() => {
+        // Analytics Trend Chart
+        if (analyticsLineChartRef.value) {
+          const chart = echarts.init(analyticsLineChartRef.value)
+          chart.setOption({
+            tooltip: { trigger: 'axis' },
+            grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+            xAxis: { type: 'category', boundaryGap: false, data: ['1日', '5日', '10日', '15日', '20日', '25日', '30日'] },
+            yAxis: { type: 'value' },
+            series: [
+              {
+                name: '活跃用户',
+                type: 'line',
+                smooth: true,
+                itemStyle: { color: '#8884d8' },
+                areaStyle: { color: 'rgba(136, 132, 216, 0.2)' },
+                data: [150, 230, 224, 218, 135, 147, 260]
+              },
+              {
+                name: '新增用户',
+                type: 'line',
+                smooth: true,
+                itemStyle: { color: '#82ca9d' },
+                areaStyle: { color: 'rgba(130, 202, 157, 0.2)' },
+                data: [280, 360, 340, 320, 250, 270, 410]
+              }
+            ]
+          })
+          window.addEventListener('resize', () => chart.resize())
+        }
+
         if (pieChartRef.value) {
             const pieChart = echarts.init(pieChartRef.value)
             pieChart.setOption({
@@ -419,6 +596,11 @@ const projectData = ref<ProjectRow[]>([
   { key: 5, name: 'Flutter 电商 App', status: 'published', views: 2300, likes: 560, updateTime: '2024-03-01' },
 ])
 
+const filteredProjects = computed(() => {
+  if (projectTab.value === 'all') return projectData.value
+  return projectData.value.filter(p => p.status === projectTab.value)
+})
+
 const projectColumns: DataTableColumns<ProjectRow> = [
   { title: '项目名称', key: 'name' },
   { 
@@ -438,7 +620,19 @@ const projectColumns: DataTableColumns<ProjectRow> = [
     key: 'actions',
     render(row) {
       return h('div', { style: 'display: flex; gap: 8px;' }, [
-        h(NButton, { size: 'tiny', secondary: true, type: 'primary', circle: true }, { icon: () => h(NIcon, null, { default: () => h(CreateOutline) }) }),
+        h(NButton, { 
+          size: 'tiny', 
+          secondary: true, 
+          type: 'primary', 
+          circle: true,
+          onClick: () => {
+             // 模拟打开项目
+             const win = window.open('', '_blank');
+             if (win) {
+                 win.document.write(`<h1>正在打开项目: ${row.name}</h1><p>这是一个演示操作，实际应跳转到编辑器。</p>`);
+             }
+          }
+        }, { icon: () => h(NIcon, null, { default: () => h(CreateOutline) }) }),
         h(NButton, { size: 'tiny', secondary: true, type: 'error', circle: true }, { icon: () => h(NIcon, null, { default: () => h(TrashOutline) }) })
       ])
     }
@@ -448,14 +642,15 @@ const projectColumns: DataTableColumns<ProjectRow> = [
 
 <style scoped lang="scss">
 .console-container {
-  min-height: 100vh;
+  height: 100vh;
   background-color: #f5f7fa;
   padding-top: 64px;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .console-layout {
-  min-height: calc(100vh - 64px);
+  height: calc(100vh - 64px);
 }
 
 .console-sider {
@@ -509,6 +704,15 @@ const projectColumns: DataTableColumns<ProjectRow> = [
 .console-content {
   background-color: #f5f7fa;
   padding: 24px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.view-container {
+  flex: 1;
+  overflow-y: auto;
 }
 
 .console-header {
@@ -603,6 +807,21 @@ const projectColumns: DataTableColumns<ProjectRow> = [
       text-decoration: line-through;
       color: #bfbfbf;
     }
+  }
+
+  .delete-btn {
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  :deep(.n-list-item:hover) .delete-btn {
+    opacity: 1;
+  }
+  
+  .add-todo-box {
+    margin-top: 16px;
+    display: flex;
+    gap: 8px;
   }
 }
 

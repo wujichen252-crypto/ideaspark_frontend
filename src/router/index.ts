@@ -46,22 +46,20 @@ const routes: RouteRecordRaw[] = [
         children: [
           {
             path: '',
-            redirect: { name: 'AiProjectHome' }
+            redirect: to => ({ 
+              name: 'AiProjectWorkbench', 
+              params: { ...to.params, module: 'home' } 
+            })
           },
           {
-            path: 'board',
-            name: 'AiProjectBoard',
-            component: () => import('@/views/ai/project/AiProjectBoard.vue')
-          },
-          {
-            path: 'workbench',
+            path: 'workbench/:module?',
             name: 'AiProjectWorkbench',
             component: () => import('@/views/ai/project/AiProjectWorkbench.vue')
           },
           {
-            path: 'home',
-            name: 'AiProjectHome',
-            component: () => import('@/views/ai/project/AiProjectHome.vue')
+            path: 'manage',
+            name: 'AiProjectManagement',
+            component: () => import('@/views/ai/project/AiProjectManagement.vue')
           },
           {
             path: 'settings',
@@ -85,6 +83,11 @@ const routes: RouteRecordRaw[] = [
     path: '/community',
     name: 'Community',
     component: () => import('@/views/CommunityView.vue')
+  },
+  {
+    path: '/community/post/:id',
+    name: 'CommunityPostDetail',
+    component: () => import('@/views/CommunityPostDetailView.vue')
   },
   {
     path: '/login',

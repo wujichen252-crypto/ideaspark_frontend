@@ -4,6 +4,12 @@
       <!-- 左侧：AI 引导对话区 -->
       <div class="chat-panel">
         <div class="panel-header">
+          <div class="header-nav">
+             <n-button text @click="router.back()">
+              <template #icon><n-icon><ArrowBack /></n-icon></template>
+              返回
+            </n-button>
+          </div>
           <h3>AI 项目引导官</h3>
           <p>告诉我你想做什么，我来帮你规划项目</p>
         </div>
@@ -17,9 +23,7 @@
               </n-avatar>
             </div>
             <div class="content">
-              <div class="bubble">
-                {{ msg.content }}
-              </div>
+              <div class="bubble" :class="{ loading: false }" v-html="renderMarkdown(msg.content)"></div>
             </div>
           </div>
           <div v-if="loading" class="message-item ai">
@@ -58,8 +62,17 @@
           <p>AI 将根据对话自动完善信息</p>
         </div>
 
-        <div class="preview-content">
-          <n-card :bordered="false" class="preview-card">
+          <div class="preview-content">
+            <div v-if="!projectData.name && !projectData.description" class="empty-state">
+              <n-empty description="等待对话开始..." size="large">
+                <template #icon>
+                  <n-icon size="64" color="#ddd">
+                    <SparklesOutline />
+                  </n-icon>
+                </template>
+              </n-empty>
+            </div>
+            <n-card v-else :bordered="false" class="preview-card">
             <n-form
               ref="formRef"
               :model="projectData"
@@ -104,7 +117,7 @@
 import { ref, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAiWorkshopStore } from '@/store/modules/aiWorkshop'
-import { PaperPlaneOutline } from '@vicons/ionicons5'
+import { PaperPlaneOutline, ArrowBack, SparklesOutline } from '@vicons/ionicons5'
 import { useMessage } from 'naive-ui'
 
 const router = useRouter()
@@ -146,6 +159,24 @@ const scrollToBottom = () => {
   })
 }
 
+// Simple Markdown Renderer
+const renderMarkdown = (text: string) => {
+  if (!text) return ''
+  // Escape HTML first to prevent XSS (basic)
+  let html = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#039;")
+  
+  // Bold **text**
+  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+  
+  // Line breaks
+  html = html.replace(/\n/g, '<br>')
+  
+  return html
+}
+
+const conversationStep = ref(0) // 0: init, 1: clarifying, 2: ready
+
 // 模拟 AI 引导逻辑
 const processAiResponse = async (userText: string) => {
   loading.value = true
@@ -153,33 +184,48 @@ const processAiResponse = async (userText: string) => {
   // 模拟延迟
   await new Promise(resolve => setTimeout(resolve, 1500))
   
-  // 简单的模拟逻辑状态机
   const text = userText.toLowerCase()
   let aiReply = ''
   
-  if (!projectData.value.name) {
-    if (text.length < 5) {
-      aiReply = '能具体描述一下吗？比如是给谁用的，解决什么问题？'
-    } else {
-      // 提取信息（模拟）
-      projectData.value.name = 'AI 生成项目 - ' + text.substring(0, 10)
-      projectData.value.description = text
-      aiReply = '听起来不错！这个项目是偏向个人练习，还是商业应用？亦或是学校作业？'
-    }
-  } else if (!projectData.value.category) {
-    if (text.includes('作业') || text.includes('练习')) {
-      projectData.value.category = '学习/练习'
-    } else if (text.includes('商') || text.includes('钱')) {
-      projectData.value.category = '商业项目'
-    } else {
-      projectData.value.category = '个人工具'
-    }
+  if (conversationStep.value === 0) {
+    // 第一步：用户输入了初步想法
+    // 简单的关键词匹配来推测分类
+    let category = '工具型产品'
+    if (text.includes('saas') || text.includes('平台') || text.includes('服务') || text.includes('系统')) category = 'SaaS 产品'
+    else if (text.includes('app') || text.includes('小程序') || text.includes('应用') || text.includes('手机')) category = 'APP / 小程序'
+    else if (text.includes('文章') || text.includes('视频') || text.includes('号') || text.includes('内容') || text.includes('ip')) category = '内容产品'
+    else if (text.includes('工具') || text.includes('脚本') || text.includes('插件') || text.includes('计算')) category = '工具型产品'
+
+    projectData.value.name = '我的' + category.split(' ')[0] + '项目'
+    projectData.value.category = category
+    projectData.value.description = userText
+
+    conversationStep.value = 1
     
-    aiReply = '好的，我已经了解了基本情况。项目信息已收集完毕，我们可以开始了！'
+    // 根据分类提出针对性问题
+    if (category === 'SaaS 产品') aiReply = '这个 SaaS 想法听起来很有潜力！\n请问你的**目标客户**是谁？他们目前最大的**痛点**是什么？'
+    else if (category === 'APP / 小程序') aiReply = '做移动端产品最重要的是场景。\n用户会在**什么场景**下使用你的产品？主要解决什么**核心问题**？'
+    else if (category === '内容产品') aiReply = '做内容最重要的是定位。\n你想发布在**哪个平台**？主要面向**哪类读者/观众**？'
+    else if (category === '工具型产品') aiReply = '工具产品需要简单高效。\n请用一句话描述：用户用你的工具**主要能完成什么具体任务**？'
+    else aiReply = '明白。为了帮你更好地规划，请告诉我：这个项目你最看重的一个**核心目标**是什么？'
+
+  } else if (conversationStep.value === 1) {
+    // 第二步：用户回答了细节
+    projectData.value.description += '\n\n补充信息：' + userText
+    
+    // 完善项目名称 (简单的模拟)
+    if (projectData.value.name.startsWith('我的')) {
+      // 尝试提取关键词作为名字 (伪逻辑)
+      const keywords = userText.substring(0, 10).replace(/[.,，。]/g, '')
+      if (keywords.length > 2) {
+        projectData.value.name = keywords + ' - ' + projectData.value.category.split(' ')[0]
+      }
+    }
+
+    aiReply = '收到！我已经为你生成了初步的项目路径和任务清单。\n\n点击右侧按钮，我们直接开始把想法变成现实！🚀'
     canCreate.value = true
     isFinished.value = true
-  } else {
-    aiReply = '请点击右侧按钮生成项目。'
+    conversationStep.value = 2
   }
 
   messages.value.push({
@@ -219,6 +265,9 @@ const createProject = async () => {
     category: projectData.value.category
   })
   
+  // 根据分类应用不同的任务模板
+  aiWorkshopStore.applyTemplate(projectData.value.category)
+  
   message.success('项目创建成功，正在跳转工作台...')
   
   setTimeout(() => {
@@ -230,23 +279,25 @@ const createProject = async () => {
 
 <style scoped lang="scss">
 .ai-project-create {
-  height: 100vh;
-  padding-top: 64px;
+  min-height: 100vh;
+  width: 100%;
   box-sizing: border-box;
   background-color: #f5f7fa;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  padding: 20px;
 }
 
 .create-layout {
   display: flex;
   width: 1200px;
-  height: 800px;
+  height: calc(100vh - 40px);
+  min-height: 600px;
+  max-height: 900px;
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   overflow: hidden;
+  margin: auto;
 }
 
 .chat-panel {
@@ -261,6 +312,10 @@ const createProject = async () => {
     border-bottom: 1px solid #eee;
     background: #fff;
     
+    .header-nav {
+      margin-bottom: 12px;
+    }
+
     h3 {
       margin: 0 0 4px 0;
       font-size: 18px;
@@ -356,6 +411,13 @@ const createProject = async () => {
     flex: 1;
     padding: 24px;
     overflow-y: auto;
+
+    .empty-state {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   }
 }
 </style>
