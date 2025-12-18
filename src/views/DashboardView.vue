@@ -68,13 +68,29 @@
           
           <!-- 1. 概览视图 (Overview) -->
           <div v-if="activeKey === 'overview'" class="view-overview">
-            <div class="welcome-card mb-6">
-              <div class="text-content">
-                <h2>早安，{{ userStore.userInfo?.username || '创造者' }} 👋</h2>
-                <p>这里是你的创意指挥中心。你昨天发布的项目获得了 <strong>128</strong> 次浏览！</p>
-              </div>
-              <div class="illustration">
-                <!-- 装饰图案 -->
+            <div class="welcome-section mb-6">
+              <div class="welcome-card">
+                <div class="text-content">
+                  <h2>早安，{{ userStore.userInfo?.username || '创造者' }} 👋</h2>
+                  <p>这里是你的创意指挥中心。准备好开始新的创作了吗？</p>
+                  <div class="quick-actions mt-4">
+                    <n-button type="primary" @click="$router.push('/ai/workshop')">
+                      <template #icon><n-icon :component="CubeOutline" /></template>
+                      进入 AI 工坊
+                    </n-button>
+                    <n-button secondary type="info" @click="$router.push('/market')">
+                      <template #icon><n-icon :component="FolderOpenOutline" /></template>
+                      浏览项目市场
+                    </n-button>
+                    <n-button secondary type="success" @click="$router.push('/community')">
+                      <template #icon><n-icon :component="HeartOutline" /></template>
+                      查看社区动态
+                    </n-button>
+                  </div>
+                </div>
+                <div class="illustration">
+                  <img src="https://api.dicebear.com/7.x/shapes/svg?seed=Work" alt="Illustration" />
+                </div>
               </div>
             </div>
 
@@ -130,35 +146,25 @@
                 </n-card>
               </n-grid-item>
               <n-grid-item>
-                <n-card title="待办事项" :bordered="false" class="todo-card">
-                   <template #header-extra>
-                     <n-button text type="primary" size="small" @click="clearCompleted">
-                       清理已完成
-                     </n-button>
-                   </template>
-                   <n-list>
-                    <n-list-item v-for="todo in todoList" :key="todo.id">
-                      <template #prefix>
-                        <n-checkbox v-model:checked="todo.done" />
-                      </template>
-                      <span class="todo-text" :class="{ done: todo.done }">{{ todo.text }}</span>
-                      <template #suffix>
-                        <n-button text type="error" size="tiny" class="delete-btn" @click="removeTodo(todo.id)">
-                          <n-icon><TrashOutline /></n-icon>
-                        </n-button>
-                      </template>
-                    </n-list-item>
-                   </n-list>
-                   <div class="add-todo-box">
-                     <n-input 
-                       v-model:value="newTodo" 
-                       placeholder="添加新待办..." 
-                       size="small" 
-                       @keyup.enter="addTodo" 
-                     />
-                     <n-button type="primary" size="small" :disabled="!newTodo.trim()" @click="addTodo">
-                       <template #icon><n-icon><AddOutline /></n-icon></template>
-                     </n-button>
+                <n-card title="最新动态" :bordered="false" class="activity-card">
+                   <n-timeline>
+                     <n-timeline-item type="success" title="项目发布成功" time="刚刚">
+                       <template #default>
+                         您发布的《AI 绘画助手》已通过审核上线。
+                       </template>
+                     </n-timeline-item>
+                     <n-timeline-item type="info" title="收到新评论" time="2小时前">
+                       @DesignMaster 评论了您的项目《Vue3 组件库》。
+                     </n-timeline-item>
+                     <n-timeline-item type="warning" title="系统通知" time="昨天">
+                       您的本周周报已生成，请前往邮箱查看。
+                     </n-timeline-item>
+                     <n-timeline-item title="项目创建" time="2024-03-20">
+                       您创建了新项目《React 仪表盘》。
+                     </n-timeline-item>
+                   </n-timeline>
+                   <div class="mt-4 text-center">
+                     <n-button text type="primary" size="small">查看更多</n-button>
                    </div>
                 </n-card>
               </n-grid-item>
@@ -352,7 +358,8 @@ import {
   NIcon, NTag, NButton, NAvatar, 
   NGrid, NGridItem, NCard, NForm, NFormItem, 
   NInput, NSelect, NSwitch, NList, NListItem, NThing,
-  NTabs, NTabPane, NStatistic, NDivider
+  NTabs, NTabPane, NStatistic, NDivider,
+  NTimeline, NTimelineItem
 } from 'naive-ui'
 import type { MenuOption, DataTableColumns } from 'naive-ui'
 import * as echarts from 'echarts'
@@ -388,38 +395,6 @@ const analyticsRanges = [
 
 // --- Projects Data ---
 const projectTab = ref('all') // all, published, draft
-interface TodoItem {
-  id: number
-  text: string
-  done: boolean
-}
-
-const todoList = ref<TodoItem[]>([
-  { id: 1, text: '回复 @DesignMaster 的评论', done: false },
-  { id: 2, text: '更新 "Vue3 Admin" 项目文档', done: true },
-  { id: 3, text: '审核新成员加入申请', done: false },
-  { id: 4, text: '准备下周的分享会 PPT', done: false }
-])
-
-const newTodo = ref('')
-
-const addTodo = () => {
-  if (!newTodo.value.trim()) return
-  todoList.value.push({
-    id: Date.now(),
-    text: newTodo.value,
-    done: false
-  })
-  newTodo.value = ''
-}
-
-const removeTodo = (id: number) => {
-  todoList.value = todoList.value.filter(t => t.id !== id)
-}
-
-const clearCompleted = () => {
-  todoList.value = todoList.value.filter(t => !t.done)
-}
 
 // 系统设置数据
 const systemSettings = ref({
@@ -730,63 +705,129 @@ const projectColumns: DataTableColumns<ProjectRow> = [
 
 /* Overview Styles */
 .welcome-card {
-  background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
-  border-radius: 12px;
-  padding: 24px;
+  background: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
+  border-radius: 16px;
+  padding: 32px;
   position: relative;
   overflow: hidden;
-  border: 1px solid #bae6fd;
+  box-shadow: 0 10px 20px rgba(142, 197, 252, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   
   .text-content {
+    position: relative;
+    z-index: 2;
+    max-width: 60%;
+
     h2 {
-      margin: 0 0 8px 0;
-      color: #0369a1;
-      font-size: 20px;
+      margin: 0 0 12px 0;
+      color: #fff;
+      font-size: 28px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     p {
       margin: 0;
-      color: #0c4a6e;
+      color: rgba(255,255,255,0.9);
+      font-size: 16px;
+    }
+    
+    .quick-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+      
+      .n-button {
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        border: none;
+      }
+    }
+  }
+  
+  .illustration {
+    position: absolute;
+    right: 20px;
+    bottom: -20px;
+    width: 180px;
+    height: 180px;
+    opacity: 0.9;
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .welcome-card {
+    padding: 20px;
+    
+    .text-content {
+      max-width: 100%;
+      
+      h2 { font-size: 24px; }
+      
+      .quick-actions {
+        flex-direction: column;
+        .n-button { width: 100%; }
+      }
+    }
+    
+    .illustration {
+      display: none;
     }
   }
 }
 
 .stat-card {
-  border-radius: 12px;
-  transition: transform 0.2s;
+  border-radius: 16px;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
   
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+    border-color: rgba(0,0,0,0.05);
   }
 
   :deep(.n-card__content) {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 20px;
+    padding: 20px !important;
   }
   
   .stat-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    font-size: 28px;
+    transition: transform 0.3s ease;
     
-    &.blue { background: #e6f7ff; color: #1890ff; }
-    &.green { background: #f6ffed; color: #52c41a; }
-    &.purple { background: #f9f0ff; color: #722ed1; }
-    &.orange { background: #fff7e6; color: #fa8c16; }
+    &.blue { background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%); color: #0050b3; }
+    &.green { background: linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%); color: #389e0d; }
+    &.purple { background: linear-gradient(135deg, #f9f0ff 0%, #efdbff 100%); color: #531dab; }
+    &.orange { background: linear-gradient(135deg, #fff7e6 0%, #ffe7ba 100%); color: #d46b08; }
+  }
+
+  &:hover .stat-icon {
+    transform: scale(1.1);
   }
   
   .stat-info {
     flex: 1;
-    .label { color: #8c8c8c; font-size: 12px; }
-    .value { font-size: 20px; font-weight: 700; color: #262626; line-height: 1.4; }
+    .label { color: #666; font-size: 13px; margin-bottom: 4px; }
+    .value { font-size: 24px; font-weight: 700; color: #1f1f1f; line-height: 1.2; }
     .trend { 
       font-size: 12px; 
-      color: #8c8c8c;
+      color: #999;
+      margin-top: 4px;
       &.up { color: #52c41a; }
       &.down { color: #ff4d4f; }
     }
@@ -798,31 +839,9 @@ const projectColumns: DataTableColumns<ProjectRow> = [
   height: 100%;
 }
 
-.todo-card {
+.activity-card {
   border-radius: 12px;
   height: 100%;
-  
-  .todo-text {
-    &.done {
-      text-decoration: line-through;
-      color: #bfbfbf;
-    }
-  }
-
-  .delete-btn {
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-
-  :deep(.n-list-item:hover) .delete-btn {
-    opacity: 1;
-  }
-  
-  .add-todo-box {
-    margin-top: 16px;
-    display: flex;
-    gap: 8px;
-  }
 }
 
 .mb-6 { margin-bottom: 24px; }

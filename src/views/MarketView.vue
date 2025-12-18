@@ -47,11 +47,11 @@
             <h1>发现无限创意<br/><span class="highlight">探索 AI 的可能性</span></h1>
             <p class="subtitle">汇聚全球开发者的智慧结晶，为您提供最前沿的 AI 应用与设计资源。在这里，每一个想法都值得被看见。</p>
             <div class="hero-actions">
-              <n-button type="primary" size="large" round class="explore-btn">
-                开始探索
+              <n-button type="primary" size="large" round class="explore-btn" @click="$router.push('/ai/workshop')">
+                立即创作
                 <template #icon><n-icon :component="ArrowForwardOutline" /></template>
               </n-button>
-              <n-button size="large" round ghost class="creator-btn">
+              <n-button size="large" round ghost class="creator-btn" @click="$router.push('/create')">
                 我是创作者
               </n-button>
             </div>
@@ -59,10 +59,16 @@
           <div class="hero-visual">
             <!-- Abstract Glass Cards -->
             <div class="glass-card card-1">
-              <div class="glass-content"></div>
+              <div class="glass-content">
+                <div class="card-icon"><n-icon :component="CubeOutline" /></div>
+                <div class="card-lines"><span></span><span></span></div>
+              </div>
             </div>
             <div class="glass-card card-2">
-              <div class="glass-content"></div>
+              <div class="glass-content">
+                <div class="card-icon"><n-icon :component="Heart" color="#f43f5e" /></div>
+                <div class="card-stat"><span>98%</span> Match</div>
+              </div>
             </div>
           </div>
         </div>
@@ -122,6 +128,9 @@
         <n-grid-item v-for="item in filteredProjectList" :key="item.id">
           <div class="project-card" @click="goToProject(item.id)">
             <div class="card-thumb" :style="{ backgroundImage: `url(${item.cover})` }">
+              <div v-if="item.likes > 500" class="hot-badge">
+                <n-icon :component="Heart" /> 热门
+              </div>
               <div class="card-overlay">
                 <n-button quaternary circle color="#fff" @click.stop>
                   <template #icon><n-icon :component="HeartOutline" /></template>
@@ -159,7 +168,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { SearchOutline, HeartOutline, Heart, ChevronForwardOutline, ChevronBackOutline, ArrowForwardOutline } from '@vicons/ionicons5'
+import { SearchOutline, HeartOutline, Heart, ChevronForwardOutline, ChevronBackOutline, ArrowForwardOutline, CubeOutline } from '@vicons/ionicons5'
 
 const router = useRouter()
 const searchQuery = ref('')
@@ -498,8 +507,42 @@ $border-color: #e5e7eb;
             top: 30px;
             left: 10px;
             z-index: 2;
-            background: linear-gradient(135deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.3) 100%);
+            background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.5) 100%);
             transform: rotate(-6deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            
+            .glass-content {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 12px;
+              
+              .card-icon {
+                font-size: 32px;
+                color: #3b82f6;
+                background: #eff6ff;
+                padding: 12px;
+                border-radius: 12px;
+              }
+              
+              .card-lines {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                
+                span {
+                  display: block;
+                  height: 6px;
+                  background: #e2e8f0;
+                  border-radius: 3px;
+                  
+                  &:first-child { width: 80px; }
+                  &:last-child { width: 50px; }
+                }
+              }
+            }
           }
           
           &.card-2 {
@@ -508,9 +551,70 @@ $border-color: #e5e7eb;
             bottom: 20px;
             right: 10px;
             z-index: 1;
-            background: linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.2) 100%);
+            background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.4) 100%);
             transform: rotate(6deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            
+            .glass-content {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 8px;
+              
+              .card-icon {
+                font-size: 40px;
+                filter: drop-shadow(0 4px 6px rgba(244, 63, 94, 0.2));
+              }
+              
+              .card-stat {
+                font-size: 14px;
+                color: #64748b;
+                font-weight: 500;
+                
+                span {
+                  color: #0f172a;
+                  font-weight: 700;
+                  font-size: 20px;
+                }
+              }
+            }
           }
+        }
+      }
+    }
+    
+    @media (max-width: 1024px) {
+      padding: 84px 16px 24px;
+      
+      .hero-card {
+        padding: 32px;
+        flex-direction: column;
+        text-align: center;
+        
+        .hero-text {
+          max-width: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          
+          h1 { font-size: 28px; }
+          .subtitle { font-size: 14px; }
+          .hero-actions { justify-content: center; }
+        }
+        
+        .hero-visual { display: none !important; }
+      }
+      
+      .top-actions {
+        flex-direction: column;
+        align-items: stretch;
+        
+        .search-bar { width: 100% !important; }
+        .header-tabs { 
+          width: 100%;
+          overflow-x: auto;
         }
       }
     }
@@ -538,6 +642,22 @@ $border-color: #e5e7eb;
   max-width: 1280px;
   margin: 0 auto;
   padding: 24px 20px 32px; /* Reduced top padding */
+
+  @media (max-width: 768px) {
+    padding: 16px;
+    
+    .list-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+      
+      .right-section {
+        width: 100%;
+        .n-space { width: 100%; justify-content: space-between; }
+        .n-select { width: 48% !important; }
+      }
+    }
+  }
 
   .list-header {
     display: flex;
@@ -709,26 +829,57 @@ $border-color: #e5e7eb;
 
 .project-card {
   background: $card-bg;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
-  transition: all 0.3s ease;
-  border: 1px solid transparent;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(0,0,0,0.05);
   cursor: pointer;
   height: 100%;
   display: flex;
   flex-direction: column;
   
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
-    border-color: rgba($primary-color, 0.3);
+    transform: translateY(-8px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: rgba($primary-color, 0.2);
+    
+    .card-thumb {
+      transform: scale(1.02);
+    }
   }
   
   .card-thumb {
-    height: 180px;
+    height: 200px;
     background-size: cover;
     background-position: center;
     position: relative;
+    transition: transform 0.5s ease;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 50%);
+      opacity: 0.6;
+    }
+
+    .hot-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(225, 29, 72, 0.9);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      z-index: 2;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      backdrop-filter: blur(4px);
+    }
     
     .card-overlay {
       position: absolute;
@@ -736,6 +887,7 @@ $border-color: #e5e7eb;
       right: 12px;
       opacity: 0;
       transition: opacity 0.2s;
+      z-index: 2;
     }
   }
   
@@ -744,37 +896,54 @@ $border-color: #e5e7eb;
   }
   
   .card-body {
-    padding: 16px;
+    padding: 20px;
     flex: 1;
     display: flex;
     flex-direction: column;
+    position: relative;
+    z-index: 1;
+    background: #fff;
     
     .card-title {
-      font-size: 16px;
-      font-weight: 600;
+      font-size: 18px;
+      font-weight: 700;
       margin: 0 0 12px;
       color: $text-primary;
       line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
     
     .card-meta {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
-      font-size: 13px;
+      margin-bottom: 16px;
+      font-size: 14px;
       color: $text-secondary;
       
       .author {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
+        font-weight: 500;
+        transition: color 0.2s;
+        
+        &:hover { color: $primary-color; }
       }
       
       .likes {
         display: flex;
         align-items: center;
-        gap: 4px;
+        gap: 6px;
+        background: #fff1f2;
+        padding: 4px 10px;
+        border-radius: 20px;
+        color: #e11d48;
+        font-weight: 600;
+        font-size: 12px;
       }
     }
     

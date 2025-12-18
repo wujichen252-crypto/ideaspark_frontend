@@ -73,8 +73,11 @@ function handleScroll() {
     return
   }
 
-  // 首页逻辑：根据滚动条位置判断
-  const scrolled = window.scrollY > 200
+  // 首页逻辑
+  const scrolled = window.scrollY > 100
+  
+  // 调试日志，确认滚动触发
+  // console.log('Scroll:', window.scrollY, 'Scrolled:', scrolled, 'Current:', isScrolled.value)
 
   if (scrolled !== isScrolled.value) {
     isScrolled.value = scrolled
@@ -110,31 +113,52 @@ onUnmounted(() => {
   tl?.kill()
 })
 
+const solidSquareRef = ref<HTMLElement | null>(null)
+const logoTitleRef = ref<HTMLElement | null>(null)
+const subtitleRef = ref<HTMLElement | null>(null)
+const logoIconRef = ref<HTMLElement | null>(null)
+const scrolledLogoRef = ref<HTMLElement | null>(null)
+
 function initAnimation() {
-  // 获取元素
-  const titleChars = document.querySelectorAll('.logo-title-char')
-  const subtitle = document.querySelector('.logo-subtitle')
-  const logoIcon = document.querySelector('.logo-icon-wrapper')
-  const energyParticles = document.querySelectorAll('.energy-particle')
-  const scrolledLogo = document.querySelector('.scrolled-logo-container')
-  const solidSquare = document.querySelector('.solid-square')
+  // 使用 Refs 获取元素
+  let titleChars = logoTitleRef.value?.querySelectorAll('.logo-title-char')
+  let subtitle = subtitleRef.value
+  let logoIcon = logoIconRef.value
+  let scrolledLogo = scrolledLogoRef.value
+  let solidSquare = solidSquareRef.value
+
+  // Fallback: 如果 Refs 为空，尝试直接查询 DOM (防止 Refs 尚未绑定)
+  if (!titleChars?.length || !subtitle || !logoIcon || !scrolledLogo || !solidSquare) {
+    const headerEl = document.querySelector('.app-header')
+    if (headerEl) {
+      if (!titleChars?.length) titleChars = headerEl.querySelectorAll('.logo-title-char')
+      if (!subtitle) subtitle = headerEl.querySelector('.logo-subtitle') as HTMLElement
+      if (!logoIcon) logoIcon = headerEl.querySelector('.logo-icon-wrapper') as HTMLElement
+      if (!scrolledLogo) scrolledLogo = headerEl.querySelector('.scrolled-logo-container') as HTMLElement
+      if (!solidSquare) solidSquare = headerEl.querySelector('.solid-square') as HTMLElement
+    }
+  }
+
+  if (!titleChars?.length || !subtitle || !logoIcon || !scrolledLogo || !solidSquare) {
+    console.warn('GSAP Animation elements missing', {
+      titleChars: titleChars?.length,
+      subtitle,
+      logoIcon,
+      scrolledLogo,
+      solidSquare
+    })
+    return
+  }
 
   // 创建时间轴 (默认为暂停状态)
   tl = gsap.timeline({ paused: true })
 
-  // 1. 初始文字解构 (Deconstruction)
-  // 文字随机散开、变模糊、变透明
+  // 1. 初始文字解构 (Deconstruction) - 简化动画以提升性能
   tl.to(titleChars, {
-    duration: 0.5,
-    x: () => (Math.random() - 0.5) * 100, // 随机横向炸开
-    y: () => (Math.random() - 0.5) * 50,  // 随机纵向炸开
+    duration: 0.4,
     opacity: 0,
-    scale: 0,
-    filter: 'blur(10px)',
-    stagger: {
-      amount: 0.3,
-      from: 'center'
-    },
+    y: -20, // 简单上移消失，替代复杂的随机炸开
+    stagger: 0.05,
     ease: 'power2.in'
   }, 0)
 
@@ -142,65 +166,44 @@ function initAnimation() {
   tl.to([subtitle, logoIcon], {
     duration: 0.4,
     opacity: 0,
-    scale: 0.5,
-    filter: 'blur(5px)',
+    scale: 0.8,
     ease: 'power2.in'
   }, 0)
 
-  // 2. 能量流过渡 (Transition Flow)
-  // 粒子从文字位置飞向左上角 Logo 位置
-  // 假设 Logo 最终位置在 left: 12px, top: 50% (相对于 header)
-  // 也就是 x: -160px (估算值，取决于布局)
-
-  // 设置粒子初始状态 (在文字区域)
-  gsap.set(energyParticles, {
-    x: 0,
-    y: 0,
-    opacity: 0,
-    scale: 0
-  })
-
+  // 2. 能量流过渡 - 减少粒子数量或简化效果
+  // 为了性能，我们这里暂时隐藏粒子效果，直接进行 Logo 切换
+  // 如果需要粒子，可以解除注释并减少数量
+  /*
+  gsap.set(energyParticles, { x: 0, y: 0, opacity: 0, scale: 0 })
   tl.to(energyParticles, {
-    duration: 0.6,
+    duration: 0.5,
     opacity: 1,
-    scale: () => Math.random() * 1 + 0.5,
-    x: -180, // 向左飞行的距离，需要根据实际布局微调
+    x: -180,
     y: 0,
-    stagger: {
-      amount: 0.4
-    },
-    ease: 'power2.inOut',
-    // 飞行过程中拉长，模拟光线
-    scaleX: 3,
-    scaleY: 0.2
+    stagger: 0.02, // 加快交错
+    ease: 'power1.inOut'
   }, 0.2)
-
-  // 粒子到达终点后消失
   tl.to(energyParticles, {
-    duration: 0.3,
-    opacity: 0,
-    scale: 0,
-    stagger: {
-      amount: 0.4
-    }
-  }, 0.6)
+    duration: 0.2,
+    opacity: 0
+  }, 0.5)
+  */
 
   // 3. 形态重组 (Reassembly)
-  // 新 Logo 从光芒中诞生
   tl.fromTo(scrolledLogo,
     {
       autoAlpha: 0,
-      scale: 0,
-      rotation: -180
+      scale: 0.5,
+      rotation: -90
     },
     {
-      duration: 0.8,
+      duration: 0.6,
       autoAlpha: 1,
       scale: 1,
       rotation: 0,
-      ease: 'elastic.out(1, 0.5)'
+      ease: 'back.out(1.7)'
     },
-    0.5 // 提前一点开始，与粒子消失重叠
+    0.3 // 提前开始，衔接更紧凑
   )
 
   // 方块的变形效果强化
@@ -242,7 +245,7 @@ function initAnimation() {
           </div>
 
           <!-- 滚动后 Logo -->
-          <div class="scrolled-logo-container">
+          <div class="scrolled-logo-container" ref="scrolledLogoRef">
              <svg class="art-pattern" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <mask id="hollow-mask">
@@ -264,25 +267,26 @@ function initAnimation() {
                 fill="#4ADE80"
                 mask="url(#hollow-mask)"
                 class="solid-square"
+                ref="solidSquareRef"
               />
             </svg>
           </div>
 
           <!-- 初始 Logo -->
           <div class="initial-logo-container">
-            <div class="logo-icon-wrapper">
+            <div class="logo-icon-wrapper" ref="logoIconRef">
               <div class="logo-icon">
                 <div class="logo-spark"></div>
               </div>
             </div>
             <div class="logo-content">
-              <div class="logo-title">
+              <div class="logo-title" ref="logoTitleRef">
                 <span class="logo-title-char">意</span>
                 <span class="logo-title-char">念</span>
                 <span class="logo-title-char">方</span>
                 <span class="logo-title-char">舟</span>
               </div>
-              <div class="logo-subtitle">IDEASPARK</div>
+              <div class="logo-subtitle" ref="subtitleRef">IDEASPARK</div>
             </div>
           </div>
         </div>

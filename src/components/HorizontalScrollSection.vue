@@ -38,6 +38,8 @@
                 :src="card.image"
                 :alt="card.title"
                 class="card-image"
+                loading="lazy"
+                decoding="async"
               />
               <!-- 可选：添加一个提示，方便用户知道这里是放图片的 -->
               <span v-else class="placeholder-text">图片占位区域</span>
@@ -49,9 +51,15 @@
         </div>
       </div>
     </div>
+    <div class="scroll-spacer" :style="{ height: `${scrollDistance}px` }" aria-hidden="true"></div>
   </section>
 </template>
 
+/**
+ * 横向滚动展示组件 (Horizontal Scroll Section)
+ * @description 使用 GSAP ScrollTrigger 实现的横向滚动展示模块
+ * 对应首页 Session 3
+ */
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue'
 import gsap from 'gsap'
@@ -73,80 +81,130 @@ const cards = [
     id: '01',
     title: '灵感生成',
     desc: '输入简单的文本描述，AI 即刻生成多种风格的创意草图。',
-    image: new URL('@/assets/images/card-1.jpg', import.meta.url).href
+    image: new URL('../assets/images/card-1.jpg', import.meta.url).href
   },
   {
     id: '02',
     title: '智能建模',
     desc: '自动拓扑与 UV 展开，从草图到高精度 3D 模型只需一步。',
-    image: new URL('@/assets/images/card-2.jpg', import.meta.url).href
+    image: new URL('../assets/images/card-2.jpg', import.meta.url).href
   },
   {
     id: '03',
     title: '材质匹配',
     desc: '基于物理的 PBR 材质库，AI 智能匹配纹理与光泽。',
-    image: new URL('@/assets/images/card-3.jpg', import.meta.url).href
+    image: new URL('../assets/images/card-3.jpg', import.meta.url).href
   },
   {
     id: '04',
     title: '场景搭建',
     desc: '智能布局算法，自动生成符合逻辑的场景道具与环境光照。',
-    image: new URL('@/assets/images/card-4.jpg', import.meta.url).href
+    image: new URL('../assets/images/card-4.jpg', import.meta.url).href
   },
   {
     id: '05',
     title: '动画绑定',
     desc: '无需手动刷权重，AI 自动识别骨骼节点并完成蒙皮绑定。',
-    image: new URL('@/assets/images/card-5.jpg', import.meta.url).href
+    image: new URL('../assets/images/card-5.jpg', import.meta.url).href
   },
   {
     id: '06',
     title: '多端发布',
     desc: '一键导出 GLB、USDZ 等通用格式，无缝对接 Unity 或 Web。',
-    image: new URL('@/assets/images/card-6.jpg', import.meta.url).href
+    image: new URL('../assets/images/card-6.jpg', import.meta.url).href
   }
 ]
 
 const sectionRef = ref<HTMLElement | null>(null)
+const pinWrapRef = ref<HTMLElement | null>(null)
 const trackRef = ref<HTMLElement | null>(null)
+const scrollDistance = ref(0)
 
-let ctx: gsap.Context
+let ctx: gsap.Context | null = null
+let observer: IntersectionObserver | null = null
+let hasInit = false
 
 onMounted(() => {
-  ctx = gsap.context(() => {
-    const section = sectionRef.value
-    const track = trackRef.value
+  /**
+   * 初始化横向滚动的 GSAP/ScrollTrigger
+   * @description 进入视口后再挂载，避免首页首屏阻塞与错误计算
+   */
+  const mountGsap = () => {
+    if (hasInit) return
+    hasInit = true
 
-    if (!section || !track) return
+    ctx = gsap.context(() => {
+      const section = sectionRef.value
+      const pinWrap = pinWrapRef.value
+      const track = trackRef.value
 
-    // 核心计算：卡片总宽度 - 视口宽度
-    // track.scrollWidth 包含了 Spacer + 所有卡片 + gap
-    // 当 translateX = -(track.scrollWidth - viewportWidth) 时
-    // 轨道的最右端会刚好对齐视口的最右端
-    const getScrollAmount = () => {
-      // 使用 offsetWidth 获取不包含滚动条的实际宽度，避免 Windows 下滚动条导致的计算误差
-      const viewportWidth = section.offsetWidth
-      return -(track.scrollWidth - viewportWidth)
-    }
+      if (!section || !pinWrap || !track) return
+      if (window.matchMedia('(max-width: 1024px)').matches) return
 
-    gsap.to(track, {
-      x: getScrollAmount,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: section,
-        pin: true,
-        start: 'top top',
-        // 滚动行程：使用实际可视宽度计算
-        end: () => `+=${track.scrollWidth - section.offsetWidth}`,
-        scrub: 0.5, // 平滑阻尼
-        invalidateOnRefresh: true
+      /**
+       * 计算横向需要滚动的距离
+       * @description 将内容滚动宽度差转为 x 平移动画距离
+       */
+      const getScrollAmount = () => {
+        const viewportWidth = section.clientWidth
+        return -Math.max(0, track.scrollWidth - viewportWidth)
       }
-    })
-  }, sectionRef.value!)
+
+      /**
+       * 更新占位高度，避免 ScrollTrigger 在初始化时动态插入占位导致“瞬移”
+       * @description 将滚动距离写入 `scrollDistance`，让 section 自身提供足够的滚动空间
+       */
+      const updateScrollDistance = () => {
+        scrollDistance.value = Math.max(0, track.scrollWidth - section.clientWidth)
+      }
+
+      updateScrollDistance()
+
+      gsap.to(track, {
+        x: getScrollAmount,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: section,
+          // pin: pinWrap, // Removed: Using CSS sticky instead for smoother behavior
+          // pinSpacing: false,
+          start: 'top top',
+          end: () => `+=${scrollDistance.value}`,
+          scrub: 0.5,
+          // anticipatePin: 1,
+          invalidateOnRefresh: true,
+          onRefreshInit: updateScrollDistance,
+          onRefresh: updateScrollDistance
+        }
+      })
+
+      requestAnimationFrame(() => ScrollTrigger.refresh())
+    }, sectionRef.value!)
+  }
+
+  if (!('IntersectionObserver' in window)) {
+    mountGsap()
+    return
+  }
+
+  observer = new IntersectionObserver(
+    entries => {
+      if (entries.some(e => e.isIntersecting)) {
+        mountGsap()
+        observer?.disconnect()
+        observer = null
+      }
+    },
+    { root: null, rootMargin: '400px 0px', threshold: 0 }
+  )
+
+  if (sectionRef.value) observer.observe(sectionRef.value)
 })
 
 onUnmounted(() => {
+  observer?.disconnect()
+  observer = null
   ctx?.revert()
+  ctx = null
 })
 </script>
 
@@ -154,18 +212,25 @@ onUnmounted(() => {
 /* 核心容器：自适应父容器宽度 (由于全局样式已修复，直接 100% 即可) */
 .horizontal-scroll-section {
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   background-color: #000; /* 黑色背景 */
 }
 
 /* Pin 包装器 */
 .pin-wrap {
   width: 100%;
-  height: 100%;
-  position: relative;
+  height: 100vh; /* Force full viewport height */
+  position: sticky; /* Use native sticky positioning */
+  top: 0;
+  z-index: 1;
   overflow: hidden;
+}
+
+.scroll-spacer {
+  width: 100%;
+  pointer-events: none;
 }
 
 /* 左侧固定内容 */
@@ -179,7 +244,10 @@ onUnmounted(() => {
   background-color: #000; /* 黑色背景，遮挡下方滑过的卡片 */
   display: flex;
   align-items: center;
-  padding-left: 6vw; /* 内部留白 */
+  /* 动态计算 padding-left 以对齐 Header */
+  /* Header: max-width 1440px, padding 32px, centered */
+  /* 使用 100% 而非 100vw，确保基于实际容器宽度（扣除滚动条）计算，避免文字偏右 */
+  padding-left: max(32px, calc((100% - 1440px) / 2 + 32px)); 
   padding-right: 40px;
 
   /* 添加右侧渐变遮罩，让卡片消失得更自然 */

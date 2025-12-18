@@ -42,9 +42,7 @@
               :key="index"
               :title="'步骤 ' + (index + 1)"
             >
-              <template #description>
-                <n-input v-model:value="userFlows[index]" placeholder="用户操作..." size="small" />
-              </template>
+              <n-input v-model:value="userFlows[index]" placeholder="用户操作..." size="small" />
             </n-step>
             <n-step title="结束" status="finish" />
           </n-steps>

@@ -238,7 +238,7 @@ import {
   DownloadOutline, ResizeOutline, ExpandOutline,
   ArrowBackOutline, SettingsOutline, LogOutOutline
 } from '@vicons/ionicons5'
-import { NIcon } from 'naive-ui'
+import { NIcon, useMessage } from 'naive-ui'
 import AiChatArea from '../components/AiChatArea.vue'
 import IdeaModule from './modules/IdeaModule.vue'
 import ProductModule from './modules/ProductModule.vue'
@@ -251,6 +251,7 @@ const route = useRoute()
 const router = useRouter()
 const store = useAiWorkshopStore()
 const { currentModuleData, currentProjectId, projectInfo, currentModule, moduleOrder } = storeToRefs(store)
+const message = useMessage()
 
 const chatAreaRef = ref()
 const isSidebarCollapsed = ref(false)
@@ -370,6 +371,14 @@ const handleAiPrompt = (e: Event) => {
 
 onMounted(() => {
   window.addEventListener('ai-prompt', handleAiPrompt)
+  
+  // Mobile adaptation: auto-collapse sidebar and set narrow mode
+  if (window.innerWidth < 768) {
+    isSidebarCollapsed.value = true
+    // Assistant panel will be stacked, so width doesn't matter as much, 
+    // but we can set it to a reasonable height if we were controlling height.
+    // CSS will handle the layout change.
+  }
 })
 
 onUnmounted(() => {
@@ -673,8 +682,8 @@ const handleExport = () => {
     
     .ph-desc {
       margin: 0;
-      font-size: 15px;
       color: #666;
+      font-size: 14px;
       line-height: 1.6;
     }
   }
@@ -786,6 +795,49 @@ const handleExport = () => {
         }
       }
     }
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-sidebar {
+    position: absolute;
+    z-index: 100;
+    height: 100%;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+    
+    /* Keep collapsed width at 64px so toggle is visible */
+    &.collapsed {
+      width: 64px;
+    }
+    
+    &:not(.collapsed) {
+      width: 240px;
+    }
+  }
+
+  .split-layout {
+    flex-direction: column;
+    padding-left: 64px; /* Make room for the collapsed sidebar */
+  }
+
+  .resizer {
+    display: none;
+  }
+
+  .assistant-panel {
+    width: 100% !important;
+    border-left: none;
+    border-top: 1px solid #eef0f5;
+    flex: 1;
+    min-height: 400px;
+    min-width: 0;
+  }
+  
+  .main-panel {
+    flex: none;
+    height: auto;
+    min-height: 50vh;
+    min-width: 0;
   }
 }
 </style>

@@ -8,10 +8,12 @@
           muted
           loop
           playsinline
-          poster="@/assets/videos/hero.jpg"
+          :poster="heroPosterUrl"
+          preload="metadata"
+          disablepictureinpicture
         >
           <!-- <source src="@/assets/videos/hero.webm" type="video/webm" /> -->
-          <source src="@/assets/videos/hero.mp4" type="video/mp4" />
+          <source :src="heroVideoUrl" type="video/mp4" />
         </video>
 
         <div class="hero__overlay"></div>
@@ -21,7 +23,7 @@
           <p>从灵感到落地，只需一句话</p>
           
           <!-- 新增“开始创作”交互按钮 -->
-          <div class="cta-link-wrapper" @click="$router.push('/login')">
+          <div class="cta-link-wrapper" @click="handleGoLogin">
             <span class="cta-text">开始创作</span>
             <span class="cta-arrow">→</span>
             <div class="cta-underline"></div>
@@ -44,28 +46,99 @@
     </section>
 
     <!-- 横向滚动模块 -->
-    <HorizontalScrollSection />
+    <div ref="horizontalSentinel" class="lazy-sentinel" aria-hidden="true"></div>
+    <section class="lazy-section" style="content-visibility: visible; contain-intrinsic-size: auto;">
+      <HorizontalScrollSection v-if="isHorizontalReady" />
+    </section>
 
     <!-- 双排自动滚动卡片模块 -->
-    <DoubleScrollSection />
+    <div ref="doubleScrollSentinel" class="lazy-sentinel" aria-hidden="true"></div>
+    <section class="lazy-section">
+      <DoubleScrollSection v-if="isDoubleScrollReady" />
+    </section>
 
     <!-- 隐私与安全模块 -->
-    <PrivacySection />
+    <div ref="privacySentinel" class="lazy-sentinel" aria-hidden="true"></div>
+    <section class="lazy-section">
+      <PrivacySection v-if="isPrivacyReady" />
+    </section>
 
     <!-- IdeaSpark 过渡模块 -->
-    <IdeaSparkSection />
+    <div ref="ideaSparkSentinel" class="lazy-sentinel" aria-hidden="true"></div>
+    <section class="lazy-section">
+      <IdeaSparkSection v-if="isIdeaSparkReady" />
+    </section>
   </div>
+
+  <!-- 占位层：替代 margin-bottom，确保能滚动出 ImpactSection 的高度 -->
+  <div class="reveal-spacer"></div>
 
   <!-- Impact 视觉冲击模块 (Fixed Reveal) -->
   <ImpactSection />
 </template>
 
 <script setup lang="ts">
-import HorizontalScrollSection from '@/components/HorizontalScrollSection.vue'
-import DoubleScrollSection from '@/components/DoubleScrollSection.vue'
-import PrivacySection from '@/components/PrivacySection.vue'
-import IdeaSparkSection from '@/components/IdeaSparkSection.vue'
+import { defineAsyncComponent, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const HorizontalScrollSection = defineAsyncComponent(() => import('@/components/HorizontalScrollSection.vue'))
+const DoubleScrollSection = defineAsyncComponent(() => import('@/components/DoubleScrollSection.vue'))
+const PrivacySection = defineAsyncComponent(() => import('@/components/PrivacySection.vue'))
+const IdeaSparkSection = defineAsyncComponent(() => import('@/components/IdeaSparkSection.vue'))
 import ImpactSection from '@/components/ImpactSection.vue'
+
+const router = useRouter()
+
+const heroVideoUrl = new URL('../assets/videos/hero.mp4', import.meta.url).href
+const heroPosterUrl = new URL('../assets/videos/hero.jpg', import.meta.url).href
+
+const horizontalSentinel = ref<HTMLElement | null>(null)
+const doubleScrollSentinel = ref<HTMLElement | null>(null)
+const privacySentinel = ref<HTMLElement | null>(null)
+const ideaSparkSentinel = ref<HTMLElement | null>(null)
+
+const isHorizontalReady = ref(false)
+const isDoubleScrollReady = ref(false)
+const isPrivacyReady = ref(false)
+const isIdeaSparkReady = ref(false)
+
+let observers: IntersectionObserver[] = []
+
+const handleGoLogin = () => {
+  router.push('/login')
+}
+
+const createObserver = (target: HTMLElement | null, onEnter: () => void, rootMargin: string) => {
+  if (!target) return
+  if (!('IntersectionObserver' in window)) {
+    onEnter()
+    return
+  }
+
+  const observer = new IntersectionObserver(
+    entries => {
+      if (entries.some(e => e.isIntersecting)) {
+        onEnter()
+        observer.disconnect()
+      }
+    },
+    { root: null, rootMargin, threshold: 0 }
+  )
+  observer.observe(target)
+  observers.push(observer)
+}
+
+onMounted(() => {
+  createObserver(horizontalSentinel.value, () => (isHorizontalReady.value = true), '600px 0px')
+  createObserver(doubleScrollSentinel.value, () => (isDoubleScrollReady.value = true), '800px 0px')
+  createObserver(privacySentinel.value, () => (isPrivacyReady.value = true), '800px 0px')
+  createObserver(ideaSparkSentinel.value, () => (isIdeaSparkReady.value = true), '800px 0px')
+})
+
+onBeforeUnmount(() => {
+  observers.forEach(o => o.disconnect())
+  observers = []
+})
 </script>
 
 <style scoped>
@@ -74,10 +147,29 @@ import ImpactSection from '@/components/ImpactSection.vue'
   position: relative;
   z-index: 10; /* 必须高于 ImpactSection */
   background-color: #000; /* 确保不透明 */
-  margin-bottom: 50vh; /* 调整为 50vh，与 ImpactSection 高度一致 */
-  width: 100%; /* 改为 100% 防止溢出 */
+  /* margin-bottom: 100vh;  移除 margin-bottom，改用 spacer */
+  width: 100%; /* 恢复为 100%，遵循正常流布局 */
   /* margin-left: calc(50% - 50vw); */ /* 移除破框技巧，避免水平滚动条 */
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5); /* 增加阴影增强层次感 */
+  contain: paint;
+}
+
+.lazy-sentinel {
+  height: 1px;
+}
+
+.lazy-section {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 900px;
+}
+
+/* 占位层样式 */
+.reveal-spacer {
+  width: 100%;
+  height: 60vh; /* 与 ImpactSection 高度一致 */
+  background: transparent;
+  position: relative;
+  z-index: -1; /* 确保不遮挡 ImpactSection */
+  pointer-events: none;
 }
 
 /* 破框，全宽显示，跳出上层 container 限制 */
@@ -130,8 +222,8 @@ import ImpactSection from '@/components/ImpactSection.vue'
   text-align: left; /* 改为左对齐 */
   color: #fff;
   max-width: 800px;
-  padding: 0; /* 移除之前的 padding */
-  margin-bottom: 100px; /* 使用 margin 把内容顶上去，而不是撑大父容器 */
+  /* padding: 0; */
+  /* margin-bottom: 100px;  由 container padding-bottom 控制 */
 }
 
 .hero__content h1 {
@@ -210,6 +302,37 @@ import ImpactSection from '@/components/ImpactSection.vue'
   color: #ccc; /* 浅灰描述 */
   max-width: 600px;
   line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 24px;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .hero__content {
+    text-align: center;
+    max-width: 100%;
+    margin-bottom: 60px;
+  }
+  
+  .hero__content h1 {
+    font-size: 2.5rem;
+  }
+  
+  .hero__content p {
+    font-size: 1.1rem;
+    margin-bottom: 32px;
+  }
+  
+  .section-title {
+    font-size: 1.8rem;
+  }
+  
+  .section-content {
+    padding: 60px 20px;
+  }
 }
 
 </style>

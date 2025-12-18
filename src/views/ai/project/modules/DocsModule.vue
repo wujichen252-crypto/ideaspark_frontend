@@ -101,7 +101,7 @@ const currentDoc = ref<ProjectDoc | null>(null)
 
 watchEffect(() => {
   if (!currentDoc.value && docs.value && docs.value.length > 0) {
-    currentDoc.value = docs.value[0]
+    currentDoc.value = docs.value[0] ?? null
   }
 })
 

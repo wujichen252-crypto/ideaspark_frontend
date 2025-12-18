@@ -88,8 +88,8 @@
               <div class="badge visibility" :class="project.visibility || 'private'">
                 {{ project.visibility === 'public' ? '公开' : '私有' }}
               </div>
-              <div class="badge status" :class="project.currentStage">
-                {{ formatStage(project.currentStage) }}
+              <div class="badge status" :class="project.currentModule">
+                {{ formatModule(project.currentModule) }}
               </div>
             </div>
             
@@ -113,10 +113,10 @@
               <span class="time">更新于 {{ formatTime(project.updatedAt) }}</span>
               <div class="progress-dots">
                 <span 
-                  v-for="(stage, index) in store.stageOrder" 
-                  :key="stage" 
+                  v-for="(moduleKey, index) in store.moduleOrder" 
+                  :key="moduleKey" 
                   class="dot"
-                  :class="{ active: store.stageOrder.indexOf(project.currentStage) >= index }"
+                  :class="{ active: store.moduleOrder.indexOf(project.currentModule) >= index }"
                 ></span>
               </div>
             </div>
@@ -144,7 +144,7 @@
 <script setup lang="ts">
 import { ref, computed, h } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAiWorkshopStore, type ProjectStage } from '@/store/modules/aiWorkshop'
+import { useAiWorkshopStore, type ProjectModule } from '@/store/modules/aiWorkshop'
 import { 
   Add, RocketOutline, DocumentsOutline, TimeOutline,
   CodeSlashOutline, ColorPaletteOutline, CreateOutline, BulbOutline,
@@ -239,7 +239,7 @@ const totalDuration = computed(() => {
 
 const totalArtifacts = computed(() => {
   // 模拟计算：每个项目产生的产物数量
-  return store.projectList.reduce((acc, curr) => acc + (curr.currentStage === 'execute' ? 5 : 2), 0)
+  return store.projectList.reduce((acc, curr) => acc + (curr.status === 'active' ? 5 : 2), 0)
 })
 
 const handlePageChange = (p: number) => {
@@ -291,14 +291,17 @@ const openProject = (id: string) => {
   }
 }
 
-const formatStage = (stage: ProjectStage) => {
-  const map: Record<string, string> = {
-    idea: '构思阶段',
-    plan: '规划阶段',
-    execute: '执行阶段',
-    optimize: '优化阶段'
+const formatModule = (moduleKey: ProjectModule) => {
+  const map: Record<ProjectModule, string> = {
+    home: '项目概览',
+    idea: '创意与需求',
+    product: '产品方案',
+    brand: '品牌与表达',
+    ui: '视觉方向',
+    feasibility: '可行性评估',
+    docs: '文档中心'
   }
-  return map[stage] || stage
+  return map[moduleKey] || moduleKey
 }
 
 const getProjectType = (category: string) => {

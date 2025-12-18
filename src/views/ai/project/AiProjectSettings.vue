@@ -585,4 +585,49 @@ const handleDelete = () => {
     border: 1px solid #eee;
   }
 }
+
+@media (max-width: 768px) {
+  .settings-container {
+    flex-direction: column;
+    padding: 12px;
+    height: auto;
+    overflow: visible;
+  }
+
+  .settings-sidebar {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+  
+  /* Force Naive UI Grid Items to full width on mobile */
+  :deep(.n-grid) {
+    display: flex !important;
+    flex-direction: column;
+  }
+  
+  :deep(.n-form-item-gi) {
+    width: 100% !important;
+    margin-right: 0 !important;
+  }
+
+  .danger-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    
+    .n-button {
+      width: 100%;
+    }
+  }
+  
+  .setting-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    
+    .n-switch {
+      align-self: flex-end;
+    }
+  }
+}
 </style>

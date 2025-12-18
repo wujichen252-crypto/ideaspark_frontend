@@ -63,18 +63,21 @@
 
 <style scoped lang="scss">
 .ideaspark-section {
-  width: 100%;
-  padding: 100px 0 60px; /* Adjusted padding */
+  width: 100vw; /* 强制全屏宽度，覆盖滚动条区域 */
+  margin-left: calc(50% - 50vw); /* 破框居中，确保背景色延伸到屏幕边缘 */
+  padding: 100px 0 0; /* Remove bottom padding */
   background-color: #000; /* Consistent dark theme */
   display: flex;
   justify-content: center;
   color: #fff;
+  position: relative;
+  z-index: 10; /* 确保盖住底部的 ImpactSection */
 }
 
 .content-wrapper {
   width: 100%;
-  max-width: 1400px;
-  padding: 0 24px;
+  max-width: 1440px; /* 统一为 1440px */
+  padding: 0 32px; /* 统一为 32px */
   display: flex;
   flex-direction: column;
 }

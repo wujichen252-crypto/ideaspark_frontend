@@ -420,4 +420,38 @@ const createProject = async () => {
     }
   }
 }
+
+@media (max-width: 768px) {
+  .ai-project-create {
+    padding: 10px;
+  }
+
+  .create-layout {
+    width: 100%;
+    flex-direction: column;
+    height: auto;
+    min-height: calc(100vh - 20px);
+    max-height: none;
+  }
+
+  .chat-panel {
+    height: 60vh;
+    border-right: none;
+    border-bottom: 1px solid #eee;
+
+    .messages-container {
+      padding: 16px;
+      
+      .message-item {
+        max-width: 90%;
+      }
+    }
+  }
+
+  .preview-panel {
+    width: 100%;
+    height: auto;
+    min-height: 40vh;
+  }
+}
 </style>

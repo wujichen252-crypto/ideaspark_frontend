@@ -36,7 +36,7 @@ export interface ProjectSummary {
   techStack?: string[]
   status?: 'active' | 'completed' | 'paused' | 'draft'
   progress?: number
-  team?: { id: string, name: string, avatar: string }[]
+  team?: { id: string, name: string, avatar: string, role?: 'owner' | 'member' }[]
   detailedDescription?: string
   visibility?: 'public' | 'private'
   allowFork?: boolean
@@ -60,7 +60,10 @@ export const useAiWorkshopStore = defineStore('aiWorkshop', () => {
       techStack: ['需求分析', '用户旅程'],
       status: 'active',
       progress: 15,
-      team: [{ id: 'u1', name: 'User', avatar: '' }, { id: 'ai', name: 'AI Team', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=ai' }],
+      team: [
+        { id: 'u1', name: 'User', avatar: '', role: 'owner' },
+        { id: 'ai', name: 'AI Team', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=ai', role: 'member' }
+      ],
       detailedDescription: '<p>致力于解决大学生求职过程中的信息差和经验不足问题。</p><p>核心功能包括：AI 简历打分与优化、基于真实 JD 的模拟面试训练、个性化职业规划建议。</p>',
       visibility: 'public',
       allowFork: true
@@ -77,7 +80,7 @@ export const useAiWorkshopStore = defineStore('aiWorkshop', () => {
       techStack: ['Flutter', 'MQTT'],
       status: 'active',
       progress: 40,
-      team: [{ id: 'u1', name: 'User', avatar: '' }],
+      team: [{ id: 'u1', name: 'User', avatar: '', role: 'owner' }],
       detailedDescription: '<p>连接家中所有智能设备，提供统一的控制界面和自动化场景配置。</p>',
       visibility: 'private',
       allowFork: false
@@ -94,7 +97,7 @@ export const useAiWorkshopStore = defineStore('aiWorkshop', () => {
       techStack: [],
       status: 'draft',
       progress: 0,
-      team: [{ id: 'me', name: 'Me', avatar: '' }],
+      team: [{ id: 'me', name: 'Me', avatar: '', role: 'owner' }],
       detailedDescription: '<p>草稿阶段...</p>',
       visibility: 'private',
       allowFork: false
@@ -217,11 +220,29 @@ export const useAiWorkshopStore = defineStore('aiWorkshop', () => {
     if (category.includes('创业') || category.includes('SaaS') || category.includes('APP') || category.includes('工具')) type = 'startup'
     else if (category.includes('内容') || category.includes('公众号') || category.includes('视频')) type = 'content'
     
-    const template = templates[type] || templates['general']
+    const template = templates[type] ?? templates.general ?? {}
     
-    if (template.idea) modules.value.idea = { ...modules.value.idea, ...template.idea, checklist: template.idea.checklist.map(i => ({...i})) }
-    if (template.product) modules.value.product = { ...modules.value.product, ...template.product, checklist: template.product.checklist.map(i => ({...i})) }
-    if (template.brand) modules.value.brand = { ...modules.value.brand, ...template.brand, checklist: template.brand.checklist.map(i => ({...i})) }
+    if (template.idea) {
+      modules.value.idea = {
+        ...modules.value.idea,
+        ...template.idea,
+        checklist: template.idea.checklist ? template.idea.checklist.map(i => ({ ...i })) : modules.value.idea.checklist
+      }
+    }
+    if (template.product) {
+      modules.value.product = {
+        ...modules.value.product,
+        ...template.product,
+        checklist: template.product.checklist ? template.product.checklist.map(i => ({ ...i })) : modules.value.product.checklist
+      }
+    }
+    if (template.brand) {
+      modules.value.brand = {
+        ...modules.value.brand,
+        ...template.brand,
+        checklist: template.brand.checklist ? template.brand.checklist.map(i => ({ ...i })) : modules.value.brand.checklist
+      }
+    }
     
     saveProject()
   }
@@ -278,11 +299,13 @@ export const useAiWorkshopStore = defineStore('aiWorkshop', () => {
   }
 
   // 更新任务
-  function updateTask(moduleKey: ProjectModule, taskId: string, updates: Partial<StageChecklistItem>) {
+  function updateTask(moduleKey: ProjectModule, taskId: string, updates: Partial<Omit<StageChecklistItem, 'id'>>) {
     const module = modules.value[moduleKey]
     const index = module.checklist.findIndex(i => i.id === taskId)
     if (index !== -1) {
-      module.checklist[index] = { ...module.checklist[index], ...updates }
+      const existing = module.checklist[index]
+      if (!existing) return
+      module.checklist[index] = { ...existing, ...updates, id: existing.id }
       saveProject()
     }
   }
@@ -338,7 +361,10 @@ export const useAiWorkshopStore = defineStore('aiWorkshop', () => {
         techStack: [],
         status: 'draft',
         progress: 0,
-        team: [{ id: 'me', name: 'Me', avatar: '' }, { id: 'ai', name: 'AI Assistant', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=ai' }],
+        team: [
+          { id: 'me', name: 'Me', avatar: '', role: 'owner' },
+          { id: 'ai', name: 'AI Assistant', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=ai', role: 'member' }
+        ],
         detailedDescription: '<p>暂无详细描述...</p>',
         visibility: 'private',
         allowFork: false,
