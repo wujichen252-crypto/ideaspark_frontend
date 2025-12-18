@@ -1,12 +1,12 @@
 <template>
-  <section class="double-scroll-section">
+  <section ref="sectionRef" class="double-scroll-section">
     <div class="section-header">
       <h2 class="section-title">社区回响</h2>
       <p class="section-subtitle">倾听来自全球开发者的灵感与洞见，汇聚科技与人文的思考</p>
     </div>
 
     <div class="scroll-row top-row">
-      <div class="scroll-track scroll-left">
+      <div class="scroll-track scroll-left" :class="{ 'is-active': isInView }">
         <!-- 第一组数据 -->
         <div class="scroll-set">
           <div
@@ -55,7 +55,7 @@
     </div>
 
     <div class="scroll-row bottom-row">
-      <div class="scroll-track scroll-right">
+      <div class="scroll-track scroll-right" :class="{ 'is-active': isInView }">
         <!-- 第二组数据 -->
         <div class="scroll-set">
           <div
@@ -106,7 +106,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 
 // 模拟数据：14条
 const allData = [
@@ -186,6 +186,31 @@ const allData = [
 const mid = Math.ceil(allData.length / 2)
 const topRowData = ref(allData.slice(0, mid))
 const bottomRowData = ref(allData.slice(mid))
+
+const sectionRef = ref<HTMLElement | null>(null)
+const isInView = ref(false)
+let observer: IntersectionObserver | null = null
+
+onMounted(() => {
+  if (!('IntersectionObserver' in window)) {
+    isInView.value = true
+    return
+  }
+
+  observer = new IntersectionObserver(
+    entries => {
+      isInView.value = entries.some(e => e.isIntersecting)
+    },
+    { root: null, threshold: 0 }
+  )
+
+  if (sectionRef.value) observer.observe(sectionRef.value)
+})
+
+onBeforeUnmount(() => {
+  observer?.disconnect()
+  observer = null
+})
 </script>
 
 <style scoped lang="scss">
@@ -258,7 +283,12 @@ const bottomRowData = ref(allData.slice(mid))
   display: flex;
   gap: 24px;
   width: max-content;
-  /* 初始状态 */
+  animation-play-state: paused;
+  will-change: transform;
+}
+
+.scroll-track.is-active {
+  animation-play-state: running;
 }
 
 .scroll-set {
@@ -373,6 +403,14 @@ const bottomRowData = ref(allData.slice(mid))
 
 .scroll-right {
   animation: scroll-right 45s linear infinite; /* 稍微错开速度 */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-left,
+  .scroll-right {
+    animation: none !important;
+    transform: none !important;
+  }
 }
 
 /* 移动端适配 */

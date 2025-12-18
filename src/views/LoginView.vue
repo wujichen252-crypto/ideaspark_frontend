@@ -213,12 +213,13 @@ function handleRegister() {
 @use "sass:color";
 @import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
 
-/* 全局变量 */
-$primary-color: #4ade80; /* 绿色主题 */
+/* 全局变量 - 亮色主题 */
+$primary-color: #4ade80; /* 保持绿色主题，清新 */
 $secondary-color: #22c55e;
-$text-color: #fff;
-$bg-glass: rgba(255, 255, 255, 0.1);
-$input-bg: rgba(255, 255, 255, 0.05);
+$text-color: #333; /* 深色文字 */
+$text-secondary: #666;
+$bg-color: #f6f5f7; /* 浅灰背景 */
+$glass-bg: rgba(255, 255, 255, 0.9); /* 高透明度白色玻璃 */
 
 /* 全局样式 */
 * {
@@ -231,25 +232,27 @@ $input-bg: rgba(255, 255, 255, 0.05);
   align-items: center;
   flex-direction: column;
   height: 100vh;
-  background: #0f0c29;
+  padding-top: 0; /* Removed padding to allow full screen centering */
+  background: $bg-color;
   font-family: 'Montserrat', sans-serif;
   overflow: hidden;
   position: relative;
 }
 
-/* --- 动态流体背景 (复用原样式) --- */
+/* --- 动态流体背景 (亮色版) --- */
 .aurora-bg {
   position: absolute;
   inset: 0;
   overflow: hidden;
   z-index: 0;
+  background: #f0fdf4; /* 极淡的绿色背景 */
 }
 
 .aurora-blob {
   position: absolute;
   border-radius: 50%;
   filter: blur(80px);
-  opacity: 0.6;
+  opacity: 0.8;
   animation: float 10s infinite ease-in-out;
 }
 
@@ -258,7 +261,7 @@ $input-bg: rgba(255, 255, 255, 0.05);
   left: -10%;
   width: 50vw;
   height: 50vw;
-  background: #24243e;
+  background: #dcfce7; /* 浅绿 */
   animation-delay: 0s;
 }
 
@@ -267,7 +270,7 @@ $input-bg: rgba(255, 255, 255, 0.05);
   right: -10%;
   width: 60vw;
   height: 60vw;
-  background: #302b63;
+  background: #e0f2fe; /* 浅蓝 */
   animation-delay: -2s;
 }
 
@@ -276,7 +279,7 @@ $input-bg: rgba(255, 255, 255, 0.05);
   left: 40%;
   width: 40vw;
   height: 40vw;
-  background: radial-gradient(circle, #0f0c29 0%, #24243e 100%);
+  background: radial-gradient(circle, #fef9c3 0%, #dcfce7 100%); /* 浅黄到浅绿 */
   transform: translate(-50%, -50%);
   animation-delay: -4s;
 }
@@ -289,17 +292,16 @@ $input-bg: rgba(255, 255, 255, 0.05);
 
 /* --- 主容器 --- */
 .container {
-  background: rgba(255, 255, 255, 0.05); /* 极淡的玻璃底 */
+  background: #fff;
   border-radius: 20px;
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.05), 0 10px 10px rgba(0, 0, 0, 0.02); /* 更柔和的阴影 */
   position: relative;
   overflow: hidden;
-  width: 900px;
-  max-width: 100%;
-  min-height: 600px;
+  width: 65vw; /* 使用视口宽度比例，适应不同宽屏 */
+  max-width: 1100px;
+  min-width: 700px; /* 桌面端最小宽度 */
+  min-height: 65vh; /* 使用视口高度比例 */
   z-index: 10;
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .form-container {
@@ -310,29 +312,28 @@ $input-bg: rgba(255, 255, 255, 0.05);
 }
 
 .form-content {
-  background: transparent; /* 透明背景，透出container的玻璃感 */
+  background: #fff; /* 纯白背景 */
   display: flex;
-  justify-content: center; /* 垂直居中 */
-  /* align-items: center;  移除此行，让子元素默认 stretch 占满宽度，从而保证 text-align: center 生效 */
+  justify-content: center;
   flex-direction: column;
   padding: 0 50px;
   height: 100%;
   text-align: center;
-  color: #fff;
+  color: $text-color;
 }
 
 .sign-in-container {
   left: 0;
   width: 50%;
   z-index: 2;
-  opacity: 1; /* 默认可见 */
+  opacity: 1; 
   transition: all 0.6s ease-in-out;
 }
 
 .container.right-panel-active .sign-in-container {
   transform: translateX(100%);
-  opacity: 0; /* 移动后隐藏，防止重叠 */
-  pointer-events: none; /* 防止点击 */
+  opacity: 0; 
+  pointer-events: none; 
 }
 
 .sign-up-container {
@@ -377,7 +378,8 @@ $input-bg: rgba(255, 255, 255, 0.05);
 }
 
 .overlay {
-  background: linear-gradient(to right, #0f0c29, #302b63, #24243e); /* 深色渐变 */
+  background: $primary-color;
+  background: linear-gradient(to right, #4ade80, #22c55e); /* 绿色渐变 */
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 0 0;
@@ -431,6 +433,12 @@ h1 {
   font-weight: bold;
   margin: 0 0 10px 0;
   font-size: 2rem;
+  color: $text-color;
+}
+
+/* 覆盖层里的标题保持白色 */
+.overlay-panel h1 {
+  color: #fff;
 }
 
 p {
@@ -439,24 +447,28 @@ p {
   line-height: 20px;
   letter-spacing: 0.5px;
   margin: 20px 0 30px;
-  color: rgba(255, 255, 255, 0.8);
+  color: $text-secondary;
+}
+
+.overlay-panel p {
+  color: rgba(255, 255, 255, 0.9);
 }
 
 span.divider-text {
   font-size: 12px;
   margin: 15px 0;
-  color: rgba(255, 255, 255, 0.5);
+  color: #999;
 }
 
 a {
-  color: $primary-color;
+  color: $text-secondary;
   font-size: 14px;
   text-decoration: none;
   margin: 15px 0;
   transition: color 0.3s;
   
   &:hover {
-    color: #fff;
+    color: $primary-color;
   }
 }
 
@@ -465,73 +477,75 @@ a {
 }
 
 .social-btn {
-    margin: 0 5px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgba(255, 255, 255, 0.05);
-    color: #fff;
+  margin: 0 5px;
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #333;
+  
+  &:hover {
+    background: #f0f0f0;
+    border-color: #ccc;
+    color: #000;
+  }
+}
+
+.input-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px; 
+}
+
+.custom-input-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 5px;
+
+  .custom-input {
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid #ddd;
     
-    &:hover {
-      background: rgba(255, 255, 255, 0.2);
-      border-color: #fff;
-    }
-  }
-
-  .input-group {
+    padding: 12px 5px;
     width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 15px; /* 增加间距 */
+    box-sizing: border-box; 
+    border-radius: 0; 
+    color: #333;
+    outline: none;
+    transition: all 0.3s;
+    
+    &::placeholder {
+      color: #aaa;
+    }
+    
+    &:focus {
+      background-color: transparent;
+      border-bottom-color: transparent; 
+      box-shadow: none;
+    }
   }
 
-  .custom-input-wrapper {
-    position: relative;
+  /* 动态下划线动画 */
+  .input-border {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: $primary-color;
+    transition: width 0.4s ease;
+  }
+
+  .custom-input:focus + .input-border {
     width: 100%;
-    margin-bottom: 5px;
-
-    .custom-input {
-      background-color: transparent; /* 透明背景 */
-      border: none;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-      padding: 12px 5px;
-      width: 100%;
-      box-sizing: border-box; /* 修复宽度溢出问题，确保 padding 包含在 width 内 */
-      border-radius: 0; /* 去掉圆角 */
-      color: #fff;
-      outline: none;
-      transition: all 0.3s;
-      
-      &::placeholder {
-        color: rgba(255, 255, 255, 0.5);
-      }
-      
-      &:focus {
-        background-color: transparent;
-        border-bottom-color: transparent; /* 由 span 接管 */
-        box-shadow: none;
-      }
-    }
-
-    /* 动态下划线动画 */
-    .input-border {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 0;
-      height: 2px;
-      background: $primary-color;
-      transition: width 0.4s ease;
-    }
-
-    .custom-input:focus + .input-border {
-      width: 100%;
-    }
   }
+}
 
-  .action-btn {
+.action-btn {
   border-radius: 25px;
   border: 1px solid $primary-color;
   background-color: $primary-color;
-  color: #0f0c29;
+  color: #fff; /* 亮色背景上白色文字 */
   font-size: 12px;
   font-weight: bold;
   padding: 12px 45px;
@@ -550,8 +564,8 @@ a {
   }
   
   &:hover {
-    background-color: color.adjust($primary-color, $lightness: 5%);
-    box-shadow: 0 0 15px rgba(74, 222, 128, 0.4);
+    background-color: color.adjust($primary-color, $lightness: -5%); /* 稍微变深一点 */
+    box-shadow: 0 4px 10px rgba(74, 222, 128, 0.3);
   }
   
   &:disabled {
@@ -567,8 +581,8 @@ a {
   color: #FFFFFF;
   
   &:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.2);
+    box-shadow: none;
   }
 }
 
@@ -576,9 +590,9 @@ a {
   display: inline-block;
   width: 14px;
   height: 14px;
-  border: 2px solid rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
-  border-top-color: #000;
+  border-top-color: #fff;
   animation: spin 0.8s linear infinite;
 }
 
@@ -587,15 +601,23 @@ a {
 }
 
 /* 响应式调整 */
+@media (max-width: 1024px) {
+  .container {
+    width: 85vw;
+    min-height: 60vh;
+  }
+}
+
 @media (max-width: 768px) {
   .container {
-    min-height: 800px; /* 增加高度以容纳垂直布局 */
+    min-height: 600px;
     width: 90%;
+    min-width: 0;
   }
   
   .form-container {
     width: 100%;
-    height: 50%; /* 上下布局 */
+    height: 100%; /* 改为全高，因为是单面板切换 */
     position: absolute;
     transition: none;
   }
@@ -607,7 +629,7 @@ a {
   }
   
   .sign-up-container {
-    top: 50%;
+    top: 0; /* 修正位置 */
     left: 0;
     transform: none !important;
     opacity: 1;
@@ -615,24 +637,15 @@ a {
   }
   
   .overlay-container {
-    display: none; /* 小屏幕隐藏滑动覆盖层，改为上下直接显示或通过tab切换 */
+    display: none;
   }
-  
-  /* 这里可以做一个更简单的tab切换逻辑，或者像原HTML那样根据 active 状态隐藏显示。
-     考虑到原HTML在小屏幕的处理是隐藏overlay，通过opacity切换。
-     我们可以简单地让两个表单都显示，或者重写响应式逻辑。
-     暂时保持原HTML的逻辑：隐藏overlay。
-     但原HTML的逻辑在小屏幕下有点问题（依赖 z-index 和 opacity）。
-     
-     为了简化，小屏幕下我们可以只显示当前激活的表单，并提供切换按钮。
-  */
   
   .sign-in-container, .sign-up-container {
     height: 100%;
     top: 0;
     opacity: 0;
     pointer-events: none;
-    background: #0f0c29; /* 实色背景防止重叠透视 */
+    background: #fff; 
   }
   
   .sign-in-container {
@@ -659,6 +672,10 @@ a {
     cursor: pointer;
     text-decoration: underline;
     font-size: 14px;
+  }
+  
+  .form-content {
+    padding: 0 20px;
   }
 }
 

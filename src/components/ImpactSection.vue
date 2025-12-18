@@ -1,58 +1,48 @@
 <template>
   <section class="impact-section">
-    <div class="impact-text">IDEA</div>
+    <div class="impact-text">IDEASPARK</div>
   </section>
 </template>
 
 <script setup lang="ts">
-// ImpactSection: Fixed Reveal Footer
 </script>
 
 <style scoped lang="scss">
-@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap');
-
 .impact-section {
   position: fixed;
   bottom: 0;
   left: 0;
-  width: 100%;
-  height: 50vh; /* 调整高度为 50vh，更像一个标准的 Footer */
-  background-color: #4ADE80; /* 鲜艳的绿色 */
+  right: calc(var(--scrollbar-width, 0px) + var(--scrollbar-overlay-gap, 0px));
+  height: 60vh; /* 调整为 60vh，只展示一部分，不占据全屏 */
+  background-color: #4ADE80;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1; /* 确保在最底层 */
+  z-index: 1; /* 保持为 1，确保在 body 背景之上 */
   overflow: hidden;
+  /* 强制可见性，防止意外隐藏 */
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .impact-text {
-  font-family: 'Archivo Black', sans-serif;
-  font-size: calc(32vh - 4px); /* 再减小 2px (总共4px)，留出更多空间 */
-  font-weight: 400;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Noto Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 15vw; /* 稍微调大一点，增加冲击力 */
+  font-weight: 800;
   color: #000;
-  line-height: 0.68;
-  letter-spacing: 2vh;
+  line-height: 1;
+  letter-spacing: -0.04em;
   white-space: nowrap;
   text-transform: uppercase;
   user-select: none;
   
-  transform: scale(2.0, 2.25); 
-  transform-origin: center;
-  
   width: 100%;
   text-align: center;
   
-  /* 关键修正：移除底部 padding，改用 Flexbox 绝对居中 */
-  /* 之前 padding-bottom: 2vh 推太高了，导致上面顶死 */
-  padding-bottom: 0; 
-  margin-top: -1vh; /* 视觉微调：稍微向上提一点点，而不是推很多 */
-  
   /* 移动端适配 */
   @media (max-width: 768px) {
-    font-size: 25vh;
-    transform: scale(1.5, 1.9);
-    line-height: 0.7;
-    padding-bottom: 2.5vh;
+    font-size: 18vw;
+    letter-spacing: -0.05em;
   }
 }
 </style>

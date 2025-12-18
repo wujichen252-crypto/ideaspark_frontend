@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>精致动态搜索输入框</title>
+    <style>
+        /* 引入 Google 字体图标 - Material Symbols Rounded */
+        @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+
+        /* CSS 变量定义，便于主题切换 */
+        :root {
+            --primary-color: #007aff; /* 苹果蓝，精致且通用 */
+            --light-color: #ffffff;
+            --dark-color: #333;
+            --grey-color: #999;
+            --focus-shadow: rgba(0, 122, 255, 0.4);
+        }
+
+        /* 全局样式和背景 - 使用中性背景以突显搜索框本身 */
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #e9ecef; /* 浅灰色背景 */
+        }
+
+        /* 搜索容器样式 */
+        .search-container {
+            display: flex;
+            align-items: center;
+            width: 450px; 
+            height: 50px;
+            
+            /* 采用 Flex 布局且定位为 relative，方便内嵌按钮的布局 */
+            position: relative; 
+            
+            background-color: var(--light-color);
+            border: 1px solid #ddd;
+            border-radius: 25px; /* 完美半圆角 */
+            
+            /* 精致的多层阴影，增加深度和质感 */
+            box-shadow: 
+                0 1px 3px rgba(0, 0, 0, 0.08), /* 内部阴影，增加立体感 */
+                0 10px 20px rgba(0, 0, 0, 0.05); /* 外部阴影，增加漂浮感 */
+            
+            transition: all 0.3s ease;
+        }
+
+        /* 聚焦时的样式：边框变蓝，外围发光 */
+        .search-container.focus {
+            border-color: var(--primary-color);
+            box-shadow: 
+                0 1px 3px rgba(0, 0, 0, 0.1),
+                0 10px 20px rgba(0, 0, 0, 0.08),
+                0 0 0 3px var(--focus-shadow); /* 关键：蓝色发光环 */
+        }
+
+        /* 搜索图标区域 */
+        .search-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 15px;
+            color: var(--grey-color);
+            transition: color 0.3s ease;
+        }
+
+        .search-icon span {
+            font-family: 'Material Symbols Rounded';
+            font-weight: 400;
+            font-size: 24px;
+        }
+
+        /* 聚焦时图标变色 */
+        .search-container.focus .search-icon {
+            color: var(--primary-color);
+        }
+
+
+        /* 搜索输入框样式 */
+        .search-input {
+            flex-grow: 1; 
+            height: 100%;
+            border: none; 
+            outline: none; 
+            padding: 0;
+            font-size: 17px;
+            color: var(--dark-color);
+            background: transparent; 
+            /* 移除输入框左侧的 padding，让内容紧贴图标 */
+            padding-right: 15px;
+        }
+
+        /* 占位符样式 */
+        .search-input::placeholder {
+            color: var(--grey-color);
+        }
+
+
+        /* 清除按钮 (x) 样式 */
+        .clear-button {
+            font-family: 'Material Symbols Rounded';
+            font-weight: 400;
+            font-size: 20px;
+            color: var(--grey-color);
+            margin-right: 10px;
+            cursor: pointer;
+            opacity: 0; 
+            transform: scale(0.9);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .clear-button.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .clear-button:hover {
+            color: var(--dark-color);
+        }
+
+        /* 内嵌搜索按钮 (放大镜图标) 区域 */
+        .submit-button {
+            /* 绝对定位到容器右侧 */
+            position: absolute;
+            right: 0px; 
+            top: 0px;
+            
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 48px; 
+            height: 48px;
+            
+            background-color: var(--primary-color);
+            color: var(--light-color);
+            
+            /* 只对右侧设置圆角 */
+            border-top-right-radius: 25px;
+            border-bottom-right-radius: 25px;
+
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s;
+        }
+
+        .submit-button span {
+            font-family: 'Material Symbols Rounded';
+            font-weight: 500;
+            font-size: 22px;
+        }
+
+        .submit-button:hover {
+            background-color: #0060d9; /* 悬停时颜色加深 */
+        }
+        
+        .submit-button:active {
+            transform: scale(0.98); /* 点击时微小缩放反馈 */
+        }
+
+        /* 调整输入框的右侧内边距，为内嵌按钮留出空间 */
+        .search-container:not(.focus) .search-input {
+            padding-right: 58px; /* 48px (按钮宽度) + 10px (间隙) */
+        }
+
+
+    </style>
+</head>
+<body>
+
+    <div class="search-container" id="searchContainer">
+        
+        <div class="search-icon">
+             <span>search</span>
+        </div>
+        
+        <input type="text" 
+               class="search-input" 
+               id="searchInput"
+               placeholder="输入关键词并回车或点击按钮搜索..."
+               maxlength="50">
+        
+        <span class="clear-button" id="clearButton">close</span>
+
+        <div class="submit-button" id="submitButton">
+             <span>search</span>
+        </div>
+    </div>
+
+    <script>
+        const searchContainer = document.getElementById('searchContainer');
+        const searchInput = document.getElementById('searchInput');
+        const clearButton = document.getElementById('clearButton');
+        const submitButton = document.getElementById('submitButton');
+
+        // 1. **聚焦/失焦时的效果**
+        searchInput.addEventListener('focus', () => {
+            searchContainer.classList.add('focus');
+        });
+
+        searchInput.addEventListener('blur', () => {
+            // 延迟移除 focus 类，避免点击按钮时样式闪烁
+            setTimeout(() => {
+                if (document.activeElement !== searchInput && document.activeElement !== submitButton) {
+                    searchContainer.classList.remove('focus');
+                }
+            }, 100); 
+        });
+
+        // 2. **输入内容时显示/隐藏清除按钮**
+        const toggleClearButton = () => {
+            if (searchInput.value.length > 0) {
+                clearButton.classList.add('visible');
+            } else {
+                clearButton.classList.remove('visible');
+            }
+        };
+
+        searchInput.addEventListener('input', toggleClearButton);
+
+        // 3. **点击清除按钮，清空输入框并聚焦**
+        clearButton.addEventListener('click', () => {
+            searchInput.value = '';
+            toggleClearButton();
+            searchInput.focus(); 
+        });
+        
+        // 4. **搜索逻辑：统一处理**
+        const performSearch = () => {
+            const query = searchInput.value.trim();
+            if (query !== '') {
+                // 实际的搜索 API 调用或路由跳转应在这里
+                alert('正在执行精致搜索: ' + query);
+                searchInput.blur(); // 搜索后失焦
+            } else {
+                 alert('请输入搜索内容。');
+                 searchInput.focus();
+            }
+        }
+
+        // 5. **点击提交按钮触发搜索**
+        submitButton.addEventListener('click', performSearch);
+        
+        // 6. **按下 Enter 键触发搜索**
+        searchInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault(); 
+                performSearch();
+            }
+        });
+    </script>
+</body>
+</html>
