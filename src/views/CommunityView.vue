@@ -35,6 +35,7 @@
             <div class="create-post-input">
               <n-avatar circle size="medium" :src="userStore.userInfo?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Guest'" />
               <n-input 
+                v-model:value="quickContent"
                 placeholder="分享你的创意和灵感..." 
                 type="textarea" 
                 :autosize="{ minRows: 1, maxRows: 3 }"
@@ -43,20 +44,20 @@
             </div>
             <div class="create-post-actions">
               <n-space>
-                <n-button text size="small">
+                <n-button text size="small" @click="openCreateModal">
                   <template #icon><n-icon :component="ImageOutline" /></template>
                   图片
                 </n-button>
-                <n-button text size="small">
+                <n-button text size="small" @click="openCreateModal">
                   <template #icon><n-icon :component="CodeSlashOutline" /></template>
                   代码
                 </n-button>
-                <n-button text size="small">
+                <n-button text size="small" @click="openCreateModal">
                   <template #icon><n-icon :component="HappyOutline" /></template>
                   表情
                 </n-button>
               </n-space>
-              <n-button type="primary" size="small" round>发布</n-button>
+              <n-button type="primary" size="small" round @click="openCreateModal">发布</n-button>
             </div>
           </n-card>
 
@@ -214,12 +215,99 @@
       </div>
     </div>
   </div>
+
+  <!-- 发布动态模态框 -->
+  <n-modal v-model:show="showCreateModal">
+    <n-card
+      style="width: 600px; max-width: 90vw"
+      title="发布新动态"
+      :bordered="false"
+      size="huge"
+      role="dialog"
+      aria-modal="true"
+    >
+      <template #header-extra>
+        <n-button text @click="showCreateModal = false">
+          <template #icon><n-icon :component="CloseOutline" /></template>
+        </n-button>
+      </template>
+
+      <n-form ref="formRef" :model="formValue" :rules="rules">
+        <!-- 标题输入 (可选) -->
+        <n-form-item label="标题 (可选)" path="title">
+          <n-input 
+            v-model:value="formValue.title" 
+            placeholder="给你的动态起个标题..." 
+            maxlength="50"
+            show-count
+          />
+        </n-form-item>
+
+        <!-- 内容输入 -->
+        <n-form-item label="正文内容" path="content">
+          <n-input
+            v-model:value="formValue.content"
+            type="textarea"
+            placeholder="分享你的创意、灵感或遇到的问题..."
+            :autosize="{ minRows: 6, maxRows: 15 }"
+            show-count
+            maxlength="2000"
+          />
+        </n-form-item>
+
+        <!-- 图片上传 -->
+        <n-form-item label="图片/视频" path="images">
+          <n-upload
+            action="https://www.mocky.io/v2/5e4bafc63100007100d8b70f"
+            list-type="image-card"
+            :max="9"
+            v-model:file-list="fileList"
+            @finish="handleUploadFinish"
+          >
+            点击上传
+          </n-upload>
+        </n-form-item>
+
+        <!-- 话题/标签 -->
+        <n-form-item label="添加话题" path="topics">
+          <n-select
+            v-model:value="formValue.topics"
+            multiple
+            filterable
+            tag
+            placeholder="输入话题后回车，如 #Vue3"
+            :options="topicOptions"
+          />
+        </n-form-item>
+
+        <!-- 可见性 -->
+        <n-form-item label="谁可以看" path="visibility">
+          <n-radio-group v-model:value="formValue.visibility" name="visibility">
+            <n-space>
+              <n-radio value="public">公开</n-radio>
+              <n-radio value="followers">仅粉丝</n-radio>
+              <n-radio value="private">仅自己</n-radio>
+            </n-space>
+          </n-radio-group>
+        </n-form-item>
+      </n-form>
+
+      <template #footer>
+        <div class="form-actions" style="display: flex; justify-content: flex-end; gap: 12px;">
+          <n-button @click="showCreateModal = false">取消</n-button>
+          <n-button type="primary" @click="handleSubmit" :loading="submitting">
+            立即发布
+          </n-button>
+        </div>
+      </template>
+    </n-card>
+  </n-modal>
 </template>
 
 <script setup lang="ts">
-import { ref, h } from 'vue'
+import { ref, h, reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import { NIcon } from 'naive-ui'
+import { NIcon, useMessage, type UploadFileInfo } from 'naive-ui'
 import type { MenuOption } from 'naive-ui'
 import { 
   HeartOutline, 
@@ -233,13 +321,93 @@ import {
   FlameOutline,
   CompassOutline,
   PeopleOutline,
-  CodeWorkingOutline
+  CodeWorkingOutline,
+  CloseOutline
 } from '@vicons/ionicons5'
 import { useUserStore } from '@/store'
 
 const userStore = useUserStore()
 const loading = ref(false)
 const router = useRouter()
+const message = useMessage()
+
+// 发布动态相关逻辑
+const showCreateModal = ref(false)
+const quickContent = ref('')
+const submitting = ref(false)
+
+const formValue = reactive({
+  title: '',
+  content: '',
+  topics: [],
+  visibility: 'public'
+})
+
+const fileList = ref<UploadFileInfo[]>([])
+
+const rules = {
+  content: {
+    required: true,
+    message: '请输入正文内容',
+    trigger: 'blur'
+  }
+}
+
+const topicOptions = [
+  { label: 'Vue3', value: 'Vue3' },
+  { label: 'TypeScript', value: 'TypeScript' },
+  { label: 'AI创作', value: 'AI创作' },
+  { label: '前端开发', value: '前端开发' },
+  { label: '设计灵感', value: '设计灵感' }
+]
+
+const handleUploadFinish = ({ file, event }: { file: UploadFileInfo; event?: ProgressEvent }) => {
+  message.success('上传成功 (Mock)')
+  return file
+}
+
+const openCreateModal = () => {
+  // 将快速输入框的内容同步到 Modal 中
+  formValue.content = quickContent.value
+  showCreateModal.value = true
+}
+
+const handleSubmit = () => {
+  if (!formValue.content) {
+    message.warning('请输入正文内容')
+    return
+  }
+  
+  submitting.value = true
+  // Simulate API call
+  setTimeout(() => {
+    submitting.value = false
+    message.success('发布成功！')
+    showCreateModal.value = false
+    
+    // Mock adding post (Optimistic update)
+    posts.value.unshift({
+      id: Date.now(),
+      author: { 
+        name: userStore.userInfo?.username || '我', 
+        avatar: userStore.userInfo?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Me' 
+      },
+      publishTime: '刚刚',
+      content: formValue.content,
+      images: fileList.value.map(() => `https://picsum.photos/seed/${Math.random()}/400/300`), // Mock random images
+      tags: formValue.topics as string[],
+      stats: { likes: 0, comments: 0 },
+      isLiked: false
+    })
+    
+    // Reset form
+    quickContent.value = ''
+    formValue.title = ''
+    formValue.content = ''
+    formValue.topics = []
+    fileList.value = []
+  }, 1000)
+}
 
 /**
  * 渲染侧边栏菜单图标
@@ -413,9 +581,11 @@ const recommendedUsers = [
     display: flex;
     gap: 12px;
     margin-bottom: 12px;
+    cursor: pointer;
     
     .input-area {
       background: #f9fafb;
+      cursor: pointer;
     }
   }
   

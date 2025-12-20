@@ -23,6 +23,7 @@ const menuOptions = computed<MenuOption[]>(() => {
   // 内部页面显示完整功能菜单
   return [
     { key: 'dashboard', label: '控制台' },
+    { key: 'workbench', label: '工作台' },
     { key: 'market', label: '项目市场' },
     { key: 'community', label: '社区动态' },
     { key: 'create', label: 'AI 工坊' }
@@ -32,6 +33,7 @@ const menuOptions = computed<MenuOption[]>(() => {
 // 监听路由变化更新 activeKey
 watch(() => route.path, (path) => {
   if (path === '/dashboard') activeKey.value = 'dashboard'
+  else if (path === '/workbench') activeKey.value = 'workbench'
   else if (path === '/market') activeKey.value = 'market'
   else if (path === '/community') activeKey.value = 'community'
   else if (path.startsWith('/ai') || path === '/create') activeKey.value = 'create'
@@ -53,6 +55,7 @@ function onUpdateMenu(key: string) {
   activeKey.value = key
   if (key === 'home') router.push('/')
   if (key === 'dashboard') router.push('/dashboard')
+  if (key === 'workbench') router.push('/workbench')
   if (key === 'market') router.push('/market')
   if (key === 'community') router.push('/community')
   if (key === 'create') router.push('/ai/workshop')

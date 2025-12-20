@@ -430,6 +430,7 @@ $border-color: #e5e7eb;
             background: linear-gradient(120deg, #2563eb, #06b6d4);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            user-select: none;
           }
         }
         

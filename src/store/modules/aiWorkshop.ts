@@ -41,6 +41,7 @@ export interface ProjectSummary {
   visibility?: 'public' | 'private'
   allowFork?: boolean
   // 新增字段
+  plugins?: string[]
   developerMessage?: string
   announcements?: { id: string, title: string, content: string, date: number }[]
 }

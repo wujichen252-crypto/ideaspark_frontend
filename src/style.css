@@ -81,3 +81,27 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* 全局 UI 交互元素防选中优化 */
+html,
+body,
+#app {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* 恢复输入框、文本域和可编辑区域的文本选择功能 */
+input,
+textarea,
+[contenteditable] {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* 恢复代码块等需要复制内容的区域选择功能 */
+code,
+pre,
+.selectable-text {
+  -webkit-user-select: text;
+  user-select: text;
+}
