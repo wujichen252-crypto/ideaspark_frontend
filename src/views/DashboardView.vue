@@ -15,14 +15,14 @@
         :native-scrollbar="false"
       >
         <div class="sider-sticky-wrapper">
-          <div class="user-profile-mini" v-if="!collapsed">
+          <div class="user-profile-mini" v-if="!collapsed" @click="$router.push('/profile')">
             <n-avatar round size="medium" :src="userStore.userInfo?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Console'" />
             <div class="user-info">
               <span class="username">{{ userStore.userInfo?.username || '创造者' }}</span>
               <span class="role">控制台</span>
             </div>
           </div>
-          <div class="user-profile-mini collapsed" v-else>
+          <div class="user-profile-mini collapsed" v-else @click="$router.push('/profile')">
              <n-avatar round size="small" :src="userStore.userInfo?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Console'" />
           </div>
           
@@ -263,86 +263,47 @@
              </n-grid>
           </div>
 
-           <!-- 4. 设置 (Settings) -->
+           <!-- 4. 系统设置 (System Settings) -->
           <div v-else-if="activeKey === 'settings'" class="view-settings">
-            <n-grid :x-gap="24" :y-gap="24" cols="1 l:2" responsive="screen">
-              <!-- Profile Card -->
-              <n-grid-item span="1 l:2">
-                <n-card :bordered="false">
-                  <div style="display: flex; align-items: center; gap: 24px;">
-                    <n-avatar :size="80" :src="userStore.userInfo?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Console'" />
-                    <div style="flex: 1;">
-                      <h3 style="margin: 0 0 8px 0; font-size: 18px;">{{ userStore.userInfo?.username || '创造者' }}</h3>
-                      <p style="margin: 0 0 16px 0; color: #666;">全栈开发者 / AI 爱好者</p>
-                      <n-button size="small">更换头像</n-button>
-                    </div>
-                  </div>
-                </n-card>
-              </n-grid-item>
-
-              <n-grid-item>
-                <n-card title="偏好设置" :bordered="false">
-                  <n-form label-placement="left" label-width="auto" class="mt-4">
+            <n-card title="系统设置" :bordered="false">
+              <template #header-extra>
+                <n-tag type="info" size="small">控制台</n-tag>
+              </template>
+              
+              <n-tabs type="line" animated>
+                <n-tab-pane name="preference" tab="偏好设置">
+                  <n-form label-placement="left" label-width="auto" class="mt-4" style="max-width: 600px;">
                     <n-form-item label="界面主题">
                        <n-select v-model:value="systemSettings.theme" :options="themeOptions" />
                     </n-form-item>
                     <n-form-item label="自动保存草稿">
                        <n-switch v-model:value="systemSettings.autoSave" />
+                       <span class="tip-text ml-2">每 5 分钟自动保存</span>
                     </n-form-item>
                     <n-form-item label="紧凑模式">
                        <n-switch v-model:value="systemSettings.compactMode" />
+                       <span class="tip-text ml-2">减少间距，显示更多内容</span>
                     </n-form-item>
                   </n-form>
-                </n-card>
-              </n-grid-item>
+                </n-tab-pane>
 
-              <n-grid-item>
-                <n-card title="通知设置" :bordered="false">
-                  <n-list clickable>
-                    <n-list-item>
-                      <template #suffix>
-                        <n-switch v-model:value="systemSettings.emailNotify" />
-                      </template>
-                      <n-thing title="邮件通知" description="接收项目审核、周报等重要邮件" />
-                    </n-list-item>
-                    <n-list-item>
-                      <template #suffix>
-                        <n-switch v-model:value="systemSettings.systemNotify" />
-                      </template>
-                      <n-thing title="站内信通知" description="接收点赞、评论等互动消息" />
-                    </n-list-item>
-                  </n-list>
-                </n-card>
-              </n-grid-item>
-
-               <n-grid-item span="1 l:2">
-                <n-card title="账户安全" :bordered="false">
-                   <div style="display: flex; gap: 12px; align-items: center; padding: 12px 0;">
-                     <div style="flex: 1;">
-                        <div style="font-weight: 500; margin-bottom: 4px;">登录密码</div>
-                        <div style="color: #999; font-size: 12px;">建议定期修改密码以保护账户安全</div>
-                     </div>
-                     <n-button>修改密码</n-button>
-                   </div>
-                   <n-divider style="margin: 12px 0;" />
-                   <div style="display: flex; gap: 12px; align-items: center; padding: 12px 0;">
-                     <div style="flex: 1;">
-                        <div style="font-weight: 500; margin-bottom: 4px;">手机绑定</div>
-                        <div style="color: #999; font-size: 12px;">已绑定：138****8888</div>
-                     </div>
-                     <n-button type="warning" ghost>换绑手机</n-button>
-                   </div>
-                   <n-divider style="margin: 12px 0;" />
-                   <div style="display: flex; gap: 12px; align-items: center; padding: 12px 0;">
-                     <div style="flex: 1;">
-                        <div style="font-weight: 500; margin-bottom: 4px; color: #d03050;">注销账号</div>
-                        <div style="color: #999; font-size: 12px;">注销后无法恢复，请谨慎操作</div>
-                     </div>
-                     <n-button type="error" ghost>注销账号</n-button>
-                   </div>
-                </n-card>
-              </n-grid-item>
-            </n-grid>
+                <n-tab-pane name="project-defaults" tab="项目默认配置">
+                   <n-form label-placement="left" label-width="auto" class="mt-4" style="max-width: 600px;">
+                    <n-form-item label="默认项目可见性">
+                       <n-radio-group v-model:value="systemSettings.defaultVisibility" name="visibility">
+                          <n-space>
+                            <n-radio value="public">公开</n-radio>
+                            <n-radio value="private">私有</n-radio>
+                          </n-space>
+                       </n-radio-group>
+                    </n-form-item>
+                    <n-form-item label="默认开启评论">
+                       <n-switch v-model:value="systemSettings.defaultComments" />
+                    </n-form-item>
+                  </n-form>
+                </n-tab-pane>
+              </n-tabs>
+            </n-card>
           </div>
 
         </div>
@@ -401,8 +362,8 @@ const systemSettings = ref({
   theme: 'light',
   autoSave: true,
   compactMode: false,
-  emailNotify: true,
-  systemNotify: true
+  defaultVisibility: 'public',
+  defaultComments: true
 })
 
 const themeOptions = [
@@ -651,6 +612,12 @@ const projectColumns: DataTableColumns<ProjectRow> = [
     gap: 12px;
     border-bottom: 1px solid #f0f0f0;
     margin-bottom: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
     
     &.collapsed {
       justify-content: center;

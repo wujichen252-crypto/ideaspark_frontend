@@ -12,6 +12,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     DoubleScrollSection: typeof import('./components/DoubleScrollSection.vue')['default']
+    DraftBox: typeof import('./components/ai/DraftBox.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
     HorizontalScrollSection: typeof import('./components/HorizontalScrollSection.vue')['default']
     IdeaSparkSection: typeof import('./components/IdeaSparkSection.vue')['default']
@@ -75,10 +76,13 @@ declare module 'vue' {
     NTabPane: typeof import('naive-ui')['NTabPane']
     NTabs: typeof import('naive-ui')['NTabs']
     NTag: typeof import('naive-ui')['NTag']
+    NText: typeof import('naive-ui')['NText']
     NTimeline: typeof import('naive-ui')['NTimeline']
     NTimelineItem: typeof import('naive-ui')['NTimelineItem']
     NTooltip: typeof import('naive-ui')['NTooltip']
     NUpload: typeof import('naive-ui')['NUpload']
+    PluginCard: typeof import('./components/PluginCard.vue')['default']
+    PluginSelector: typeof import('./components/ai/PluginSelector.vue')['default']
     PrivacySection: typeof import('./components/PrivacySection.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

@@ -38,8 +38,8 @@
         </div>
 
         <div class="action-buttons">
-          <n-button type="primary" round ghost>编辑资料</n-button>
-          <n-button circle secondary>
+          <n-button type="primary" round ghost @click="router.push('/profile/edit')">编辑资料</n-button>
+          <n-button circle secondary @click="router.push('/profile/settings')">
             <template #icon><n-icon :component="SettingsOutline" /></template>
           </n-button>
         </div>

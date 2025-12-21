@@ -62,51 +62,64 @@
           <p>AI 将根据对话自动完善信息</p>
         </div>
 
-          <div class="preview-content">
-            <div v-if="!projectData.name && !projectData.description" class="empty-state">
-              <n-empty description="等待对话开始..." size="large">
-                <template #icon>
-                  <n-icon size="64" color="#ddd">
-                    <SparklesOutline />
-                  </n-icon>
-                </template>
-              </n-empty>
-            </div>
-            <n-card v-else :bordered="false" class="preview-card">
-            <n-form
-              ref="formRef"
-              :model="projectData"
-              label-placement="top"
-            >
-              <n-form-item label="项目名称">
-                <n-input v-model:value="projectData.name" placeholder="等待 AI 生成..." readonly />
-              </n-form-item>
-              
-              <n-form-item label="项目分类">
-                <n-input v-model:value="projectData.category" placeholder="等待 AI 生成..." readonly />
-              </n-form-item>
-              
-              <n-form-item label="项目简介">
-                <n-input
-                  v-model:value="projectData.description"
-                  type="textarea"
-                  placeholder="等待 AI 生成..."
-                  :autosize="{ minRows: 3, maxRows: 6 }"
-                  readonly
-                />
-              </n-form-item>
+        <div class="preview-content">
+          <div v-if="!projectData.name && !projectData.description" class="empty-state">
+            <n-empty description="等待对话开始..." size="large">
+              <template #icon>
+                <n-icon size="64" color="#ddd">
+                  <SparklesOutline />
+                </n-icon>
+              </template>
+            </n-empty>
+          </div>
+          <n-card v-else :bordered="false" class="preview-card">
+          <n-form
+            ref="formRef"
+            :model="projectData"
+            label-placement="top"
+          >
+            <n-form-item label="项目名称">
+              <n-input v-model:value="projectData.name" placeholder="等待 AI 生成..." readonly />
+            </n-form-item>
+            
+            <n-form-item label="项目分类">
+              <n-input v-model:value="projectData.category" placeholder="等待 AI 生成..." readonly />
+            </n-form-item>
+            
+            <n-form-item label="项目简介">
+              <n-input
+                v-model:value="projectData.description"
+                type="textarea"
+                placeholder="等待 AI 生成..."
+                :autosize="{ minRows: 3, maxRows: 6 }"
+                readonly
+              />
+            </n-form-item>
 
-              <div class="action-area" v-if="canCreate">
-                <n-divider />
-                <n-alert title="项目信息已就绪" type="success" style="margin-bottom: 16px;">
-                  AI 已收集足够信息，可以开始项目了。
-                </n-alert>
-                <n-button type="primary" block size="large" @click="createProject" :loading="creating">
-                  生成项目并进入看板
-                </n-button>
-              </div>
-            </n-form>
-          </n-card>
+            <n-divider />
+            <plugin-selector v-model:modelValue="selectedPlugins" />
+
+            <n-divider />
+            <div class="draft-actions">
+              <n-button secondary block @click="saveDraft" :loading="savingDraft">
+                保存为草稿
+              </n-button>
+            </div>
+
+            <div class="action-area" v-if="canCreate">
+              <n-divider />
+              <n-alert title="项目信息已就绪" type="success" style="margin-bottom: 16px;">
+                AI 已收集足够信息，可以开始项目了。
+              </n-alert>
+              <n-button type="primary" block size="large" @click="createProject" :loading="creating">
+                生成项目并进入看板
+              </n-button>
+            </div>
+          </n-form>
+        </n-card>
+        
+        <n-divider />
+        <draft-box />
         </div>
       </div>
     </div>
@@ -119,6 +132,8 @@ import { useRouter } from 'vue-router'
 import { useAiWorkshopStore } from '@/store/modules/aiWorkshop'
 import { PaperPlaneOutline, ArrowBack, SparklesOutline } from '@vicons/ionicons5'
 import { useMessage } from 'naive-ui'
+import PluginSelector from '@/components/ai/PluginSelector.vue'
+import DraftBox from '@/components/ai/DraftBox.vue'
 
 const router = useRouter()
 const aiWorkshopStore = useAiWorkshopStore()
@@ -150,6 +165,8 @@ const projectData = ref({
   category: '',
   description: ''
 })
+const selectedPlugins = ref<string[]>([])
+const savingDraft = ref(false)
 
 const scrollToBottom = () => {
   nextTick(() => {
@@ -262,7 +279,8 @@ const createProject = async () => {
   aiWorkshopStore.setProjectInfo({
     name: projectData.value.name,
     description: projectData.value.description,
-    category: projectData.value.category
+    category: projectData.value.category,
+    plugins: selectedPlugins.value
   })
   
   // 根据分类应用不同的任务模板
@@ -275,6 +293,28 @@ const createProject = async () => {
   }, 1000)
 }
 
+/**
+ * 保存草稿
+ */
+const saveDraft = async () => {
+  if (!projectData.value.description) {
+    message.warning('请先在左侧描述你的项目想法')
+    return
+  }
+  savingDraft.value = true
+  const draftId = 'draft_' + Date.now()
+  aiWorkshopStore.initProject(draftId)
+  aiWorkshopStore.setProjectInfo({
+    name: projectData.value.name || '未命名项目',
+    description: projectData.value.description,
+    category: projectData.value.category || '未分类',
+    status: 'draft',
+    plugins: selectedPlugins.value
+  })
+  aiWorkshopStore.saveProject()
+  message.success('草稿已保存')
+  savingDraft.value = false
+}
 </script>
 
 <style scoped lang="scss">

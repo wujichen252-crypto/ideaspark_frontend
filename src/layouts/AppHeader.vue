@@ -23,18 +23,18 @@ const menuOptions = computed<MenuOption[]>(() => {
   // 内部页面显示完整功能菜单
   return [
     { key: 'dashboard', label: '控制台' },
+    { key: 'workbench', label: '工作台' },
     { key: 'market', label: '项目市场' },
-    { key: 'community', label: '社区动态' },
-    { key: 'create', label: 'AI 工坊' }
+    { key: 'community', label: '社区动态' }
   ]
 })
 
 // 监听路由变化更新 activeKey
 watch(() => route.path, (path) => {
   if (path === '/dashboard') activeKey.value = 'dashboard'
+  else if (path === '/workbench') activeKey.value = 'workbench'
   else if (path === '/market') activeKey.value = 'market'
   else if (path === '/community') activeKey.value = 'community'
-  else if (path.startsWith('/ai') || path === '/create') activeKey.value = 'create'
   else activeKey.value = null
 }, { immediate: true })
 
@@ -53,9 +53,9 @@ function onUpdateMenu(key: string) {
   activeKey.value = key
   if (key === 'home') router.push('/')
   if (key === 'dashboard') router.push('/dashboard')
+  if (key === 'workbench') router.push('/workbench')
   if (key === 'market') router.push('/market')
   if (key === 'community') router.push('/community')
-  if (key === 'create') router.push('/ai/workshop')
 }
 
 /**
@@ -63,41 +63,36 @@ function onUpdateMenu(key: string) {
  * 同时也负责根据路由判断 Header 状态
  */
 function handleScroll() {
-  // 如果不是首页，强制保持滚动状态 (Scrolled State)
-  // 这样可以确保在非首页（通常背景较亮或无 Hero 区）时 Header 清晰可见
-  if (route.path !== '/') {
-    if (!isScrolled.value) {
-      isScrolled.value = true
-      tl?.play()
-    }
-    return
+  const isHome = route.path === '/'
+  const shouldBeScrolled = !isHome || window.scrollY > 100
+
+  // 更新状态
+  if (isScrolled.value !== shouldBeScrolled) {
+    isScrolled.value = shouldBeScrolled
   }
 
-  // 首页逻辑
-  const scrolled = window.scrollY > 100
-  
-  // 调试日志，确认滚动触发
-  // console.log('Scroll:', window.scrollY, 'Scrolled:', scrolled, 'Current:', isScrolled.value)
-
-  if (scrolled !== isScrolled.value) {
-    isScrolled.value = scrolled
-
-    if (scrolled) {
-      tl?.play()
+  // 同步 GSAP 动画状态
+  // 即使状态没有改变，也需要确保 timeline 处于正确位置（例如刚初始化时）
+  if (tl) {
+    if (shouldBeScrolled) {
+      tl.play()
     } else {
-      tl?.reverse()
+      tl.reverse()
     }
   }
 }
 
 // 监听路由变化，及时更新 Header 状态
-watch(
-  () => route.path,
-  () => {
-    // 路由切换时，重新评估 Header 状态
-    handleScroll()
-  }
-)
+  watch(
+    () => route.path,
+    async () => {
+      // 路由切换时，重新评估 Header 状态
+      await nextTick()
+      handleScroll()
+      // 重新初始化动画，防止元素丢失
+      initAnimation()
+    }
+  )
 
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
@@ -118,78 +113,50 @@ const logoTitleRef = ref<HTMLElement | null>(null)
 const subtitleRef = ref<HTMLElement | null>(null)
 const logoIconRef = ref<HTMLElement | null>(null)
 const scrolledLogoRef = ref<HTMLElement | null>(null)
+const initialLogoRef = ref<HTMLElement | null>(null)
 
 function initAnimation() {
+  // 清理旧的时间轴，防止冲突
+  if (tl) {
+    tl.kill()
+    tl = null
+  }
+
   // 使用 Refs 获取元素
-  let titleChars = logoTitleRef.value?.querySelectorAll('.logo-title-char')
-  let subtitle = subtitleRef.value
-  let logoIcon = logoIconRef.value
+  // 注意：只严格检查动画实际需要的元素，避免因无关元素缺失导致动画失效
   let scrolledLogo = scrolledLogoRef.value
   let solidSquare = solidSquareRef.value
+  let initialLogo = initialLogoRef.value
 
   // Fallback: 如果 Refs 为空，尝试直接查询 DOM (防止 Refs 尚未绑定)
-  if (!titleChars?.length || !subtitle || !logoIcon || !scrolledLogo || !solidSquare) {
+  if (!scrolledLogo || !solidSquare || !initialLogo) {
+    // 再次尝试获取，可能是 v-if 或 DOM 更新导致
     const headerEl = document.querySelector('.app-header')
     if (headerEl) {
-      if (!titleChars?.length) titleChars = headerEl.querySelectorAll('.logo-title-char')
-      if (!subtitle) subtitle = headerEl.querySelector('.logo-subtitle') as HTMLElement
-      if (!logoIcon) logoIcon = headerEl.querySelector('.logo-icon-wrapper') as HTMLElement
       if (!scrolledLogo) scrolledLogo = headerEl.querySelector('.scrolled-logo-container') as HTMLElement
       if (!solidSquare) solidSquare = headerEl.querySelector('.solid-square') as HTMLElement
+      if (!initialLogo) initialLogo = headerEl.querySelector('.initial-logo-container') as HTMLElement
     }
   }
 
-  if (!titleChars?.length || !subtitle || !logoIcon || !scrolledLogo || !solidSquare) {
-    console.warn('GSAP Animation elements missing', {
-      titleChars: titleChars?.length,
-      subtitle,
-      logoIcon,
-      scrolledLogo,
-      solidSquare
-    })
+  // 必须确保关键动画元素存在
+  if (!scrolledLogo || !solidSquare || !initialLogo) {
+    // 如果仍然获取不到，可能是路由切换导致组件重新挂载，等待 DOM 稳定
     return
   }
 
   // 创建时间轴 (默认为暂停状态)
   tl = gsap.timeline({ paused: true })
 
-  // 1. 初始文字解构 (Deconstruction) - 简化动画以提升性能
-  tl.to(titleChars, {
+  // 1. 初始 Logo 整体淡出
+  tl.to(initialLogo, {
     duration: 0.4,
-    opacity: 0,
-    y: -20, // 简单上移消失，替代复杂的随机炸开
-    stagger: 0.05,
+    autoAlpha: 0,
+    y: -10,
     ease: 'power2.in'
   }, 0)
 
-  // 副标题和图标也随之消失
-  tl.to([subtitle, logoIcon], {
-    duration: 0.4,
-    opacity: 0,
-    scale: 0.8,
-    ease: 'power2.in'
-  }, 0)
-
-  // 2. 能量流过渡 - 减少粒子数量或简化效果
-  // 为了性能，我们这里暂时隐藏粒子效果，直接进行 Logo 切换
-  // 如果需要粒子，可以解除注释并减少数量
-  /*
-  gsap.set(energyParticles, { x: 0, y: 0, opacity: 0, scale: 0 })
-  tl.to(energyParticles, {
-    duration: 0.5,
-    opacity: 1,
-    x: -180,
-    y: 0,
-    stagger: 0.02, // 加快交错
-    ease: 'power1.inOut'
-  }, 0.2)
-  tl.to(energyParticles, {
-    duration: 0.2,
-    opacity: 0
-  }, 0.5)
-  */
-
-  // 3. 形态重组 (Reassembly)
+  // 2. 形态重组 (Reassembly)
   tl.fromTo(scrolledLogo,
     {
       autoAlpha: 0,
@@ -203,18 +170,17 @@ function initAnimation() {
       rotation: 0,
       ease: 'back.out(1.7)'
     },
-    0.3 // 提前开始，衔接更紧凑
+    0.2 // 稍微提前，衔接更紧凑
   )
 
   // 方块的变形效果强化
   tl.fromTo(solidSquare,
     { rx: 40 }, // 圆形
     { duration: 0.6, rx: 8, ease: 'power2.out' },
-    0.6
+    0.5
   )
 
   // 动画初始化完成后，立即检查一次状态
-  // 确保如果当前已经在滚动位置（刷新页面时）或在非首页，能正确应用状态
   handleScroll()
 }
 </script>
@@ -273,7 +239,7 @@ function initAnimation() {
           </div>
 
           <!-- 初始 Logo -->
-          <div class="initial-logo-container">
+          <div class="initial-logo-container" ref="initialLogoRef">
             <div class="logo-icon-wrapper" ref="logoIconRef">
               <div class="logo-icon">
                 <div class="logo-spark"></div>
@@ -369,6 +335,22 @@ function initAnimation() {
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: none; /* 移除阴影，避免与下方内容头部重叠产生视觉脏感 */
+
+    /* CSS 状态控制作为 GSAP 的兜底 */
+    .initial-logo-container {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(-10px);
+      transition: all 0.4s ease-out;
+    }
+
+    .scrolled-logo-container {
+      opacity: 1;
+      visibility: visible;
+      transform: scale(1) rotate(0deg);
+      transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
 
     .app-header__content {
       max-width: 100%; /* 全宽显示，适应控制台等全屏布局 */
@@ -480,6 +462,7 @@ function initAnimation() {
   transform: translateY(-50%);
   transform-origin: left center;
   width: 100%;
+  transition: all 0.4s ease-out; /* Add default transition */
 }
 
 .scrolled-logo-container {
@@ -495,6 +478,8 @@ function initAnimation() {
   align-items: center;
   justify-content: center;
   transform-origin: center center;
+  z-index: 20; /* 确保层级高于 initial-logo */
+  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); /* Add default transition */
 
   .art-pattern {
     width: 100%;

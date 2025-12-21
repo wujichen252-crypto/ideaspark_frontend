@@ -18,11 +18,9 @@
               <div class="card-content">
                 <p class="card-quote">“{{ item.quote }}”</p>
                 <div class="card-footer">
-                  <n-avatar
-                    :size="48"
-                    :src="item.avatar"
-                    class="card-avatar"
-                  />
+                  <div class="css-avatar" :style="getAvatarStyle(item.author)">
+                    {{ item.author.charAt(0) }}
+                  </div>
                   <p class="card-author">{{ item.author }}</p>
                 </div>
               </div>
@@ -40,11 +38,9 @@
               <div class="card-content">
                 <p class="card-quote">“{{ item.quote }}”</p>
                 <div class="card-footer">
-                  <n-avatar
-                    :size="48"
-                    :src="item.avatar"
-                    class="card-avatar"
-                  />
+                  <div class="css-avatar" :style="getAvatarStyle(item.author)">
+                    {{ item.author.charAt(0) }}
+                  </div>
                   <p class="card-author">{{ item.author }}</p>
                 </div>
               </div>
@@ -67,11 +63,9 @@
               <div class="card-content">
                 <p class="card-quote">“{{ item.quote }}”</p>
                 <div class="card-footer">
-                  <n-avatar
-                    :size="48"
-                    :src="item.avatar"
-                    class="card-avatar"
-                  />
+                  <div class="css-avatar" :style="getAvatarStyle(item.author)">
+                    {{ item.author.charAt(0) }}
+                  </div>
                   <p class="card-author">{{ item.author }}</p>
                 </div>
               </div>
@@ -89,11 +83,9 @@
               <div class="card-content">
                 <p class="card-quote">“{{ item.quote }}”</p>
                 <div class="card-footer">
-                  <n-avatar
-                    :size="48"
-                    :src="item.avatar"
-                    class="card-avatar"
-                  />
+                  <div class="css-avatar" :style="getAvatarStyle(item.author)">
+                    {{ item.author.charAt(0) }}
+                  </div>
                   <p class="card-author">{{ item.author }}</p>
                 </div>
               </div>
@@ -108,75 +100,95 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 
+// 生成随机渐变色
+const getAvatarStyle = (name: string) => {
+  const colors = [
+    ['#ff9a9e', '#fecfef'],
+    ['#a18cd1', '#fbc2eb'],
+    ['#84fab0', '#8fd3f4'],
+    ['#cfd9df', '#e2ebf0'],
+    ['#fccb90', '#d57eeb'],
+    ['#e0c3fc', '#8ec5fc'],
+    ['#f093fb', '#f5576c'],
+    ['#4facfe', '#00f2fe']
+  ]
+  // 简单的 hash
+  let hash = 0
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  const index = Math.abs(hash) % colors.length
+  const [c1, c2] = colors[index]
+  
+  return {
+    background: `linear-gradient(135deg, ${c1}, ${c2})`,
+    color: '#fff',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontWeight: 'bold',
+    fontSize: '1.2rem',
+    width: '48px',
+    height: '48px',
+    borderRadius: '50%'
+  }
+}
+
 // 模拟数据：14条
 const allData = [
   {
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix',
     quote: '设计不仅仅是外观和感觉，设计是工作原理。',
     author: 'Steve Jobs'
   },
   {
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka',
     quote: '简单是复杂的最终演变。',
     author: 'Leonardo da Vinci'
   },
   {
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Zoe',
     quote: '优秀的软件作用于无形。',
     author: 'John Allsopp'
   },
   {
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jack',
     quote: '代码是写给人看的，只是顺便让机器执行。',
     author: 'Donald Knuth'
   },
   {
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sam',
     quote: '预测未来的最好方式就是去创造它。',
     author: 'Alan Kay'
   },
   {
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Molly',
     quote: '细节决定成败。',
     author: 'Charles Eames'
   },
   {
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Leo',
     quote: '少即是多。',
     author: 'Ludwig Mies van der Rohe'
   },
   {
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Bella',
     quote: '形式服从功能。',
     author: 'Louis Sullivan'
   },
   {
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Max',
     quote: '唯一不变的就是变化本身。',
     author: 'Heraclitus'
   },
   {
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Lucy',
     quote: '创造力就是把事物联系起来。',
     author: 'Steve Jobs'
   },
   {
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Oscar',
     quote: '好的设计是显而易见的，伟大的设计是透明的。',
     author: 'Joe Sparano'
   },
   {
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Nora',
     quote: '不要让我思考。',
     author: 'Steve Krug'
   },
   {
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ethan',
     quote: '过早优化是万恶之源。',
     author: 'Donald Knuth'
   },
   {
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mia',
     quote: '保持饥饿，保持愚蠢。',
     author: 'Steve Jobs'
   }

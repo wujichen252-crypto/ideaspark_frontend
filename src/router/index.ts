@@ -13,71 +13,14 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/DashboardView.vue')
   },
   {
+    path: '/workbench',
+    name: 'Workbench',
+    component: () => import('@/views/WorkbenchView.vue')
+  },
+  {
     path: '/market',
     name: 'Explore',
     component: () => import('@/views/MarketView.vue')
-  },
-  {
-    path: '/ai',
-    component: RouterView,
-    children: [
-      {
-        path: '',
-        redirect: 'workshop'
-      },
-      {
-        path: 'intro',
-        name: 'AiLanding',
-        component: () => import('@/views/ai/AiLandingPage.vue')
-      },
-      {
-        path: 'workshop',
-        name: 'AiWorkshop',
-        component: () => import('@/views/ai/components/WorkshopDashboard.vue')
-      },
-      {
-        path: 'workshop/start',
-        name: 'AiProjectCreate',
-        component: () => import('@/views/ai/project/AiProjectCreate.vue')
-      },
-      {
-        path: 'workshop/project/:id',
-        component: () => import('@/views/ai/project/AiProjectLayout.vue'),
-        children: [
-          {
-            path: '',
-            redirect: to => ({ 
-              name: 'AiProjectWorkbench', 
-              params: { ...to.params, module: 'home' } 
-            })
-          },
-          {
-            path: 'workbench/:module?',
-            name: 'AiProjectWorkbench',
-            component: () => import('@/views/ai/project/AiProjectWorkbench.vue')
-          },
-          {
-            path: 'manage',
-            name: 'AiProjectManagement',
-            component: () => import('@/views/ai/project/AiProjectManagement.vue')
-          },
-          {
-            path: 'settings',
-            name: 'AiProjectSettings',
-            component: () => import('@/views/ai/project/AiProjectSettings.vue')
-          }
-        ]
-      },
-      {
-        path: 'chat',
-        name: 'AiChat',
-        component: () => import('@/views/ai/AiChatView.vue')
-      }
-    ]
-  },
-  {
-    path: '/create',
-    redirect: '/ai/workshop/start'
   },
   {
     path: '/community',
@@ -100,9 +43,24 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/ProfileView.vue')
   },
   {
+    path: '/profile/edit',
+    name: 'EditProfile',
+    component: () => import('@/views/user/EditProfileView.vue')
+  },
+  {
+    path: '/profile/settings',
+    name: 'AccountSettings',
+    component: () => import('@/views/user/AccountSettingsView.vue')
+  },
+  {
     path: '/project/:id',
     name: 'ProjectDetail',
     component: () => import('@/views/ProjectDetailView.vue')
+  },
+  {
+    path: '/project/create',
+    name: 'CreateProject',
+    component: () => import('@/views/project/CreateProjectView.vue')
   },
   {
     path: '/user/:id',

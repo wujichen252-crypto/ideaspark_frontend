@@ -32,7 +32,7 @@
               <span class="card-title">{{ card.title }}</span>
             </div>
             <div class="card-visual-placeholder">
-              <!-- 如果有图片则显示图片，否则显示默认背景 -->
+              <!-- Priority 1: Image -->
               <img
                 v-if="card.image"
                 :src="card.image"
@@ -41,7 +41,11 @@
                 loading="lazy"
                 decoding="async"
               />
-              <!-- 可选：添加一个提示，方便用户知道这里是放图片的 -->
+              <!-- Priority 2: CSS Dynamic Visual -->
+              <div v-else-if="card.cssClass" class="card-visual" :class="card.cssClass">
+                <div class="visual-inner"></div>
+              </div>
+              <!-- Priority 3: Placeholder Text -->
               <span v-else class="placeholder-text">图片占位区域</span>
             </div>
             <p class="card-desc">
@@ -81,37 +85,37 @@ const cards = [
     id: '01',
     title: '灵感生成',
     desc: '输入简单的文本描述，AI 即刻生成多种风格的创意草图。',
-    image: new URL('../assets/images/card-1.jpg', import.meta.url).href
+    cssClass: 'visual-flow'
   },
   {
     id: '02',
     title: '智能建模',
     desc: '自动拓扑与 UV 展开，从草图到高精度 3D 模型只需一步。',
-    image: new URL('../assets/images/card-2.jpg', import.meta.url).href
+    cssClass: 'visual-grid'
   },
   {
     id: '03',
     title: '材质匹配',
     desc: '基于物理的 PBR 材质库，AI 智能匹配纹理与光泽。',
-    image: new URL('../assets/images/card-3.jpg', import.meta.url).href
+    cssClass: 'visual-pulse'
   },
   {
     id: '04',
     title: '场景搭建',
     desc: '智能布局算法，自动生成符合逻辑的场景道具与环境光照。',
-    image: new URL('../assets/images/card-4.jpg', import.meta.url).href
+    cssClass: 'visual-waves'
   },
   {
     id: '05',
     title: '动画绑定',
     desc: '无需手动刷权重，AI 自动识别骨骼节点并完成蒙皮绑定。',
-    image: new URL('../assets/images/card-5.jpg', import.meta.url).href
+    cssClass: 'visual-particles'
   },
   {
     id: '06',
     title: '多端发布',
     desc: '一键导出 GLB、USDZ 等通用格式，无缝对接 Unity 或 Web。',
-    image: new URL('../assets/images/card-6.jpg', import.meta.url).href
+    cssClass: 'visual-noise'
   }
 ]
 
@@ -346,21 +350,129 @@ onUnmounted(() => {
   justify-content: center;
 }
 
-.card-image {
+/* 视觉特效容器 */
+.card-visual {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
 }
 
-.card-item:hover .card-image {
-  transform: scale(1.05);
+.visual-inner {
+  width: 100%;
+  height: 100%;
+}
+
+/* 1. 流动光效 */
+.visual-flow {
+  background: linear-gradient(135deg, #1e1e2e, #2d2d44);
+}
+.visual-flow .visual-inner {
+  background: linear-gradient(45deg, transparent 0%, rgba(74, 222, 128, 0.2) 50%, transparent 100%);
+  background-size: 200% 200%;
+  animation: shimmer 3s infinite linear;
+}
+
+/* 2. 网格扫描 */
+.visual-grid {
+  background: #111;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+  linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+.visual-grid .visual-inner {
+  background: linear-gradient(to bottom, transparent 0%, rgba(59, 130, 246, 0.3) 50%, transparent 100%);
+  background-size: 100% 200%;
+  animation: scan 4s infinite linear;
+}
+
+/* 3. 脉冲圆环 */
+.visual-pulse {
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.visual-pulse .visual-inner {
+  width: 50%;
+  height: 50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+  animation: pulse 2s infinite ease-in-out;
+}
+
+/* 4. 波浪 */
+.visual-waves {
+  background: linear-gradient(180deg, #0f172a, #1e293b);
+}
+.visual-waves .visual-inner {
+  background: repeating-radial-gradient(
+    circle at 50% 100%,
+    transparent 0,
+    rgba(6, 182, 212, 0.1) 10px,
+    transparent 20px
+  );
+  animation: waves 4s infinite linear;
+  transform-origin: bottom center;
+}
+
+/* 5. 粒子噪声 */
+.visual-particles {
+  background: #000;
+}
+.visual-particles .visual-inner {
+  background-image: radial-gradient(#fbbf24 1px, transparent 1px);
+  background-size: 20px 20px;
+  animation: particles 10s infinite linear;
+}
+
+/* 6. 动态噪声 */
+.visual-noise {
+  background: #18181b;
+}
+.visual-noise .visual-inner {
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(236, 72, 153, 0.1) 10px,
+    rgba(236, 72, 153, 0.1) 20px
+  );
+  background-size: 200% 200%;
+  animation: shift 5s infinite linear;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@keyframes scan {
+  0% { background-position: 0 -100%; }
+  100% { background-position: 0 200%; }
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.5); opacity: 1; }
+}
+@keyframes waves {
+  0% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.5; }
+}
+@keyframes particles {
+  0% { background-position: 0 0; }
+  100% { background-position: 100px 100px; }
+}
+@keyframes shift {
+  0% { background-position: 0 0; }
+  100% { background-position: 100% 100%; }
 }
 
 .placeholder-text {
+  color: #666;
   font-size: 0.9rem;
-  color: #888;
-  pointer-events: none;
 }
 
 .card-desc {
