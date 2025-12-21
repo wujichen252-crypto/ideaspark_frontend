@@ -30,6 +30,12 @@
         <!-- 资源社区视图 -->
         <WorkbenchCommunityView v-else-if="activeKey === 'community'" />
 
+        <!-- 最近打开视图 -->
+        <WorkbenchRecentView v-else-if="activeKey === 'recent'" />
+
+        <!-- 草稿箱视图 -->
+        <WorkbenchDraftView v-else-if="activeKey === 'drafts'" />
+
         <!-- 其他视图占位 -->
         <div v-else class="content-placeholder">
           <n-empty description="此区域暂无内容">
@@ -175,6 +181,8 @@ import {
 import { useUserStore } from '@/store'
 import WorkbenchTeamView from './workbench/WorkbenchTeamView.vue'
 import WorkbenchCommunityView from './workbench/WorkbenchCommunityView.vue'
+import WorkbenchRecentView from './workbench/WorkbenchRecentView.vue'
+import WorkbenchDraftView from './workbench/WorkbenchDraftView.vue'
 
 // 引入 User Store
 const userStore = useUserStore()

@@ -25,8 +25,7 @@ const menuOptions = computed<MenuOption[]>(() => {
     { key: 'dashboard', label: '控制台' },
     { key: 'workbench', label: '工作台' },
     { key: 'market', label: '项目市场' },
-    { key: 'community', label: '社区动态' },
-    { key: 'create', label: 'AI 工坊' }
+    { key: 'community', label: '社区动态' }
   ]
 })
 
@@ -36,7 +35,6 @@ watch(() => route.path, (path) => {
   else if (path === '/workbench') activeKey.value = 'workbench'
   else if (path === '/market') activeKey.value = 'market'
   else if (path === '/community') activeKey.value = 'community'
-  else if (path.startsWith('/ai') || path === '/create') activeKey.value = 'create'
   else activeKey.value = null
 }, { immediate: true })
 
@@ -58,7 +56,6 @@ function onUpdateMenu(key: string) {
   if (key === 'workbench') router.push('/workbench')
   if (key === 'market') router.push('/market')
   if (key === 'community') router.push('/community')
-  if (key === 'create') router.push('/ai/workshop')
 }
 
 /**
@@ -126,28 +123,24 @@ function initAnimation() {
   }
 
   // 使用 Refs 获取元素
-  let titleChars = logoTitleRef.value?.querySelectorAll('.logo-title-char')
-  let subtitle = subtitleRef.value
-  let logoIcon = logoIconRef.value
+  // 注意：只严格检查动画实际需要的元素，避免因无关元素缺失导致动画失效
   let scrolledLogo = scrolledLogoRef.value
   let solidSquare = solidSquareRef.value
   let initialLogo = initialLogoRef.value
 
   // Fallback: 如果 Refs 为空，尝试直接查询 DOM (防止 Refs 尚未绑定)
-  if (!titleChars?.length || !subtitle || !logoIcon || !scrolledLogo || !solidSquare || !initialLogo) {
+  if (!scrolledLogo || !solidSquare || !initialLogo) {
     // 再次尝试获取，可能是 v-if 或 DOM 更新导致
     const headerEl = document.querySelector('.app-header')
     if (headerEl) {
-      if (!titleChars?.length) titleChars = headerEl.querySelectorAll('.logo-title-char')
-      if (!subtitle) subtitle = headerEl.querySelector('.logo-subtitle') as HTMLElement
-      if (!logoIcon) logoIcon = headerEl.querySelector('.logo-icon-wrapper') as HTMLElement
       if (!scrolledLogo) scrolledLogo = headerEl.querySelector('.scrolled-logo-container') as HTMLElement
       if (!solidSquare) solidSquare = headerEl.querySelector('.solid-square') as HTMLElement
       if (!initialLogo) initialLogo = headerEl.querySelector('.initial-logo-container') as HTMLElement
     }
   }
 
-  if (!titleChars?.length || !subtitle || !logoIcon || !scrolledLogo || !solidSquare || !initialLogo) {
+  // 必须确保关键动画元素存在
+  if (!scrolledLogo || !solidSquare || !initialLogo) {
     // 如果仍然获取不到，可能是路由切换导致组件重新挂载，等待 DOM 稳定
     return
   }

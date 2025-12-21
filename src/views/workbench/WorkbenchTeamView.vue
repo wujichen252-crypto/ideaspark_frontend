@@ -24,10 +24,6 @@
             <template #icon><n-icon :component="PersonAddOutline" /></template>
             邀请成员
           </n-button>
-          <n-button type="primary" class="create-btn">
-            <template #icon><n-icon :component="AddOutline" /></template>
-            新建项目
-          </n-button>
         </div>
       </div>
 
@@ -37,186 +33,62 @@
           <n-tab-pane name="projects" tab="项目">
              <!-- 项目列表内容 -->
             <div class="project-list-container custom-scrollbar">
-              <div class="filter-bar">
-                 <div class="filter-left">
-                  <n-dropdown trigger="click" :options="sortOptions">
-                    <n-button text class="sort-trigger">
-                      创建时间
-                      <n-icon :component="ChevronDownOutline" class="ml-1" />
-                    </n-button>
-                  </n-dropdown>
-                </div>
-                <div class="filter-right">
-                  <n-button text>
-                    <template #icon><n-icon :component="ListOutline" /></template>
-                  </n-button>
-                </div>
-              </div>
 
-              <!-- 个人团队 IdeaSpark (仅个人空间显示) -->
-              <div v-if="props.isPersonal">
-                <div class="team-group">
-                  <div class="group-header">
-                    <span class="group-title">IdeaSpark</span>
-                    <n-badge :value="1" type="info" class="group-count" />
+              <!-- 所有项目 -->
+              <div class="team-group">
+                <div class="group-header">
+                  <div class="header-left">
+                    <span class="group-title">全部项目</span>
+                    <n-badge :value="allProjects.length" type="info" class="group-count" />
                   </div>
-                  
-                  <!-- 项目行 -->
-                  <div class="project-row-list">
-                    <!-- 文件 1 -->
-                    <div class="project-row-card simple-file-row">
-                      <div class="file-icon">
-                         <n-icon :component="DocumentText" color="#10b981" size="24" />
-                      </div>
-                      <div class="card-info">
-                        <div class="card-title-row">
-                          <span class="card-title">项目总览文件</span>
-                        </div>
-                      </div>
-                       <div class="card-actions">
-                          <n-button circle quaternary size="small">
-                            <template #icon><n-icon :component="AddOutline" /></template>
-                          </n-button>
-                          <n-button circle quaternary size="small">
-                            <template #icon><n-icon :component="DownloadOutline" /></template>
-                          </n-button>
-                           <n-button circle quaternary size="small">
-                            <template #icon><n-icon :component="pricetagOutline" /></template>
-                          </n-button>
-                          <n-button circle quaternary size="small">
-                            <template #icon><n-icon :component="ShareSocialOutline" /></template>
-                          </n-button>
-                      </div>
-                    </div>
-
-                    <!-- 文件 2 -->
-                    <div class="project-row-card simple-file-row">
-                      <div class="file-icon">
-                         <n-icon :component="TextOutline" color="#3b82f6" size="24" />
-                      </div>
-                      <div class="card-info">
-                        <div class="card-title-row">
-                          <span class="card-title">产品需求文档 (PRD) v1.2</span>
-                        </div>
-                      </div>
-                       <div class="card-actions">
-                          <n-button circle quaternary size="small">
-                            <template #icon><n-icon :component="AddOutline" /></template>
-                          </n-button>
-                          <n-button circle quaternary size="small">
-                            <template #icon><n-icon :component="DownloadOutline" /></template>
-                          </n-button>
-                           <n-button circle quaternary size="small">
-                            <template #icon><n-icon :component="pricetagOutline" /></template>
-                          </n-button>
-                          <n-button circle quaternary size="small">
-                            <template #icon><n-icon :component="ShareSocialOutline" /></template>
-                          </n-button>
-                      </div>
-                    </div>
-
-                    <!-- 文件 3 -->
-                    <div class="project-row-card simple-file-row">
-                      <div class="file-icon">
-                         <n-icon :component="ImageOutline" color="#f59e0b" size="24" />
-                      </div>
-                      <div class="card-info">
-                        <div class="card-title-row">
-                          <span class="card-title">UI 设计稿 - 首页改版.png</span>
-                        </div>
-                      </div>
-                       <div class="card-actions">
-                          <n-button circle quaternary size="small">
-                            <template #icon><n-icon :component="AddOutline" /></template>
-                          </n-button>
-                          <n-button circle quaternary size="small">
-                            <template #icon><n-icon :component="DownloadOutline" /></template>
-                          </n-button>
-                           <n-button circle quaternary size="small">
-                            <template #icon><n-icon :component="pricetagOutline" /></template>
-                          </n-button>
-                          <n-button circle quaternary size="small">
-                            <template #icon><n-icon :component="ShareSocialOutline" /></template>
-                          </n-button>
-                      </div>
-                    </div>
-
-                    <!-- 文件 4 -->
-                    <div class="project-row-card simple-file-row">
-                      <div class="file-icon">
-                         <n-icon :component="FolderOpenOutline" color="#8b5cf6" size="24" />
-                      </div>
-                      <div class="card-info">
-                        <div class="card-title-row">
-                          <span class="card-title">2023-10 会议记录归档</span>
-                        </div>
-                      </div>
-                       <div class="card-actions">
-                          <n-button circle quaternary size="small">
-                            <template #icon><n-icon :component="AddOutline" /></template>
-                          </n-button>
-                          <n-button circle quaternary size="small">
-                            <template #icon><n-icon :component="DownloadOutline" /></template>
-                          </n-button>
-                           <n-button circle quaternary size="small">
-                            <template #icon><n-icon :component="pricetagOutline" /></template>
-                          </n-button>
-                          <n-button circle quaternary size="small">
-                            <template #icon><n-icon :component="ShareSocialOutline" /></template>
-                          </n-button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 个人团队 思维导图 -->
-                <div class="team-group">
-                  <div class="group-header">
-                    <span class="group-title">思维导图</span>
-                    <n-badge :value="1" type="info" class="group-count" />
-                  </div>
-
-                  <!-- 项目行 -->
-                  <div class="project-row-list">
-                    <div class="project-row-card">
-                      <div class="card-preview">
-                        <div class="preview-placeholder preview-2"></div>
-                      </div>
-                      <div class="card-info">
-                        <div class="card-title-row">
-                          <n-icon :component="DocumentText" color="#8b5cf6" />
-                          <span class="card-title">后端规划与学习</span>
-                        </div>
-                      </div>
-                       <div class="card-actions">
-                          <n-button circle quaternary size="small">
-                            <template #icon><n-icon :component="AddOutline" /></template>
-                          </n-button>
-                          <n-button circle quaternary size="small">
-                            <template #icon><n-icon :component="DownloadOutline" /></template>
-                          </n-button>
-                           <n-button circle quaternary size="small">
-                            <template #icon><n-icon :component="pricetagOutline" /></template>
-                          </n-button>
-                          <n-button circle quaternary size="small">
-                            <template #icon><n-icon :component="ShareSocialOutline" /></template>
-                          </n-button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 新团队空状态 -->
-              <div v-else class="empty-team-state">
-                <n-empty description="团队暂无项目">
-                  <template #extra>
-                    <n-button type="primary">
+                  <div class="header-right">
+                    <n-button type="primary" size="small" @click="openCreateModal">
                       <template #icon><n-icon :component="AddOutline" /></template>
-                      创建第一个项目
+                      创建项目
                     </n-button>
-                  </template>
-                </n-empty>
+                  </div>
+                </div>
+                
+                <div class="project-row-list">
+                  <div 
+                    v-for="project in allProjects" 
+                    :key="project.id" 
+                    class="project-row-card simple-file-row"
+                    @click="handleOpenProject(project.id)"
+                  >
+                    <div class="file-icon">
+                       <n-icon :component="DocumentText" color="#8b5cf6" size="24" />
+                    </div>
+                    <div class="card-info">
+                      <div class="card-title-row">
+                        <span class="card-title">{{ project.name }}</span>
+                      </div>
+                      <div class="card-meta-row">
+                         <n-tag size="small" :bordered="false">{{ project.category }}</n-tag>
+                      </div>
+                    </div>
+                     <div class="card-actions">
+                        <n-button circle quaternary size="small">
+                          <template #icon><n-icon :component="ShareSocialOutline" /></template>
+                        </n-button>
+                    </div>
+                  </div>
+
+                  <!-- 创建新项目卡片 -->
+                    <!-- <div class="project-row-card create-new-card" @click="router.push('/ai/workshop/start')">
+                       <div class="file-icon">
+                          <n-icon :component="AddOutline" color="#9ca3af" size="32" />
+                       </div>
+                       <div class="card-info">
+                         <span class="card-title text-gray">创建新项目</span>
+                       </div>
+                     </div> -->
+                </div>
+              </div>
+
+              <!-- 空状态 -->
+              <div v-if="allProjects.length === 0" class="empty-team-state">
+                <n-empty description="团队暂无项目" />
               </div>
             </div>
           </n-tab-pane>
@@ -243,7 +115,7 @@
                   <div class="col-name">
                     <n-avatar round size="small" :src="userStore.userInfo?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Guest'" />
                     <span class="member-name">{{ userStore.userInfo?.username || '未登录用户' }}</span>
-                    <n-tag size="small" type="info" bordered={false} class="me-tag">我</n-tag>
+                    <n-tag size="small" type="info" :bordered="false" class="me-tag">我</n-tag>
                   </div>
                   <div class="col-role">
                     <span class="role-text">所有者</span>
@@ -361,11 +233,49 @@
         </n-tabs>
       </div>
     </div>
+
+    <!-- 创建项目弹窗 -->
+    <n-modal v-model:show="showCreateModal">
+      <n-card
+        style="width: 600px"
+        title="创建新项目"
+        :bordered="false"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+      >
+        <n-form
+          ref="formRef"
+          :model="createForm"
+          :rules="createRules"
+          label-placement="left"
+          label-width="auto"
+          require-mark-placement="right-hanging"
+        >
+          <n-form-item label="项目名称" path="name">
+            <n-input v-model:value="createForm.name" placeholder="请输入项目名称" />
+          </n-form-item>
+          <n-form-item label="公开项目" path="isPublic">
+            <n-switch v-model:value="createForm.isPublic" />
+            <span style="margin-left: 12px; font-size: 12px; color: #666;">
+              {{ createForm.isPublic ? '所有人都可见' : '仅团队成员可见' }}
+            </span>
+          </n-form-item>
+        </n-form>
+        <template #footer>
+          <n-space justify="end">
+            <n-button @click="showCreateModal = false">取消</n-button>
+            <n-button type="primary" @click="handleCreateProject">确认创建</n-button>
+          </n-space>
+        </template>
+      </n-card>
+    </n-modal>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, reactive } from 'vue'
+import { useRouter } from 'vue-router'
 import { 
   SearchOutline, 
   PersonAddOutline,
@@ -385,8 +295,29 @@ import {
   GridOutline,
   FilterOutline
 } from '@vicons/ionicons5'
-import { useUserStore } from '@/store'
-import { NEmpty } from 'naive-ui'
+import { useUserStore, useAiWorkshopStore } from '@/store'
+import { 
+  NEmpty, 
+  NModal, 
+  NCard, 
+  NForm, 
+  NFormItem, 
+  NInput, 
+  NSwitch, 
+  NSpace, 
+  NButton, 
+  NIcon, 
+  NTabs, 
+  NTabPane, 
+  NAvatar, 
+  NBadge, 
+  NTag, 
+  NDivider, 
+  NRadioGroup, 
+  NRadioButton,
+  FormInst,
+  useMessage
+} from 'naive-ui'
 
 const props = defineProps<{
   teamId?: string
@@ -394,14 +325,67 @@ const props = defineProps<{
   isPersonal?: boolean
 }>()
 
+const router = useRouter()
 const userStore = useUserStore()
+const aiStore = useAiWorkshopStore()
+const message = useMessage()
 const currentTab = ref('projects')
 
-const sortOptions = [
-  { label: '创建时间', key: 'created' },
-  { label: '最近修改', key: 'updated' },
-  { label: '名称', key: 'name' }
-]
+// 创建项目相关
+const showCreateModal = ref(false)
+const formRef = ref<FormInst | null>(null)
+const createForm = reactive({
+  name: '',
+  isPublic: false
+})
+const createRules = {
+  name: {
+    required: true,
+    message: '请输入项目名称',
+    trigger: ['blur', 'input']
+  }
+}
+
+// 打开创建弹窗
+const openCreateModal = () => {
+  createForm.name = ''
+  createForm.isPublic = false
+  showCreateModal.value = true
+}
+
+// 确认创建
+const handleCreateProject = () => {
+  formRef.value?.validate((errors) => {
+    if (!errors) {
+      const id = Date.now().toString()
+      // 初始化项目
+      aiStore.initProject(id)
+      // 更新信息
+      aiStore.setProjectInfo({
+        name: createForm.name,
+        visibility: createForm.isPublic ? 'public' : 'private',
+        status: 'active' // 默认为活跃状态
+      })
+      // 保存
+      aiStore.saveProject()
+      
+      message.success('创建成功')
+      showCreateModal.value = false
+      // 跳转到项目详情页
+      router.push(`/ai/workshop/project/${id}`)
+    }
+  })
+}
+
+// 计算所有项目（目前就是全部，后续可加过滤）
+const allProjects = computed(() => {
+  return aiStore.projectList
+})
+
+// 打开项目
+const handleOpenProject = (id: string) => {
+  router.push(`/ai/workshop/project/${id}`)
+}
 </script>
 
 <style scoped lang="scss">
@@ -522,6 +506,95 @@ const sortOptions = [
   align-items: center;
   justify-content: center;
   padding: 24px 16px;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  height: 200px; /* Fixed height for uniformity */
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border-color: #d1d5db;
+  }
+}
+
+.recent-project-card {
+  border-left: 4px solid #10b981; /* Highlight recent */
+}
+
+.create-new-card {
+  border: 2px dashed #e5e7eb;
+  background: transparent;
+  
+  &:hover {
+    border-color: #10b981;
+    background: #f0fdf4;
+  }
+  
+  .text-gray {
+    color: #9ca3af;
+  }
+}
+
+.file-icon {
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60px;
+  width: 60px;
+  background: #f3f4f6;
+  border-radius: 12px;
+}
+
+.card-info {
+  text-align: center;
+  width: 100%;
+  
+  .card-title {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 16px;
+    margin-bottom: 4px;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .card-desc-row {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 8px;
+    height: 36px; /* 2 lines */
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .card-meta {
+    font-size: 12px;
+    color: #9ca3af;
+  }
+}
+
+.card-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.project-row-card:hover .card-actions {
+  opacity: 1;
+}
+
+.project-card {
   background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
@@ -655,8 +728,14 @@ const sortOptions = [
   .group-header {
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: space-between;
     margin-bottom: 16px;
+    
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
     
     .group-title {
       font-size: 16px;
