@@ -55,7 +55,7 @@
             <div class="card-header">
               <n-checkbox 
                 :checked="item.completed" 
-                @update:checked="(v) => handleToggle(moduleKey, item.id, v)"
+                @update:checked="(v: boolean) => handleToggle(moduleKey, item.id, v)"
                 @click.stop
               />
               <n-tag 

@@ -71,6 +71,7 @@ export function usePluginCatalog() {
     const i = selected.value.indexOf(id)
     if (i > 0) {
       const tmp = selected.value[i - 1]
+      if (!tmp) return
       selected.value[i - 1] = id
       selected.value[i] = tmp
     }
@@ -84,6 +85,7 @@ export function usePluginCatalog() {
     const i = selected.value.indexOf(id)
     if (i !== -1 && i < selected.value.length - 1) {
       const tmp = selected.value[i + 1]
+      if (!tmp) return
       selected.value[i + 1] = id
       selected.value[i] = tmp
     }

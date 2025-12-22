@@ -154,7 +154,7 @@
                   <n-list hoverable clickable>
                     <n-list-item v-for="task in currentModuleData.checklist" :key="task.id" @click="handleTaskClick(task)">
                       <template #prefix>
-                        <n-checkbox :checked="task.completed" @update:checked="(v) => store.toggleChecklistItem(currentModule, task.id)" @click.stop />
+                        <n-checkbox :checked="task.completed" @update:checked="(v: boolean) => store.toggleChecklistItem(currentModule, task.id)" @click.stop />
                       </template>
                       <div class="task-content">
                         <span :class="{ 'completed': task.completed }">{{ task.label }}</span>

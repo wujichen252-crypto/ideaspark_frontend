@@ -92,6 +92,7 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import { useMessage } from 'naive-ui'
+import type { UploadFileInfo } from 'naive-ui'
 import { ArrowBackOutline as ArrowBack } from '@vicons/ionicons5'
 import { useUserStore } from '@/store' // Assuming this store exists
 // Note: If user store doesn't exist, we might need to mock or check. 
@@ -118,7 +119,7 @@ const rules = {
   }
 }
 
-const handleAvatarFinish = ({ file, event }: { file: any; event: any }) => {
+const handleAvatarFinish = ({ file, event }: { file: Required<UploadFileInfo>; event?: ProgressEvent<EventTarget> }) => {
   message.success('头像上传成功 (Mock)')
   // In real app, update formValue.avatar with response url
 }

@@ -120,7 +120,7 @@ const aiStore = useAiWorkshopStore()
 const message = useMessage()
 
 const searchQuery = ref('')
-const selectedCategory = ref<string | null>(null)
+const selectedCategory = ref('')
 
 // 卡片菜单选项
 const cardOptions = [
@@ -135,7 +135,7 @@ const categoryOptions = computed(() => {
   const categories = new Set(draftList.value.map(p => p.category).filter(Boolean))
   const options = Array.from(categories).map(c => ({ label: c, value: c }))
   return [
-    { label: '所有分类', value: null },
+    { label: '所有分类', value: '' },
     ...options
   ]
 })
@@ -201,8 +201,12 @@ const groupedProjects = computed(() => {
 
 // 打开项目
 const handleOpenProject = (id: string) => {
-  aiStore.initProject(id)
-  router.push(`/ai/workshop/project/${id}`)
+  const project = aiStore.getProjectById(id)
+  if (project && project.type === 'document') {
+    router.push(`/project/doc/${id}`)
+  } else {
+    router.push(`/project/${id}`)
+  }
 }
 
 // 处理卡片操作
@@ -372,6 +376,7 @@ const formatTime = (timestamp: number) => {
         line-height: 1.4;
         display: -webkit-box;
         -webkit-line-clamp: 1;
+        line-clamp: 1;
         -webkit-box-orient: vertical;
         overflow: hidden;
         flex: 1;
@@ -396,6 +401,7 @@ const formatTime = (timestamp: number) => {
       margin: 0 0 auto 0;
       display: -webkit-box;
       -webkit-line-clamp: 2;
+      line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }

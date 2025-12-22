@@ -71,6 +71,53 @@ export const useChatStore = defineStore('chat', () => {
     return id
   }
 
+  /**
+   * 使用指定 ID 创建会话（用于绑定到某个页面/文件）
+   * @param id - 会话 ID
+   * @param title - 会话标题
+   * @param model - 模型名称
+   */
+  function createSessionWithId(id: string, title = '新对话', model = 'GPT-4 Turbo') {
+    const existing = sessions.value.find(s => s.id === id)
+    if (existing) {
+      currentSessionId.value = existing.id
+      return existing.id
+    }
+    const newSession: ChatSession = {
+      id,
+      title,
+      messages: [
+        {
+          id: Date.now().toString() + 'init',
+          role: 'ai',
+          content: '你好！我是 IdeaSpark AI 助手。请问今天想聊点什么？',
+          type: 'text',
+          timestamp: Date.now()
+        }
+      ],
+      model,
+      lastUpdated: Date.now()
+    }
+    sessions.value.unshift(newSession)
+    currentSessionId.value = id
+    return id
+  }
+
+  /**
+   * 确保会话存在并切换到该会话
+   * @param id - 会话 ID
+   * @param title - 会话标题
+   * @param model - 模型名称
+   */
+  function ensureSession(id: string, title = '新对话', model = 'GPT-4 Turbo') {
+    const existing = sessions.value.find(s => s.id === id)
+    if (existing) {
+      currentSessionId.value = existing.id
+      return existing.id
+    }
+    return createSessionWithId(id, title, model)
+  }
+
   function switchSession(id: string) {
     currentSessionId.value = id
   }
@@ -125,6 +172,8 @@ export const useChatStore = defineStore('chat', () => {
     currentSession,
     models,
     createSession,
+    createSessionWithId,
+    ensureSession,
     switchSession,
     addMessage,
     deleteSession,

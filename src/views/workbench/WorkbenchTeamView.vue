@@ -315,9 +315,9 @@ import {
   NDivider, 
   NRadioGroup, 
   NRadioButton,
-  FormInst,
   useMessage
 } from 'naive-ui'
+import type { FormInst } from 'naive-ui'
 
 const props = defineProps<{
   teamId?: string
@@ -384,7 +384,13 @@ const allProjects = computed(() => {
 
 // 打开项目
 const handleOpenProject = (id: string) => {
-  router.push(`/ai/workshop/project/${id}`)
+  const project = aiStore.getProjectById(id)
+  if (project && project.type === 'document') {
+    router.push(`/project/doc/${id}`)
+  } else {
+    // router.push(`/project/${id}`)
+    router.push(`/project/workspace/${id}`)
+  }
 }
 </script>
 
@@ -573,6 +579,7 @@ const handleOpenProject = (id: string) => {
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
   }
 

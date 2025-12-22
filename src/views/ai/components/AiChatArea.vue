@@ -100,11 +100,14 @@ const scrollToBottom = () => {
 watch(() => messages.value.length, scrollToBottom)
 
 async function handleSend(text: string) {
-  if (!props.sessionId) {
+  let sid = props.sessionId
+  if (sid) {
+    chatStore.ensureSession(sid, '文档协作')
+  } else {
     chatStore.createSession()
+    sid = chatStore.currentSessionId
   }
-  
-  const sid = chatStore.currentSessionId!
+  if (!sid) return
   
   // 1. Add User Message
   chatStore.addMessage(sid, {

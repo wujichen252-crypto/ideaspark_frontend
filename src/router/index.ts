@@ -63,6 +63,21 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/project/CreateProjectView.vue')
   },
   {
+    path: '/project/doc/:id',
+    name: 'DocumentEditor',
+    component: () => import('@/views/editor/AiDocumentEditorView.vue')
+  },
+  {
+    path: '/project/workspace/:id',
+    name: 'ProjectWorkspace',
+    component: () => import('@/views/project/ProjectWorkspaceView.vue')
+  },
+  {
+    path: '/project/workspace/:id/file/:fileId',
+    name: 'ProjectFileEditor',
+    component: () => import('@/views/project/ProjectFileEditorView.vue')
+  },
+  {
     path: '/user/:id',
     name: 'PublicProfile',
     component: () => import('@/views/PublicProfileView.vue')

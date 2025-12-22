@@ -58,8 +58,12 @@ const drafts = computed(() => store.projectList.filter(p => p.status === 'draft'
  * @param id 项目ID
  */
 function continueProject(id: string) {
-  store.initProject(id)
-  router.push(`/ai/workshop/project/${id}`)
+  const project = store.getProjectById(id)
+  if (project && project.type === 'document') {
+    router.push(`/project/doc/${id}`)
+  } else {
+    router.push(`/project/${id}`)
+  }
 }
 
 /**

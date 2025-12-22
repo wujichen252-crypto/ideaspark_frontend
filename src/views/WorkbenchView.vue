@@ -33,6 +33,9 @@
         <!-- 最近打开视图 -->
         <WorkbenchRecentView v-else-if="activeKey === 'recent'" />
 
+        <!-- 所有项目视图 -->
+        <WorkbenchProjectsView v-else-if="activeKey === 'projects'" />
+
         <!-- 草稿箱视图 -->
         <WorkbenchDraftView v-else-if="activeKey === 'drafts'" />
 
@@ -176,13 +179,15 @@ import {
   AddOutline,
   CloseOutline,
   TrashOutline,
-  CreateOutline
+  CreateOutline,
+  FolderOutline
 } from '@vicons/ionicons5'
 import { useUserStore } from '@/store'
 import WorkbenchTeamView from './workbench/WorkbenchTeamView.vue'
 import WorkbenchCommunityView from './workbench/WorkbenchCommunityView.vue'
 import WorkbenchRecentView from './workbench/WorkbenchRecentView.vue'
 import WorkbenchDraftView from './workbench/WorkbenchDraftView.vue'
+import WorkbenchProjectsView from './workbench/WorkbenchProjectsView.vue'
 
 // 引入 User Store
 const userStore = useUserStore()
@@ -331,6 +336,11 @@ const menuOptions = computed<MenuOption[]>(() => {
       label: '最近打开',
       key: 'recent',
       icon: renderIcon(TimeOutline)
+    },
+    {
+      label: '所有项目',
+      key: 'projects',
+      icon: renderIcon(FolderOutline)
     },
     {
       label: '我的草稿',

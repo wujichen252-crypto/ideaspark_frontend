@@ -46,6 +46,9 @@
       </div>
       
       <div class="message-actions" v-if="message.role === 'ai' && message.status !== 'loading'">
+        <n-button size="tiny" quaternary circle @click="handleSaveText">
+          <template #icon><n-icon><SaveOutline /></n-icon></template>
+        </n-button>
         <n-button size="tiny" quaternary circle @click="copyMessage">
           <template #icon><n-icon><CopyOutline /></n-icon></template>
         </n-button>
@@ -140,6 +143,14 @@ function copyMessage() {
 
 function handleSaveCode(code: string, lang: string) {
   emit('save-code', { code, lang })
+}
+
+/**
+ * 将整段 AI 文本插入到编辑器/保存目标
+ */
+function handleSaveText() {
+  emit('save-code', { code: props.message.content, lang: 'markdown' })
+  nMessage.success('已发送到编辑器')
 }
 </script>
 

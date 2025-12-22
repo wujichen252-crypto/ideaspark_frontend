@@ -1,9 +1,9 @@
 <template>
-  <div class="workbench-recent-view">
+  <div class="workbench-projects-view">
     <div class="view-header">
       <div class="header-left">
-        <h1 class="view-title">最近打开</h1>
-        <span class="view-subtitle">快速访问您最近工作的项目</span>
+        <h1 class="view-title">我的项目</h1>
+        <span class="view-subtitle">管理您的所有项目和文档</span>
       </div>
       <div class="header-right">
         <n-button type="primary" style="margin-right: 12px" @click="handleCreateClick">
@@ -44,63 +44,60 @@
 
     <div class="project-list-container custom-scrollbar">
       <template v-if="hasProjects">
-        <div v-for="group in groupedProjects" :key="group.title" class="time-group">
-          <h3 class="group-title">{{ group.title }}</h3>
-          <div class="project-grid">
-            <div 
-              v-for="project in group.projects" 
-              :key="project.id" 
-              class="project-card"
-              @click="handleOpenProject(project.id)"
-            >
-              <div class="card-cover" :style="{ backgroundImage: project.cover ? `url(${project.cover})` : 'none' }">
-                <div v-if="!project.cover" class="default-cover">
-                  <n-icon v-if="project.category.includes('设计')" :component="ImageOutline" color="#f59e0b" size="32" />
-                  <n-icon v-else-if="project.category.includes('代码')" :component="CodeSlashOutline" color="#3b82f6" size="32" />
-                  <n-icon v-else :component="BulbOutline" color="#10b981" size="32" />
-                </div>
-                <div class="card-overlay">
-                  <n-button type="primary" size="tiny" @click.stop="handleOpenProject(project.id)">
-                    进入
+        <div class="project-grid">
+          <div 
+            v-for="project in filteredProjects" 
+            :key="project.id" 
+            class="project-card"
+            @click="handleOpenProject(project.id)"
+          >
+            <div class="card-cover" :style="{ backgroundImage: project.cover ? `url(${project.cover})` : 'none' }">
+              <div v-if="!project.cover" class="default-cover">
+                <n-icon v-if="project.category && project.category.includes('设计')" :component="ImageOutline" color="#f59e0b" size="32" />
+                <n-icon v-else-if="project.category && project.category.includes('代码')" :component="CodeSlashOutline" color="#3b82f6" size="32" />
+                <n-icon v-else :component="BulbOutline" color="#10b981" size="32" />
+              </div>
+              <div class="card-overlay">
+                <n-button type="primary" size="tiny" @click.stop="handleOpenProject(project.id)">
+                  进入
+                </n-button>
+              </div>
+            </div>
+            
+            <div class="card-content">
+              <div class="card-header">
+                <span class="card-title" :title="project.name">{{ project.name }}</span>
+                <n-dropdown 
+                  trigger="click" 
+                  :options="cardOptions" 
+                  @select="(key) => handleCardAction(key, project.id)"
+                  @click.stop
+                >
+                  <n-button text size="tiny" class="more-btn" @click.stop>
+                    <template #icon><n-icon :component="EllipsisHorizontal" /></template>
                   </n-button>
-                </div>
+                </n-dropdown>
               </div>
               
-              <div class="card-content">
-                <div class="card-header">
-                  <span class="card-title" :title="project.name">{{ project.name }}</span>
-                  <n-dropdown 
-                    trigger="click" 
-                    :options="cardOptions" 
-                    @select="(key) => handleCardAction(key, project.id)"
-                    @click.stop
-                  >
-                    <n-button text size="tiny" class="more-btn" @click.stop>
-                      <template #icon><n-icon :component="EllipsisHorizontal" /></template>
-                    </n-button>
-                  </n-dropdown>
-                </div>
-                
-                <p class="card-desc" :title="project.description">{{ project.description || '暂无描述' }}</p>
-                
-                <div class="card-footer">
-                  <n-tag v-if="project.category" size="tiny" :bordered="false" type="info" class="category-tag">
-                    {{ project.category }}
-                  </n-tag>
-                  <span class="time-text">{{ formatTime(project.updatedAt) }}</span>
-                </div>
+              <p class="card-desc" :title="project.description">{{ project.description || '暂无描述' }}</p>
+              
+              <div class="card-footer">
+                <n-tag v-if="project.category" size="tiny" :bordered="false" type="info" class="category-tag">
+                  {{ project.category }}
+                </n-tag>
+                <span class="time-text">{{ formatTime(project.updatedAt) }}</span>
               </div>
             </div>
           </div>
         </div>
         
-        <div v-if="groupedProjects.length === 0" class="empty-search">
+        <div v-if="filteredProjects.length === 0" class="empty-search">
           <n-empty description="未找到匹配的项目" />
         </div>
       </template>
       
       <div v-else class="empty-state">
-        <n-empty description="暂无最近打开的项目" />
+        <n-empty description="暂无项目" />
       </div>
     </div>
 
@@ -148,7 +145,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, reactive, h } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAiWorkshopStore } from '@/store'
 import { 
@@ -180,7 +177,6 @@ import {
   NRadio,
   NSpace
 } from 'naive-ui'
-import { h, reactive } from 'vue'
 
 const router = useRouter()
 const aiStore = useAiWorkshopStore()
@@ -252,22 +248,8 @@ const categoryOptions = computed(() => {
 // 是否有项目
 const hasProjects = computed(() => aiStore.projectList.length > 0)
 
-// 时间分组逻辑
-const getTimeGroup = (timestamp: number) => {
-  const now = new Date()
-  const date = new Date(timestamp)
-  const diffTime = now.getTime() - date.getTime()
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
-  
-  if (diffDays === 0 && now.getDate() === date.getDate()) return '今天'
-  if (diffDays === 1 || (diffDays === 0 && now.getDate() !== date.getDate())) return '昨天'
-  if (diffDays < 7) return '过去7天'
-  if (diffDays < 30) return '过去30天'
-  return '更早'
-}
-
-// 分组后的项目
-const groupedProjects = computed(() => {
+// 过滤后的项目
+const filteredProjects = computed(() => {
   let list = [...aiStore.projectList]
   
   // 分类过滤
@@ -284,28 +266,10 @@ const groupedProjects = computed(() => {
     )
   }
   
-  // 按时间排序
+  // 按时间排序（最新的在前）
   list.sort((a, b) => b.updatedAt - a.updatedAt)
   
-  // 分组
-  const groups: Record<string, typeof list> = {}
-  const groupOrder = ['今天', '昨天', '过去7天', '过去30天', '更早']
-  
-  list.forEach(project => {
-    const groupName = getTimeGroup(project.updatedAt)
-    if (!groups[groupName]) {
-      groups[groupName] = []
-    }
-    groups[groupName].push(project)
-  })
-  
-  // 转为数组并按顺序排列
-  return groupOrder
-    .filter(key => groups[key] && groups[key].length > 0)
-    .map(key => ({
-      title: key,
-      projects: groups[key]
-    }))
+  return list
 })
 
 // 打开项目
@@ -324,7 +288,8 @@ const handleCardAction = (key: string, id: string) => {
   if (key === 'share') {
     message.success('分享链接已复制到剪贴板')
   } else if (key === 'remove') {
-    message.info('已从最近列表中移除')
+    aiStore.deleteProject(id)
+    message.success('项目已删除')
   }
 }
 
@@ -342,25 +307,25 @@ const formatTime = (timestamp: number) => {
 </script>
 
 <style scoped lang="scss">
-.workbench-recent-view {
+.workbench-projects-view {
   height: 100%;
   display: flex;
   flex-direction: column;
   background-color: #f9fafb;
-  padding: 24px 32px; /* 减少页面内边距 */
+  padding: 24px 32px;
   width: 100%;
   box-sizing: border-box;
 }
 
 .view-header {
-  margin-bottom: 24px; /* 减少头部间距 */
+  margin-bottom: 24px;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
   
   .header-left {
     .view-title {
-      font-size: 20px; /* 减小标题字体 */
+      font-size: 20px;
       font-weight: 700;
       color: #111827;
       margin: 0 0 4px 0;
@@ -397,34 +362,22 @@ const formatTime = (timestamp: number) => {
   padding-right: 6px;
 }
 
-.time-group {
-  margin-bottom: 24px; /* 减少组间距 */
-  
-  .group-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: #9ca3af;
-    margin-bottom: 12px;
-    padding-left: 2px;
-  }
-}
-
 .project-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* 减小卡片最小宽度 */
-  gap: 16px; /* 减少网格间距 */
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
 }
 
 .project-card {
   background: #fff;
-  border-radius: 8px; /* 减小圆角 */
+  border-radius: 8px;
   border: 1px solid #e5e7eb;
   cursor: pointer;
   transition: all 0.2s ease;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  height: 200px; /* 减小卡片高度 */
+  height: 200px;
   
   &:hover {
     transform: translateY(-2px);
@@ -439,7 +392,7 @@ const formatTime = (timestamp: number) => {
   }
   
   .card-cover {
-    height: 100px; /* 减小封面高度 */
+    height: 100px;
     background-color: #f3f4f6;
     background-size: cover;
     background-position: center;
@@ -468,7 +421,7 @@ const formatTime = (timestamp: number) => {
   }
   
   .card-content {
-    padding: 12px; /* 减少内容区内边距 */
+    padding: 12px;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -482,7 +435,7 @@ const formatTime = (timestamp: number) => {
       .card-title {
         font-weight: 600;
         color: #1f2937;
-        font-size: 14px; /* 减小标题字体 */
+        font-size: 14px;
         line-height: 1.3;
         white-space: nowrap;
         overflow: hidden;

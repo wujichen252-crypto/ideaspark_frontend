@@ -74,13 +74,15 @@ import ScrollTrigger from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
 
-// 卡片数据配置
-// 【添加图片说明】：
-// 1. 将图片文件放入 src/assets/ 目录下（例如 src/assets/images/）
-// 2. 在下方 image 字段中引入图片，或者填写图片路径
-//    方式 A (推荐): image: new URL('../assets/images/demo.jpg', import.meta.url).href
-//    方式 B (如果不使用动态路径): 直接 import img1 from ... 然后 image: img1
-const cards = [
+type ScrollCard = {
+  id: string
+  title: string
+  desc: string
+  cssClass?: string
+  image?: string
+}
+
+const cards: ScrollCard[] = [
   {
     id: '01',
     title: '灵感生成',

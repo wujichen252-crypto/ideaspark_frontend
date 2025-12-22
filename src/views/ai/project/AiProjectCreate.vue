@@ -273,23 +273,22 @@ const sendMessage = () => {
 
 const createProject = async () => {
   creating.value = true
-  // 初始化 Store
-  const projectId = 'proj_' + Date.now()
-  aiWorkshopStore.initProject(projectId)
-  aiWorkshopStore.setProjectInfo({
-    name: projectData.value.name,
+  // 使用新的 addProject 方法
+  const newProject = aiWorkshopStore.addProject({
+    name: projectData.value.name || '未命名项目',
     description: projectData.value.description,
-    category: projectData.value.category,
-    plugins: selectedPlugins.value
+    category: projectData.value.category || '未分类',
+    type: 'app' // 默认为应用类型
   })
   
-  // 根据分类应用不同的任务模板
-  aiWorkshopStore.applyTemplate(projectData.value.category)
+  // 如果需要，这里可以保留 applyTemplate 逻辑，但需要确认 store 中是否支持
+  // 目前 store 中没有看到 applyTemplate，暂时注释掉或忽略
+  // aiWorkshopStore.applyTemplate(projectData.value.category)
   
   message.success('项目创建成功，正在跳转工作台...')
   
   setTimeout(() => {
-    router.push(`/ai/workshop/project/${projectId}`)
+    router.push(`/project/${newProject.id}`)
   }, 1000)
 }
 

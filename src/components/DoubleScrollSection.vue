@@ -118,7 +118,7 @@ const getAvatarStyle = (name: string) => {
     hash = name.charCodeAt(i) + ((hash << 5) - hash)
   }
   const index = Math.abs(hash) % colors.length
-  const [c1, c2] = colors[index]
+  const [c1, c2] = colors[index] ?? ['#111827', '#374151']
   
   return {
     background: `linear-gradient(135deg, ${c1}, ${c2})`,
