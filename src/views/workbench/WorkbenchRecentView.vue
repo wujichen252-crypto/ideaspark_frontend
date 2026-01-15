@@ -72,7 +72,7 @@
                   <n-dropdown 
                     trigger="click" 
                     :options="cardOptions" 
-                    @select="(key) => handleCardAction(key, project.id)"
+                    @select="(key) => handleCardAction(key)"
                     @click.stop
                   >
                     <n-button text size="tiny" class="more-btn" @click.stop>
@@ -124,6 +124,14 @@
           <n-form-item label="项目名称" path="name">
             <n-input v-model:value="createForm.name" placeholder="请输入项目名称" />
           </n-form-item>
+          <n-form-item label="项目类型" path="type">
+            <n-radio-group v-model:value="createForm.type" name="radiogroup">
+              <n-space>
+                <n-radio value="app">应用</n-radio>
+                <n-radio value="document">文档</n-radio>
+              </n-space>
+            </n-radio-group>
+          </n-form-item>
           <n-form-item label="可见性" path="visibility">
             <n-select v-model:value="createForm.visibility" :options="visibilityOptions" />
           </n-form-item>
@@ -167,7 +175,10 @@ import {
   NCard,
   NForm,
   NFormItem,
-  NSelect
+  NSelect,
+  NRadioGroup,
+  NRadio,
+  NSpace
 } from 'naive-ui'
 import { h, reactive } from 'vue'
 
@@ -176,14 +187,19 @@ const aiStore = useAiWorkshopStore()
 const message = useMessage()
 
 const searchQuery = ref('')
-const selectedCategory = ref<string | null>(null)
+const selectedCategory = ref('')
 
 // 创建项目相关
 const showCreateModal = ref(false)
 const createFormRef = ref(null)
-const createForm = reactive({
+const createForm = reactive<{
+  name: string
+  visibility: 'private' | 'public'
+  type: 'app' | 'document'
+}>({
   name: '',
-  visibility: 'private'
+  visibility: 'private',
+  type: 'app'
 })
 const visibilityOptions = [
   { label: '私有项目', value: 'private' },
@@ -193,6 +209,7 @@ const visibilityOptions = [
 const handleCreateClick = () => {
   createForm.name = ''
   createForm.visibility = 'private'
+  createForm.type = 'app'
   showCreateModal.value = true
 }
 
@@ -202,23 +219,22 @@ const handleCreateProject = () => {
     return
   }
   
-  const id = Date.now().toString()
-  // 初始化项目
-  aiStore.initProject(id)
-  // 更新信息
-  aiStore.setProjectInfo({
+  const newProject = aiStore.addProject({
     name: createForm.name,
     visibility: createForm.visibility,
-    status: 'active',
-    updatedAt: Date.now()
+    type: createForm.type,
+    category: createForm.type === 'document' ? '文档' : '应用'
   })
-  // 保存
-  aiStore.saveProject()
   
   message.success('创建成功')
   showCreateModal.value = false
-  // 跳转到项目详情
-  router.push(`/ai/workshop/project/${id}`)
+  
+  if (newProject.type === 'document') {
+    router.push(`/project/doc/${newProject.id}`)
+  } else {
+    // router.push(`/project/${newProject.id}`)
+    router.push(`/project/workspace/${newProject.id}`)
+  }
 }
 
 // 卡片菜单选项
@@ -232,7 +248,7 @@ const categoryOptions = computed(() => {
   const categories = new Set(aiStore.projectList.map(p => p.category).filter(Boolean))
   const options = Array.from(categories).map(c => ({ label: c, value: c }))
   return [
-    { label: '所有分类', value: null },
+    { label: '所有分类', value: '' },
     ...options
   ]
 })
@@ -298,11 +314,17 @@ const groupedProjects = computed(() => {
 
 // 打开项目
 const handleOpenProject = (id: string) => {
-  router.push(`/ai/workshop/project/${id}`)
+  const project = aiStore.getProjectById(id)
+  if (project && project.type === 'document') {
+    router.push(`/project/doc/${id}`)
+  } else {
+    // router.push(`/project/${id}`)
+    router.push(`/project/workspace/${id}`)
+  }
 }
 
 // 处理卡片操作
-const handleCardAction = (key: string, id: string) => {
+const handleCardAction = (key: string) => {
   if (key === 'share') {
     message.success('分享链接已复制到剪贴板')
   } else if (key === 'remove') {

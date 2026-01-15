@@ -1,6 +1,6 @@
 <template>
   <div class="ai-chat-area" :class="{ 'is-sidebar': mode === 'sidebar', 'is-fluid': fluid }">
-    <div class="chat-header" v-if="mode === 'full'">
+    <div v-if="mode === 'full'" class="chat-header">
       <div class="model-selector">
         <span class="label">AI 导师在线</span>
         <n-tag type="success" size="small" round bordered>已连接</n-tag>
@@ -12,7 +12,7 @@
       </div>
     </div>
 
-    <div class="messages-scroll-area" ref="scrollRef">
+    <div ref="scrollRef" class="messages-scroll-area">
       <div class="messages-content">
         <div v-if="messages.length === 0" class="empty-state">
           <div class="logo-placeholder">
@@ -55,8 +55,7 @@
 <script setup lang="ts">
 import { ref, computed, nextTick, watch } from 'vue'
 import { useChatStore } from '@/store/chat'
-import { useAiWorkshopStore } from '@/store/modules/aiWorkshop'
-import { ChevronDownOutline, SettingsOutline, Sparkles } from '@vicons/ionicons5'
+import { SettingsOutline, Sparkles } from '@vicons/ionicons5'
 import AiMessageItem from './AiMessageItem.vue'
 import AiInputBox from './AiInputBox.vue'
 
@@ -69,6 +68,7 @@ const props = withDefaults(defineProps<{
 }>(), {
   mode: 'full',
   currentStep: 0,
+  systemContext: '',
   fluid: false
 })
 
@@ -78,7 +78,6 @@ const emit = defineEmits<{
 }>()
 
 const chatStore = useChatStore()
-const workshopStore = useAiWorkshopStore()
 const scrollRef = ref<HTMLElement | null>(null)
 const loading = ref(false)
 
@@ -100,11 +99,14 @@ const scrollToBottom = () => {
 watch(() => messages.value.length, scrollToBottom)
 
 async function handleSend(text: string) {
-  if (!props.sessionId) {
+  let sid = props.sessionId
+  if (sid) {
+    chatStore.ensureSession(sid, '文档协作')
+  } else {
     chatStore.createSession()
+    sid = chatStore.currentSessionId
   }
-  
-  const sid = chatStore.currentSessionId!
+  if (!sid) return
   
   // 1. Add User Message
   chatStore.addMessage(sid, {
@@ -117,7 +119,6 @@ async function handleSend(text: string) {
   loading.value = true
   
   // 2. Mock AI Response (Stream)
-  const tempId = Date.now().toString()
   // Add initial empty AI message
   chatStore.addMessage(sid, {
     role: 'ai',
@@ -131,7 +132,7 @@ async function handleSend(text: string) {
   if (!aiMsg) return
   
   // Use system context from prop
-  const systemContext = props.systemContext || ''
+  const systemContext = props.systemContext
 
   // Simulate stream
   const responseText = await mockAiResponse(text, systemContext)

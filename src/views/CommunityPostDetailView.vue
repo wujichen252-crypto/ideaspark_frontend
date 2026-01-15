@@ -32,7 +32,7 @@
               :style="{ backgroundImage: `url(${img})` }"
             ></div>
           </div>
-          <div class="tags" v-if="post.tags && post.tags.length">
+          <div v-if="post.tags && post.tags.length" class="tags">
             <n-tag v-for="tag in post.tags" :key="tag" size="small" round type="primary" secondary>
               # {{ tag }}
             </n-tag>
@@ -85,7 +85,7 @@
                 </div>
                 <p class="text">{{ comment.content }}</p>
                 <div class="comment-actions">
-                  <n-button text size="tiny" @click="toggleCommentLike(comment)" :type="comment.isLiked ? 'error' : 'default'">
+                  <n-button text size="tiny" :type="comment.isLiked ? 'error' : 'default'" @click="toggleCommentLike(comment)">
                     <template #icon>
                       <n-icon :component="comment.isLiked ? Heart : HeartOutline" />
                     </template>

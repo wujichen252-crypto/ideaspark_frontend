@@ -5,7 +5,13 @@
       <div class="header-content">
         <div class="top-actions">
           <div class="header-tabs">
-            <n-tabs type="line" animated size="large">
+            <n-tabs
+              v-model:value="headerTabValue"
+              type="line"
+              animated
+              size="large"
+              @update:value="handleHeaderTabChange"
+            >
               <n-tab-pane name="all" tab="全部" />
               <n-tab-pane name="popular" tab="热门" />
               <n-tab-pane name="newest" tab="最新" />
@@ -17,9 +23,9 @@
           <div class="search-bar">
             <n-input-group>
               <n-input 
+                v-model:value="searchQuery" 
                 size="large" 
-                placeholder="搜索项目、标签或作者..." 
-                v-model:value="searchQuery"
+                placeholder="搜索项目、标签或作者..."
                 @keydown.enter="handleSearch"
               >
                 <template #prefix>
@@ -85,8 +91,17 @@
             <n-icon :component="ChevronBackOutline" />
           </button>
           
-          <div class="creators-list" ref="creatorsScrollRef">
-            <div v-for="creator in creatorsList" :key="creator.id" class="creator-card">
+          <div ref="creatorsScrollRef" class="creators-list">
+            <div
+              v-for="creator in creatorsList"
+              :key="creator.id"
+              class="creator-card"
+              role="button"
+              tabindex="0"
+              @click="goToCreator(creator.id)"
+              @keydown.enter="goToCreator(creator.id)"
+              @keydown.space.prevent="goToCreator(creator.id)"
+            >
               <div class="creator-bg" :style="{ backgroundImage: `url(${creator.bg})` }"></div>
               <div class="creator-info">
                 <n-avatar round :size="48" :src="creator.avatar" class="creator-avatar" />
@@ -124,7 +139,7 @@
         </div>
       </div>
 
-      <n-grid :x-gap="24" :y-gap="24" cols="1 s:2 m:3 l:3" responsive="screen">
+      <n-grid :x-gap="24" :y-gap="24" cols="1 s:2 m:3 l:4 xl:4" responsive="screen">
         <n-grid-item v-for="item in filteredProjectList" :key="item.id">
           <div class="project-card" @click="goToProject(item.id)">
             <div class="card-thumb" :style="{ backgroundImage: `url(${item.cover})` }">
@@ -140,7 +155,7 @@
             <div class="card-body">
               <h3 class="card-title">{{ item.title }}</h3>
               <div class="card-meta">
-                <span class="author" @click.stop="router.push(`/user/${item.authorId}`)" style="cursor: pointer">
+                <span class="author" style="cursor: pointer" @click.stop="router.push(`/user/${item.authorId}`)">
                   <n-avatar round size="small" :src="item.avatar" />
                   {{ item.author }}
                 </span>
@@ -149,7 +164,7 @@
                 </span>
               </div>
               <div class="card-tags">
-                <n-tag size="small" :bordered="false" v-for="tag in item.tags" :key="tag">
+                <n-tag v-for="tag in item.tags" :key="tag" size="small" :bordered="false">
                   {{ tag }}
                 </n-tag>
               </div>
@@ -166,7 +181,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { SearchOutline, HeartOutline, Heart, ChevronForwardOutline, ChevronBackOutline, ArrowForwardOutline, CubeOutline } from '@vicons/ionicons5'
 
@@ -176,15 +191,89 @@ const page = ref(1)
 const sortValue = ref('default')
 const categoryValue = ref('all')
 const creatorsScrollRef = ref<HTMLElement | null>(null)
+const headerTabValue = ref<'all' | 'popular' | 'newest' | 'web' | 'mobile' | 'design'>('all')
 
 /**
  * 跳转到项目详情页
  * @param id 项目ID
  */
 const goToProject = (id: number | string) => {
-  console.log('Navigating to project:', id)
   router.push(`/project/${id}`)
 }
+
+/**
+ * 跳转到创作者公开主页
+ * @param id 创作者ID
+ */
+function goToCreator(id: number | string) {
+  router.push(`/user/${id}`)
+}
+
+/**
+ * 处理顶部 Tabs 菜单切换
+ * @param tab 顶部 Tab key
+ */
+function handleHeaderTabChange(tab: typeof headerTabValue.value) {
+  headerTabValue.value = tab
+  page.value = 1
+
+  if (tab === 'all') {
+    categoryValue.value = 'all'
+    sortValue.value = 'default'
+    return
+  }
+
+  if (tab === 'popular') {
+    categoryValue.value = 'all'
+    sortValue.value = 'likes'
+    return
+  }
+
+  if (tab === 'newest') {
+    categoryValue.value = 'all'
+    sortValue.value = 'newest'
+    return
+  }
+
+  if (tab === 'web') {
+    categoryValue.value = 'frontend'
+    sortValue.value = 'default'
+    return
+  }
+
+  if (tab === 'mobile') {
+    categoryValue.value = 'backend'
+    sortValue.value = 'default'
+    return
+  }
+
+  categoryValue.value = 'design'
+  sortValue.value = 'default'
+}
+
+watch([categoryValue, sortValue], ([category, sort]) => {
+  if (category === 'frontend') {
+    headerTabValue.value = 'web'
+    return
+  }
+  if (category === 'backend') {
+    headerTabValue.value = 'mobile'
+    return
+  }
+  if (category === 'design') {
+    headerTabValue.value = 'design'
+    return
+  }
+  if (sort === 'likes') {
+    headerTabValue.value = 'popular'
+    return
+  }
+  if (sort === 'newest') {
+    headerTabValue.value = 'newest'
+    return
+  }
+  headerTabValue.value = 'all'
+})
 
 const categoryOptions = [
   { label: '全部分类', value: 'all' },
@@ -261,7 +350,7 @@ const filteredProjectList = computed(() => {
 })
 
 function handleSearch() {
-  console.log('Searching for:', searchQuery.value)
+  page.value = 1
 }
 
 function scrollCreators(direction: 'left' | 'right') {
@@ -642,7 +731,7 @@ $border-color: #e5e7eb;
 .market-content {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 24px 20px 32px; /* Reduced top padding */
+  padding: 32px 20px 40px; /* Reduced top padding */
 
   @media (max-width: 768px) {
     padding: 16px;
@@ -701,7 +790,7 @@ $border-color: #e5e7eb;
 
   /* Creators Section Styles */
   .creators-section {
-    margin-bottom: 40px;
+    margin-bottom: 44px;
     
     .section-title {
       font-size: 24px;
@@ -712,6 +801,10 @@ $border-color: #e5e7eb;
 
     .creators-container {
       position: relative;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid #eef2f7;
+      border-radius: 18px;
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.04);
       
       &:hover .scroll-btn {
         opacity: 1;
@@ -722,7 +815,7 @@ $border-color: #e5e7eb;
         display: flex;
         gap: 20px;
         overflow-x: auto;
-        padding-bottom: 10px;
+        padding: 4px 52px 10px;
         scrollbar-width: none; /* Firefox */
         -ms-overflow-style: none; /* IE 10+ */
         
@@ -792,6 +885,7 @@ $border-color: #e5e7eb;
         z-index: 10;
         opacity: 0;
         transition: all 0.3s ease;
+        pointer-events: none;
         color: #374151;
         font-size: 20px;
         flex-shrink: 0; /* Prevent shrinking */
@@ -815,6 +909,7 @@ $border-color: #e5e7eb;
 
       &:hover .scroll-btn {
         opacity: 1;
+        pointer-events: auto;
         
         &.right {
           transform: translateY(-50%) translateX(0);

@@ -29,7 +29,7 @@
 
       <!-- 选项卡导航 -->
       <div class="profile-tabs">
-        <n-tabs type="line" animated v-model:value="currentTab">
+        <n-tabs v-model:value="currentTab" type="line" animated>
           <n-tab-pane name="projects" tab="项目">
              <!-- 项目列表内容 -->
             <div class="project-list-container custom-scrollbar">
@@ -95,59 +95,171 @@
           
           <n-tab-pane name="members" tab="成员">
             <div class="members-container">
-              <div class="members-tabs">
-                 <n-tabs type="segment" size="small" style="width: 200px;">
-                    <n-tab-pane name="members-list" tab="成员 (1)" />
-                    <n-tab-pane name="visitors-list" tab="访客 (2)" />
-                 </n-tabs>
-                 <div class="members-filter">
-                    <n-button text class="filter-btn">全部权限 <n-icon :component="ChevronDownOutline" /></n-button>
-                    <n-button text class="search-btn"><template #icon><n-icon :component="SearchOutline" /></template> 搜索成员</n-button>
-                 </div>
+              <div class="members-toolbar">
+                <n-tabs
+                  v-model:value="membersSubTab"
+                  type="segment"
+                  size="small"
+                  style="width: 240px;"
+                >
+                  <n-tab-pane name="members" :tab="`成员 (${memberCount})`" />
+                  <n-tab-pane name="visitors" :tab="`访客 (${visitorCount})`" />
+                </n-tabs>
+                <div class="members-tools">
+                  <n-select
+                    v-model:value="memberRoleFilter"
+                    size="small"
+                    :options="memberRoleOptions"
+                    style="width: 140px;"
+                  />
+                  <n-input
+                    v-model:value="memberKeyword"
+                    clearable
+                    size="small"
+                    placeholder="搜索成员"
+                    style="width: 220px;"
+                  >
+                    <template #prefix><n-icon :component="SearchOutline" /></template>
+                  </n-input>
+                </div>
               </div>
               
               <div class="members-table-header">
                 <div class="col-name">名称</div>
                 <div class="col-role">团队权限</div>
+                <div class="col-actions">操作</div>
               </div>
-              <div class="members-list">
-                <div class="member-row">
+              <div v-if="displayedMembers.length" class="members-list">
+                <div v-for="m in displayedMembers" :key="m.id" class="member-row">
                   <div class="col-name">
-                    <n-avatar round size="small" :src="userStore.userInfo?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Guest'" />
-                    <span class="member-name">{{ userStore.userInfo?.username || '未登录用户' }}</span>
-                    <n-tag size="small" type="info" :bordered="false" class="me-tag">我</n-tag>
+                    <n-avatar round size="small" :src="m.avatar || getMemberFallbackAvatar(m)" />
+                    <div class="member-meta">
+                      <div class="member-name-row">
+                        <span class="member-name">{{ m.name }}</span>
+                        <n-tag v-if="m.isMe" size="small" type="info" :bordered="false" class="me-tag">我</n-tag>
+                      </div>
+                      <span class="member-sub">{{ formatJoinTime(m.joinedAt) }}</span>
+                    </div>
                   </div>
                   <div class="col-role">
-                    <span class="role-text">所有者</span>
+                    <span class="role-text">{{ getRoleLabel(m.role) }}</span>
+                  </div>
+                  <div class="col-actions">
+                    <n-button
+                      v-if="!m.isMe && !props.isPersonal"
+                      text
+                      size="small"
+                      @click="handleRemoveMember(m.id)"
+                    >
+                      移除
+                    </n-button>
+                    <span v-else class="action-placeholder">—</span>
                   </div>
                 </div>
+              </div>
+              <div v-else class="members-empty">
+                <n-empty :description="membersEmptyText">
+                  <template #extra>
+                    <n-space>
+                      <n-button secondary @click="handleInviteMember">邀请成员</n-button>
+                      <n-button quaternary @click="resetMemberFilters">清除筛选</n-button>
+                    </n-space>
+                  </template>
+                </n-empty>
               </div>
             </div>
           </n-tab-pane>
           
           <n-tab-pane name="resources" tab="资源">
              <div class="resources-container">
-               <div class="resources-subtabs">
-                  <n-radio-group value="repo" size="medium">
-                    <n-radio-button value="repo" label="资源库" />
-                    <n-radio-button value="fonts" label="字体库" />
-                  </n-radio-group>
-               </div>
-               <div class="resources-search">
-                  <n-input placeholder="搜索资源库名称" round>
+               <div class="resources-toolbar">
+                 <n-radio-group v-model:value="resourceKind" size="medium">
+                   <n-radio-button value="repo" label="资源库" />
+                   <n-radio-button value="fonts" label="字体库" />
+                 </n-radio-group>
+                 <div class="resources-tools">
+                   <n-button type="primary" size="small" @click="openCreateResourceModal">
+                     新建{{ resourceKindLabel }}
+                   </n-button>
+                   <n-input
+                     v-model:value="resourceKeyword"
+                     clearable
+                     size="small"
+                     :placeholder="`搜索${resourceKindLabel}名称`"
+                     style="width: 240px;"
+                   >
                      <template #prefix><n-icon :component="SearchOutline" /></template>
-                  </n-input>
-               </div>
-               <div class="resources-empty">
-                 <div class="empty-icon-wrapper">
-                   <!-- 简单的文件夹图标 -->
-                   <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20 6H12L10 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6Z" fill="#e5e7eb"/>
-                   </svg>
+                   </n-input>
                  </div>
-                 <span class="empty-text">暂无资源库文件</span>
+               </div>
+
+               <div v-if="filteredResources.length" class="resources-list">
+                 <div v-for="r in filteredResources" :key="r.id" class="resource-row">
+                   <div class="resource-main">
+                     <div class="resource-icon">
+                       <n-icon :component="r.kind === 'repo' ? FolderOpenOutline : TextOutline" size="22" color="#10b981" />
+                     </div>
+                     <div class="resource-info">
+                       <div class="resource-title">{{ r.name }}</div>
+                       <div class="resource-meta">
+                         <span>{{ r.itemCount }} 项</span>
+                         <span class="meta-dot">·</span>
+                         <span>{{ formatUpdateTime(r.updatedAt) }}</span>
+                       </div>
+                     </div>
+                   </div>
+                   <div class="resource-actions">
+                     <n-button text size="small" @click="handleOpenResource(r.id)">打开</n-button>
+                   </div>
+                 </div>
+               </div>
+               <div v-else class="resources-empty">
+                 <n-empty :description="`暂无${resourceKindLabel}`">
+                   <template #extra>
+                     <n-space>
+                       <n-button type="primary" @click="openCreateResourceModal">新建{{ resourceKindLabel }}</n-button>
+                       <n-button quaternary @click="resetResourceFilters">清除搜索</n-button>
+                     </n-space>
+                   </template>
+                 </n-empty>
                </div>
              </div>
+
+             <n-modal v-model:show="showCreateResourceModal">
+               <n-card
+                 style="width: 560px"
+                 title="新建资源"
+                 :bordered="false"
+                 size="huge"
+                 role="dialog"
+                 aria-modal="true"
+               >
+                 <n-form
+                   ref="resourceFormRef"
+                   :model="createResourceForm"
+                   :rules="createResourceRules"
+                   label-placement="left"
+                   label-width="auto"
+                   require-mark-placement="right-hanging"
+                 >
+                   <n-form-item label="类型" path="kind">
+                     <n-radio-group v-model:value="createResourceForm.kind">
+                       <n-radio-button value="repo" label="资源库" />
+                       <n-radio-button value="fonts" label="字体库" />
+                     </n-radio-group>
+                   </n-form-item>
+                   <n-form-item label="名称" path="name">
+                     <n-input v-model:value="createResourceForm.name" placeholder="请输入名称" />
+                   </n-form-item>
+                 </n-form>
+                 <template #footer>
+                   <n-space justify="end">
+                     <n-button @click="showCreateResourceModal = false">取消</n-button>
+                     <n-button type="primary" @click="handleCreateResource">确认创建</n-button>
+                   </n-space>
+                 </template>
+               </n-card>
+             </n-modal>
           </n-tab-pane>
           
           <n-tab-pane name="settings" tab="设置">
@@ -195,7 +307,7 @@
               </div>
               <div class="project-grid">
                 <!-- 示例回收站项目 -->
-                <div class="project-card" v-for="i in 1" :key="i">
+                <div v-for="i in 1" :key="i" class="project-card">
                    <div class="card-preview">
                      <div class="preview-placeholder">
                         <n-icon :component="DocumentText" size="40" color="#8b5cf6" />
@@ -211,7 +323,7 @@
                       </div>
                    </div>
                 </div>
-                 <div class="project-card" v-for="i in 3" :key="'file'+i">
+                 <div v-for="i in 3" :key="'file'+i" class="project-card">
                    <div class="card-preview">
                      <div class="preview-placeholder">
                         <n-icon :component="DocumentText" size="40" color="#8b5cf6" />
@@ -282,18 +394,10 @@ import {
   AddOutline,
   CreateOutline,
   ChevronDownOutline,
-  ListOutline,
   DocumentText,
-  DownloadOutline,
   ShareSocialOutline,
-  PricetagOutline as pricetagOutline,
-  TrashOutline,
-  EllipsisHorizontal,
   FolderOpenOutline,
-  ImageOutline,
   TextOutline,
-  GridOutline,
-  FilterOutline
 } from '@vicons/ionicons5'
 import { useUserStore, useAiWorkshopStore } from '@/store'
 import { 
@@ -303,6 +407,7 @@ import {
   NForm, 
   NFormItem, 
   NInput, 
+  NSelect,
   NSwitch, 
   NSpace, 
   NButton, 
@@ -315,9 +420,9 @@ import {
   NDivider, 
   NRadioGroup, 
   NRadioButton,
-  FormInst,
   useMessage
 } from 'naive-ui'
+import type { FormInst } from 'naive-ui'
 
 const props = defineProps<{
   teamId?: string
@@ -346,14 +451,18 @@ const createRules = {
   }
 }
 
-// 打开创建弹窗
+/**
+ * 打开创建项目弹窗并重置表单。
+ */
 const openCreateModal = () => {
   createForm.name = ''
   createForm.isPublic = false
   showCreateModal.value = true
 }
 
-// 确认创建
+/**
+ * 校验并创建新项目，然后跳转到项目工作区。
+ */
 const handleCreateProject = () => {
   formRef.value?.validate((errors) => {
     if (!errors) {
@@ -382,9 +491,237 @@ const allProjects = computed(() => {
   return aiStore.projectList
 })
 
-// 打开项目
+/**
+ * 打开项目（按项目类型路由跳转）。
+ */
 const handleOpenProject = (id: string) => {
-  router.push(`/ai/workshop/project/${id}`)
+  const project = aiStore.getProjectById(id)
+  if (project && project.type === 'document') {
+    router.push(`/project/doc/${id}`)
+  } else {
+    // router.push(`/project/${id}`)
+    router.push(`/project/workspace/${id}`)
+  }
+}
+
+type MemberRole = 'owner' | 'admin' | 'member' | 'visitor'
+
+interface TeamMember {
+  id: string
+  name: string
+  avatar?: string
+  role: MemberRole
+  joinedAt: number
+  isMe?: boolean
+}
+
+type MembersSubTab = 'members' | 'visitors'
+
+const membersSubTab = ref<MembersSubTab>('members')
+const memberRoleFilter = ref<MemberRole | 'all'>('all')
+const memberKeyword = ref('')
+
+const members = ref<TeamMember[]>([
+  {
+    id: userStore.userInfo?.id || 'me',
+    name: userStore.userInfo?.username || '未登录用户',
+    avatar: userStore.userInfo?.avatar,
+    role: 'owner',
+    joinedAt: Date.now() - 1000 * 60 * 60 * 24 * 7,
+    isMe: true
+  }
+])
+
+const memberRoleOptions = computed(() => {
+  const base = [
+    { label: '全部权限', value: 'all' as const },
+    { label: '所有者', value: 'owner' as const },
+    { label: '管理员', value: 'admin' as const },
+    { label: '成员', value: 'member' as const },
+    { label: '访客', value: 'visitor' as const }
+  ]
+  if (membersSubTab.value === 'visitors') {
+    return base.filter((i) => i.value === 'all' || i.value === 'visitor')
+  }
+  return base.filter((i) => i.value !== 'visitor')
+})
+
+const memberCount = computed(() => members.value.filter((m) => m.role !== 'visitor').length)
+const visitorCount = computed(() => members.value.filter((m) => m.role === 'visitor').length)
+
+const displayedMembers = computed(() => {
+  const keyword = memberKeyword.value.trim().toLowerCase()
+  const inSubTab = members.value.filter((m) => (membersSubTab.value === 'visitors' ? m.role === 'visitor' : m.role !== 'visitor'))
+  const inRole = inSubTab.filter((m) => (memberRoleFilter.value === 'all' ? true : m.role === memberRoleFilter.value))
+  if (!keyword) return inRole
+  return inRole.filter((m) => m.name.toLowerCase().includes(keyword))
+})
+
+const membersEmptyText = computed(() => {
+  if (!members.value.length) return '暂无成员'
+  if (membersSubTab.value === 'visitors') return '暂无访客'
+  if (memberKeyword.value.trim()) return '未找到匹配的成员'
+  if (memberRoleFilter.value !== 'all') return '该权限下暂无成员'
+  return '暂无成员'
+})
+
+/**
+ * 获取成员角色文案。
+ */
+function getRoleLabel(role: MemberRole): string {
+  const map: Record<MemberRole, string> = {
+    owner: '所有者',
+    admin: '管理员',
+    member: '成员',
+    visitor: '访客'
+  }
+  return map[role]
+}
+
+/**
+ * 生成成员头像兜底地址（基于名称 seed）。
+ */
+function getMemberFallbackAvatar(member: TeamMember): string {
+  const seed = encodeURIComponent(member.name || 'Guest')
+  return `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`
+}
+
+/**
+ * 格式化加入时间，用于成员行的副信息展示。
+ */
+function formatJoinTime(joinedAt: number): string {
+  const diff = Date.now() - joinedAt
+  const day = Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)))
+  if (day === 0) return '今天加入'
+  if (day === 1) return '昨天加入'
+  if (day < 30) return `${day} 天前加入`
+  const month = Math.floor(day / 30)
+  return `${month} 个月前加入`
+}
+
+/**
+ * 清空成员筛选与搜索条件。
+ */
+function resetMemberFilters(): void {
+  memberRoleFilter.value = 'all'
+  memberKeyword.value = ''
+}
+
+/**
+ * 邀请成员入口（当前为占位交互）。
+ */
+function handleInviteMember(): void {
+  message.info('邀请成员功能建设中')
+}
+
+/**
+ * 从当前列表移除指定成员（仅前端演示）。
+ */
+function handleRemoveMember(memberId: string): void {
+  members.value = members.value.filter((m) => m.id !== memberId)
+  message.success('已移除')
+}
+
+type ResourceKind = 'repo' | 'fonts'
+
+interface ResourceLibrary {
+  id: string
+  name: string
+  kind: ResourceKind
+  itemCount: number
+  updatedAt: number
+}
+
+const resourceKind = ref<ResourceKind>('repo')
+const resourceKeyword = ref('')
+const resources = ref<ResourceLibrary[]>([])
+
+const filteredResources = computed(() => {
+  const keyword = resourceKeyword.value.trim().toLowerCase()
+  const list = resources.value.filter((r) => r.kind === resourceKind.value)
+  if (!keyword) return list
+  return list.filter((r) => r.name.toLowerCase().includes(keyword))
+})
+
+const resourceKindLabel = computed(() => (resourceKind.value === 'repo' ? '资源库' : '字体库'))
+
+const showCreateResourceModal = ref(false)
+const resourceFormRef = ref<FormInst | null>(null)
+const createResourceForm = reactive<{ kind: ResourceKind; name: string }>({
+  kind: 'repo',
+  name: ''
+})
+
+const createResourceRules = {
+  kind: {
+    required: true,
+    message: '请选择类型',
+    trigger: ['change']
+  },
+  name: {
+    required: true,
+    message: '请输入名称',
+    trigger: ['blur', 'input']
+  }
+}
+
+/**
+ * 打开新建资源弹窗并同步当前子类型。
+ */
+function openCreateResourceModal(): void {
+  createResourceForm.kind = resourceKind.value
+  createResourceForm.name = ''
+  showCreateResourceModal.value = true
+}
+
+/**
+ * 校验并创建资源条目（仅前端演示）。
+ */
+function handleCreateResource(): void {
+  resourceFormRef.value?.validate((errors) => {
+    if (errors) return
+    const id = `res-${Date.now()}`
+    resources.value = [
+      {
+        id,
+        name: createResourceForm.name.trim(),
+        kind: createResourceForm.kind,
+        itemCount: 0,
+        updatedAt: Date.now()
+      },
+      ...resources.value
+    ]
+    showCreateResourceModal.value = false
+    message.success('创建成功')
+  })
+}
+
+/**
+ * 清空资源搜索条件。
+ */
+function resetResourceFilters(): void {
+  resourceKeyword.value = ''
+}
+
+/**
+ * 打开资源入口（当前为占位交互）。
+ */
+function handleOpenResource(resourceId: string): void {
+  const target = resources.value.find((r) => r.id === resourceId)
+  if (!target) return
+  message.info(`打开：${target.name}`)
+}
+
+/**
+ * 格式化资源更新时间展示。
+ */
+function formatUpdateTime(updatedAt: number): string {
+  const diff = Date.now() - updatedAt
+  const hour = Math.max(0, Math.floor(diff / (1000 * 60 * 60)))
+  if (hour < 1) return '刚刚更新'
+  if (hour < 24) return `${hour} 小时前更新`
+  const day = Math.floor(hour / 24)
+  return `${day} 天前更新`
 }
 </script>
 
@@ -573,6 +910,7 @@ const handleOpenProject = (id: string) => {
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
   }
 
@@ -884,6 +1222,228 @@ const handleOpenProject = (id: string) => {
         }
       }
     }
+  }
+}
+
+.members-container {
+  padding: 4px 0;
+}
+
+.members-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.members-tools {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.members-table-header {
+  display: grid;
+  grid-template-columns: 1fr 140px 80px;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f9fafb;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.members-list {
+  margin-top: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.member-row {
+  display: grid;
+  grid-template-columns: 1fr 140px 80px;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.member-row:last-child {
+  border-bottom: none;
+}
+
+.col-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.member-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.member-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.member-name {
+  font-weight: 600;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.member-sub {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: 2px;
+}
+
+.col-role {
+  display: flex;
+  align-items: center;
+  color: #374151;
+}
+
+.col-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.action-placeholder {
+  color: #d1d5db;
+}
+
+.members-empty {
+  margin-top: 16px;
+  padding: 32px 0;
+  border: 1px dashed #e5e7eb;
+  border-radius: 12px;
+  background: #fafafa;
+}
+
+.resources-container {
+  padding: 4px 0;
+}
+
+.resources-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.resources-tools {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.resources-list {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.resource-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.resource-row:last-child {
+  border-bottom: none;
+}
+
+.resource-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.resource-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #f0fdf4;
+  flex: 0 0 auto;
+}
+
+.resource-info {
+  min-width: 0;
+}
+
+.resource-title {
+  font-weight: 600;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.resource-meta {
+  margin-top: 2px;
+  font-size: 12px;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.meta-dot {
+  color: #d1d5db;
+}
+
+.resources-empty {
+  padding: 32px 0;
+  border: 1px dashed #e5e7eb;
+  border-radius: 12px;
+  background: #fafafa;
+}
+
+@media (max-width: 768px) {
+  .workbench-team-view {
+    padding: 16px 16px;
+  }
+
+  .members-table-header {
+    grid-template-columns: 1fr 110px;
+  }
+
+  .member-row {
+    grid-template-columns: 1fr 110px;
+  }
+
+  .col-actions {
+    display: none;
   }
 }
 

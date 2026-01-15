@@ -50,7 +50,7 @@
       <div class="profile-tabs">
         <n-tabs type="line" animated size="large">
           <n-tab-pane name="projects" :tab="`我的项目 (${displayUserInfo.projects.length})`">
-            <div class="projects-grid" v-if="displayUserInfo.projects.length > 0">
+            <div v-if="displayUserInfo.projects.length > 0" class="projects-grid">
               <div 
                 v-for="item in displayUserInfo.projects" 
                 :key="item.id" 
@@ -75,7 +75,7 @@
                 <span class="add-text">创建新项目</span>
               </div>
             </div>
-            <div class="empty-state" v-else>
+            <div v-else class="empty-state">
               <n-empty description="暂无项目">
                 <template #extra>
                   <n-button size="small" type="primary" @click="router.push('/create')">
@@ -86,7 +86,7 @@
             </div>
           </n-tab-pane>
           <n-tab-pane name="stars" :tab="`收藏夹 (${displayUserInfo.starredProjects.length})`">
-            <div class="projects-grid" v-if="displayUserInfo.starredProjects.length > 0">
+            <div v-if="displayUserInfo.starredProjects.length > 0" class="projects-grid">
                <div
                 v-for="item in displayUserInfo.starredProjects"
                 :key="item.id"
@@ -106,7 +106,7 @@
                 </div>
               </div>
             </div>
-            <div class="empty-state" v-else>
+            <div v-else class="empty-state">
               <n-empty description="还没有收藏任何内容" />
             </div>
           </n-tab-pane>
@@ -116,7 +116,7 @@
                 <h3>个人介绍</h3>
                 <p>{{ displayUserInfo.description || '暂无详细介绍' }}</p>
               </div>
-              <div class="info-group" v-if="displayUserInfo.techStack && displayUserInfo.techStack.length">
+              <div v-if="displayUserInfo.techStack && displayUserInfo.techStack.length" class="info-group">
                 <h3>技术栈</h3>
                 <div class="tech-tags">
                   <n-tag v-for="tech in displayUserInfo.techStack" :key="tech" size="small" round>{{ tech }}</n-tag>
@@ -148,6 +148,35 @@ import { useUserStore } from '@/store'
 const router = useRouter()
 const userStore = useUserStore()
 
+interface ProfileProjectCard {
+  id: string | number
+  cover?: string
+  title: string
+  desc: string
+  views: number
+  likes: number
+}
+
+interface ProfileStats {
+  likes: number
+  followers: number
+  following: number
+}
+
+interface DisplayUserInfo {
+  username: string
+  avatar: string
+  role: string
+  bio: string
+  cover: string
+  description: string
+  joinDate: string
+  techStack: string[]
+  stats: ProfileStats
+  projects: ProfileProjectCard[]
+  starredProjects: ProfileProjectCard[]
+}
+
 /**
  * 跳转到项目详情页
  * @param id 项目ID
@@ -158,10 +187,16 @@ const goToProject = (id: string | number) => {
 
 // 合并 store 数据与 mock 数据，确保展示效果
 const displayUserInfo = computed(() => {
-  const storeUser = userStore.userInfo || {}
+  type StoreUserInfo = Partial<Omit<DisplayUserInfo, 'stats' | 'projects' | 'starredProjects'>> & {
+    stats?: Partial<ProfileStats>
+    projects?: ProfileProjectCard[]
+    starredProjects?: ProfileProjectCard[]
+  }
+
+  const storeUser = (userStore.userInfo ?? {}) as StoreUserInfo
   
   // 默认 Mock 数据
-  const defaultUser = {
+  const defaultUser: DisplayUserInfo = {
     username: '我的用户名',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Me',
     role: '开发者',
@@ -175,21 +210,16 @@ const displayUserInfo = computed(() => {
       followers: 0,
       following: 0
     },
-    projects: [] as any[], // Add type annotation
-    starredProjects: [] as any[] // Add starredProjects
+    projects: [],
+    starredProjects: []
   }
-
-  // Safe access helper
-  const getStats = (user: any) => user.stats || {}
-  const getProjects = (user: any) => user.projects || []
-  const getStarred = (user: any) => user.starredProjects || []
 
   return {
     ...defaultUser,
     ...storeUser,
-    stats: { ...defaultUser.stats, ...getStats(storeUser) },
-    projects: getProjects(storeUser).length ? getProjects(storeUser) : defaultUser.projects,
-    starredProjects: getStarred(storeUser).length ? getStarred(storeUser) : defaultUser.starredProjects
+    stats: { ...defaultUser.stats, ...(storeUser.stats ?? {}) },
+    projects: storeUser.projects?.length ? storeUser.projects : defaultUser.projects,
+    starredProjects: storeUser.starredProjects?.length ? storeUser.starredProjects : defaultUser.starredProjects
   }
 })
 </script>

@@ -12,10 +12,10 @@
               </n-button>
             </template>
             <n-input
+              v-model:value="painPoints"
               type="textarea"
               placeholder="用户面临的最大问题是什么？为什么现有的解决方案不够好？"
               :autosize="{ minRows: 4, maxRows: 8 }"
-              v-model:value="painPoints"
             />
           </n-card>
         </n-grid-item>
@@ -28,10 +28,10 @@
               </n-button>
             </template>
             <n-input
+              v-model:value="targetUsers"
               type="textarea"
               placeholder="谁会使用这个产品？他们的年龄、职业、兴趣是什么？"
               :autosize="{ minRows: 4, maxRows: 8 }"
-              v-model:value="targetUsers"
             />
           </n-card>
         </n-grid-item>
@@ -44,10 +44,10 @@
               </n-button>
             </template>
             <n-input
+              v-model:value="coreValue"
               type="textarea"
               placeholder="我们提供什么独特的价值？一句话介绍这个产品。"
               :autosize="{ minRows: 4, maxRows: 8 }"
-              v-model:value="coreValue"
             />
           </n-card>
         </n-grid-item>
@@ -82,8 +82,8 @@
            </n-button>
         </template>
         <n-input
-          type="textarea"
           v-model:value="docContent"
+          type="textarea"
           placeholder="此处将生成完整的需求分析说明书..."
           :autosize="{ minRows: 10 }"
           class="doc-editor"
@@ -101,12 +101,7 @@ import {
   SearchOutline, 
   DocumentTextOutline 
 } from '@vicons/ionicons5'
-import { useAiWorkshopStore } from '@/store/modules/aiWorkshop'
-import { useChatStore } from '@/store/chat'
 import { useAiModuleData } from '@/composables/useAiModule'
-
-const store = useAiWorkshopStore()
-const chatStore = useChatStore()
 
 const {
   painPoints,

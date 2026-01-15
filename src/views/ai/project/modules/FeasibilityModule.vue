@@ -13,13 +13,13 @@
           
           <n-form label-placement="top">
             <n-form-item label="变现模式 (Monetization)">
-              <n-input type="textarea" v-model:value="monetization" placeholder="例如：订阅制、广告、按次付费..." :autosize="{ minRows: 2 }" />
+              <n-input v-model:value="monetization" type="textarea" placeholder="例如：订阅制、广告、按次付费..." :autosize="{ minRows: 2 }" />
             </n-form-item>
             <n-form-item label="获客渠道 (Acquisition)">
-              <n-input type="textarea" v-model:value="acquisition" placeholder="用户从哪里来？SEO、社交媒体、地推..." :autosize="{ minRows: 2 }" />
+              <n-input v-model:value="acquisition" type="textarea" placeholder="用户从哪里来？SEO、社交媒体、地推..." :autosize="{ minRows: 2 }" />
             </n-form-item>
              <n-form-item label="成本结构 (Cost Structure)">
-              <n-input type="textarea" v-model:value="costStructure" placeholder="主要成本在哪里？服务器、人力、营销..." :autosize="{ minRows: 2 }" />
+              <n-input v-model:value="costStructure" type="textarea" placeholder="主要成本在哪里？服务器、人力、营销..." :autosize="{ minRows: 2 }" />
             </n-form-item>
           </n-form>
         </n-card>
@@ -44,7 +44,7 @@
               <n-dynamic-input v-model:value="risks" placeholder="风险点" />
             </n-form-item>
             <n-form-item label="法律/合规问题">
-               <n-input type="textarea" v-model:value="legalIssues" placeholder="数据隐私、版权、资质许可..." :autosize="{ minRows: 3 }" />
+               <n-input v-model:value="legalIssues" type="textarea" placeholder="数据隐私、版权、资质许可..." :autosize="{ minRows: 3 }" />
             </n-form-item>
           </n-form>
         </n-card>
@@ -61,8 +61,8 @@
             </n-button>
         </template>
         <n-input
-          type="textarea"
           v-model:value="reportContent"
+          type="textarea"
           placeholder="此处将生成完整的可行性评估报告..."
           :autosize="{ minRows: 10 }"
           class="doc-editor"
@@ -73,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { 
   TrendingUpOutline, 
   WarningOutline, 

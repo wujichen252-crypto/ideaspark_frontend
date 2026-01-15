@@ -16,7 +16,7 @@
               </template>
             </n-button>
           </div>
-          <span class="project-title" v-if="!isSidebarCollapsed">{{ projectInfo.name || '未命名项目' }}</span>
+          <span v-if="!isSidebarCollapsed" class="project-title">{{ projectInfo.name || '未命名项目' }}</span>
         </div>
         
         <div class="nav-menu">
@@ -53,14 +53,14 @@
       </div>
 
       <!-- 中间与右侧：分割面板布局 -->
-      <div class="split-layout" ref="splitLayoutRef">
+      <div ref="splitLayoutRef" class="split-layout">
         
         <!-- 主工作区 -->
         <div class="main-panel" :style="{ flex: `1 1 0%` }">
           <div class="panel-header">
             <div class="module-info">
               <h3>{{ currentModuleData.label }}</h3>
-              <span class="desc" v-if="currentModuleData.description">{{ currentModuleData.description }}</span>
+              <span v-if="currentModuleData.description" class="desc">{{ currentModuleData.description }}</span>
             </div>
             <div class="header-actions">
                <n-button-group size="small">
@@ -140,8 +140,8 @@
             <!-- 模块视图 -->
             <div v-else class="module-view-wrapper h-full">
               <component 
-                v-if="currentModuleComponent" 
                 :is="currentModuleComponent" 
+                v-if="currentModuleComponent" 
               />
               
               <!-- 通用模块视图 (Fallback) -->
@@ -154,7 +154,7 @@
                   <n-list hoverable clickable>
                     <n-list-item v-for="task in currentModuleData.checklist" :key="task.id" @click="handleTaskClick(task)">
                       <template #prefix>
-                        <n-checkbox :checked="task.completed" @update:checked="(v) => store.toggleChecklistItem(currentModule, task.id)" @click.stop />
+                        <n-checkbox :checked="task.completed" @update:checked="(v: boolean) => store.toggleChecklistItem(currentModule, task.id)" @click.stop />
                       </template>
                       <div class="task-content">
                         <span :class="{ 'completed': task.completed }">{{ task.label }}</span>
@@ -228,15 +228,16 @@
 
 <script setup lang="ts">
 import { ref, computed, h, onMounted, onUnmounted, watch } from 'vue'
+import type { Component } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { useAiWorkshopStore, type ProjectModule } from '@/store/modules/aiWorkshop'
+import { useAiWorkshopStore, type ProjectModule, type StageChecklistItem } from '@/store/modules/aiWorkshop'
 import { 
   Sparkles, ChatbubbleEllipsesOutline, HomeOutline, BulbOutline, 
   ConstructOutline, MegaphoneOutline, ColorPaletteOutline, 
   DocumentTextOutline, WarningOutline, MenuOutline,
   DownloadOutline, ResizeOutline, ExpandOutline,
-  ArrowBackOutline, SettingsOutline, LogOutOutline
+  ArrowBackOutline, SettingsOutline
 } from '@vicons/ionicons5'
 import { NIcon, useMessage } from 'naive-ui'
 import AiChatArea from '../components/AiChatArea.vue'
@@ -250,7 +251,7 @@ import DocsModule from './modules/DocsModule.vue'
 const route = useRoute()
 const router = useRouter()
 const store = useAiWorkshopStore()
-const { currentModuleData, currentProjectId, projectInfo, currentModule, moduleOrder } = storeToRefs(store)
+const { currentModuleData, currentProjectId, projectInfo, currentModule } = storeToRefs(store)
 const message = useMessage()
 
 const chatAreaRef = ref()
@@ -319,7 +320,7 @@ const handleModuleChange = (key: string) => {
 const splitLayoutRef = ref<HTMLElement | null>(null)
 const isResizing = ref(false)
 
-const startResize = (e: MouseEvent) => {
+const startResize = () => {
   isResizing.value = true
   document.addEventListener('mousemove', handleMouseMove)
   document.addEventListener('mouseup', stopResize)
@@ -386,7 +387,7 @@ onUnmounted(() => {
 })
 
 // 导航菜单配置
-function renderIcon(icon: any) {
+function renderIcon(icon: Component) {
   return () => h(NIcon, null, { default: () => h(icon) })
 }
 
@@ -451,11 +452,11 @@ const editorPlaceholder = computed(() => {
 })
 
 // 交互操作
-const handleTaskClick = (task: any) => {
+const handleTaskClick = (task: StageChecklistItem) => {
   console.log('Task clicked:', task)
 }
 
-const askAI = (task: any) => {
+const askAI = (task: StageChecklistItem) => {
   console.log('Ask AI about:', task.label)
 }
 

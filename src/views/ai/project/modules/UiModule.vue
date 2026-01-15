@@ -52,8 +52,8 @@
                 </n-button>
              </template>
              <n-input
-                type="textarea"
                 v-model:value="logoConcept"
+                type="textarea"
                 placeholder="描述 Logo 的形状、隐喻和视觉元素..."
                 :autosize="{ minRows: 3, maxRows: 5 }"
               />
@@ -67,8 +67,8 @@
                 </n-button>
              </template>
              <n-input
-                type="textarea"
                 v-model:value="layoutStructure"
+                type="textarea"
                 placeholder="- 顶部导航 (Logo + 登录)\n- Hero 区域 (Slogan + CTA)\n- 核心功能展示 (3列布局)\n..."
                 :autosize="{ minRows: 6 }"
                 class="code-editor"
@@ -88,8 +88,8 @@
             </n-button>
         </template>
         <n-input
-          type="textarea"
           v-model:value="guideContent"
+          type="textarea"
           placeholder="此处将生成完整的视觉方向说明书..."
           :autosize="{ minRows: 8 }"
           class="doc-editor"

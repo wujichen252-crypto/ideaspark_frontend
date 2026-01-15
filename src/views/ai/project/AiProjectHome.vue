@@ -30,7 +30,7 @@
         <n-grid-item span="2">
           <!-- Project Details -->
           <n-card title="项目详情" class="content-card" :bordered="false">
-            <div class="rich-text" v-html="store.projectInfo.detailedDescription || '<p>暂无详细描述...</p>'"></div>
+            <div class="rich-text">{{ detailedDescriptionText }}</div>
             
             <n-divider />
             
@@ -109,7 +109,7 @@
 
           <!-- Artifacts Summary -->
           <n-card title="产出物概览" class="sidebar-card mt-4" size="small" :bordered="false">
-            <n-empty description="暂无产出物" v-if="!hasArtifacts" size="small">
+            <n-empty v-if="!hasArtifacts" description="暂无产出物" size="small">
               <template #extra>
                 <n-button text type="primary" size="small" @click="router.push({ name: 'AiProjectWorkbench' })">去生成</n-button>
               </template>
@@ -139,6 +139,20 @@ import {
 
 const router = useRouter()
 const store = useAiWorkshopStore()
+
+const htmlToText = (html: string) => {
+  const normalized = (html || '')
+    .replace(/<\s*br\s*\/?>/gi, '\n')
+    .replace(/<\/\s*p\s*>/gi, '\n')
+    .replace(/<\/\s*div\s*>/gi, '\n')
+  return normalized.replace(/<[^>]*>/g, '')
+}
+
+const detailedDescriptionText = computed(() => {
+  const raw = store.projectInfo.detailedDescription || ''
+  const text = htmlToText(raw)
+  return text.trim().length > 0 ? text : '暂无详细描述...'
+})
 
 // 计算进度百分比
 const progressPercentage = computed(() => {

@@ -18,8 +18,8 @@
           <div class="sub-section mt-4">
             <div class="label">不做什么 (产品边界)</div>
             <n-input
-              type="textarea"
               v-model:value="boundaries"
+              type="textarea"
               placeholder="明确这一阶段不做什，防止范围蔓延..."
               :autosize="{ minRows: 3 }"
             />
@@ -65,8 +65,8 @@
         <n-tabs type="segment">
           <n-tab-pane name="doc" tab="完整方案文档">
             <n-input
-              type="textarea"
               v-model:value="docContent"
+              type="textarea"
               placeholder="此处将生成完整的产品方案文档..."
               :autosize="{ minRows: 12 }"
               class="doc-editor"
@@ -74,8 +74,8 @@
           </n-tab-pane>
           <n-tab-pane name="structure" tab="功能结构树">
             <n-input
-              type="textarea"
               v-model:value="structureContent"
+              type="textarea"
               placeholder="- 首页
   - Banner
   - 推荐列表

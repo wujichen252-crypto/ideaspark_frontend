@@ -37,8 +37,8 @@
                  <n-button size="tiny" dashed @click="askAI('根据品牌核心生成一段吸引人的官网首屏文案')">✨ 生成首屏文案</n-button>
               </div>
               <n-input
-                type="textarea"
                 v-model:value="homepageCopy"
+                type="textarea"
                 placeholder="主标题、副标题、CTA 按钮文案..."
                 :autosize="{ minRows: 8 }"
                 class="copy-editor"
@@ -49,8 +49,8 @@
                  <n-button size="tiny" dashed @click="askAI('生成一段给投资人看的一分钟电梯演讲稿')">✨ 生成演讲稿</n-button>
               </div>
               <n-input
-                type="textarea"
                 v-model:value="pitchCopy"
+                type="textarea"
                 placeholder="向别人介绍你的项目..."
                 :autosize="{ minRows: 8 }"
                 class="copy-editor"
@@ -61,8 +61,8 @@
                  <n-button size="tiny" dashed @click="askAI('基于痛点和愿景，写一个感人的品牌故事')">✨ 生成品牌故事</n-button>
               </div>
               <n-input
-                type="textarea"
                 v-model:value="storyCopy"
+                type="textarea"
                 placeholder="我们为什么做这个..."
                 :autosize="{ minRows: 8 }"
                 class="copy-editor"
@@ -83,8 +83,8 @@
            </n-button>
         </template>
         <n-input
-          type="textarea"
           v-model:value="manualContent"
+          type="textarea"
           placeholder="此处将生成完整的品牌手册内容..."
           :autosize="{ minRows: 6 }"
           class="doc-editor"

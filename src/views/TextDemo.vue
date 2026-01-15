@@ -16,13 +16,13 @@
       <!-- 搜索栏 + Tabs 分类 -->
       <div class="header-section">
         <n-input
+          v-model:value="keyword"
           round
           size="large"
           placeholder="搜索你想要的内容..."
-          v-model:value="keyword"
           class="search-box"
         />
-        <n-tabs type="line" animated v-model:value="activeTab">
+        <n-tabs v-model:value="activeTab" type="line" animated>
           <n-tab name="all">全部</n-tab>
           <n-tab name="ui">UI 设计</n-tab>
           <n-tab name="code">代码模板</n-tab>
@@ -37,14 +37,14 @@
           <!-- 左侧筛选 -->
           <n-space>
             <n-select
-              style="width: 160px"
               v-model:value="sort"
+              style="width: 160px"
               :options="sortOptions"
               placeholder="排序方式"
             />
             <n-select
-              style="width: 160px"
               v-model:value="price"
+              style="width: 160px"
               :options="priceOptions"
               placeholder="价格范围"
             />

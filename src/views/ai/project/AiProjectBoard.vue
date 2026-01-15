@@ -55,7 +55,7 @@
             <div class="card-header">
               <n-checkbox 
                 :checked="item.completed" 
-                @update:checked="(v) => handleToggle(moduleKey, item.id, v)"
+                @update:checked="() => handleToggle(moduleKey, item.id)"
                 @click.stop
               />
               <n-tag 
@@ -73,7 +73,7 @@
               {{ item.label }}
             </div>
             
-            <div class="card-meta" v-if="item.description || item.dueDate || item.tags?.length">
+            <div v-if="item.description || item.dueDate || item.tags?.length" class="card-meta">
                <n-space size="small" align="center">
                  <n-icon v-if="item.description" color="#999"><DocumentTextOutline /></n-icon>
                  <n-tag v-for="tag in item.tags" :key="tag" size="tiny" :bordered="false" type="default">
@@ -100,7 +100,7 @@
           <n-input v-model:value="formModel.label" placeholder="请输入任务名称" />
         </n-form-item>
         <n-form-item label="详细描述">
-          <n-input type="textarea" v-model:value="formModel.description" placeholder="任务详细说明..." />
+          <n-input v-model:value="formModel.description" type="textarea" placeholder="任务详细说明..." />
         </n-form-item>
         <n-form-item label="优先级">
           <n-radio-group v-model:value="formModel.priority">
@@ -131,7 +131,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAiWorkshopStore, type ProjectModule, type StageChecklistItem } from '@/store/modules/aiWorkshop'
 import { 
@@ -200,7 +200,7 @@ const formatDate = (ts: number) => {
 }
 
 // Actions
-const handleToggle = (moduleKey: ProjectModule, id: string, checked: boolean) => {
+const handleToggle = (moduleKey: ProjectModule, id: string) => {
   store.toggleChecklistItem(moduleKey, id)
 }
 

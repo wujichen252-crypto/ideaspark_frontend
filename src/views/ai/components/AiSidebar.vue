@@ -10,7 +10,7 @@
     </div>
     
     <div class="session-list">
-      <div class="list-title" v-if="chatStore.sessions.length > 0">近期记录</div>
+      <div v-if="chatStore.sessions.length > 0" class="list-title">近期记录</div>
       <n-scrollbar>
         <div 
           v-for="session in chatStore.sessions" 
@@ -39,7 +39,7 @@
     </div>
 
     <div class="sidebar-footer">
-      <div class="user-info" v-if="userStore.userInfo">
+      <div v-if="userStore.userInfo" class="user-info">
         <n-avatar round size="small" :src="userStore.userInfo.avatar" />
         <span class="username">{{ userStore.userInfo.username }}</span>
       </div>

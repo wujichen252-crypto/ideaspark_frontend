@@ -5,8 +5,8 @@
       <div class="controls">
         <n-space>
           <n-select 
-            :options="categoryOptions" 
             v-model:value="activeCategoryInternal" 
+            :options="categoryOptions" 
             size="small" 
             style="width: 140px" 
           />
@@ -18,10 +18,10 @@
       </div>
     </div>
 
-    <div class="selected-area" v-if="selectedInternal.length">
+    <div v-if="selectedInternal.length" class="selected-area">
       <div class="selected-title">已选插件</div>
       <div class="selected-list">
-        <div class="chip" v-for="id in selectedInternal" :key="id">
+        <div v-for="id in selectedInternal" :key="id" class="chip">
           <span class="chip-name">{{ nameById(id) }}</span>
           <div class="chip-actions">
             <n-button text size="tiny" @click="moveUpInternal(id)">上移</n-button>

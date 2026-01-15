@@ -10,8 +10,15 @@ const route = useRoute()
 
 // Determine if the header should be hidden
 const isHeaderHidden = computed(() => {
-  // Hide header for specific routes, e.g., inside a project workbench
-  const hiddenRouteNames = ['AiProjectWorkbench', 'AiProjectSettings', 'AiProjectCreate', 'AiProjectManagement']
+  const hiddenRouteNames = [
+    'AiProjectWorkbench',
+    'AiProjectSettings',
+    'AiProjectCreate',
+    'AiProjectManagement',
+    'DocumentEditor',
+    'ProjectWorkspace',
+    'ProjectFileEditor'
+  ]
   return hiddenRouteNames.includes(route.name as string)
 })
 

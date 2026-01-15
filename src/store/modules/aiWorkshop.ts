@@ -14,13 +14,39 @@ export interface StageChecklistItem {
   tags?: string[]
 }
 
+export type ArtifactType = 'document' | 'image' | 'code' | 'link' | 'other'
+
+export interface Artifact {
+  id: string
+  name: string
+  type: ArtifactType
+  createdAt: number
+  updatedAt?: number
+  url?: string
+  content?: string
+}
+
 export interface ModuleData {
   key: ProjectModule
   label: string
   description: string
   checklist: StageChecklistItem[]
-  artifacts: any[] // 产出物
-  data?: Record<string, any> // 模块内表单数据
+  artifacts: Artifact[] // 产出物
+  data?: Record<string, unknown> // 模块内表单数据
+}
+
+export type ProjectFileType = 'document' | 'sheet' | 'slide' | 'image' | 'other'
+
+export interface ProjectFile {
+  id: string
+  name: string
+  type: ProjectFileType
+  ext?: string
+  size?: number
+  updatedAt: number
+  source?: 'plugin' | 'upload' | 'system'
+  pluginId?: string
+  content?: string
 }
 
 export interface ProjectSummary {
@@ -28,6 +54,7 @@ export interface ProjectSummary {
   name: string
   description: string
   category: string
+  type?: 'app' | 'document'
   currentModule: ProjectModule
   updatedAt: number
   // Expanded fields
@@ -42,8 +69,10 @@ export interface ProjectSummary {
   allowFork?: boolean
   // 新增字段
   plugins?: string[]
+  files?: ProjectFile[]
   developerMessage?: string
   announcements?: { id: string, title: string, content: string, date: number }[]
+  content?: string
 }
 
 export const useAiWorkshopStore = defineStore('aiWorkshop', () => {
@@ -65,6 +94,11 @@ export const useAiWorkshopStore = defineStore('aiWorkshop', () => {
         { id: 'u1', name: 'User', avatar: '', role: 'owner' },
         { id: 'ai', name: 'AI Team', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=ai', role: 'member' }
       ],
+      files: [
+        { id: 'f-1', name: '项目说明.md', type: 'document', ext: 'md', updatedAt: Date.now() - 7200000, source: 'system', content: '# 项目说明\n\n这里是项目说明的 demo 内容。\n' },
+        { id: 'f-2', name: '任务清单.csv', type: 'sheet', ext: 'csv', updatedAt: Date.now() - 5400000, source: 'system', content: '任务,负责人,截止日期,状态\n需求梳理,我,2025-01-05,进行中\n原型设计,我,2025-01-10,待开始\n' },
+        { id: 'f-3', name: '路演大纲.ppt', type: 'slide', ext: 'ppt', updatedAt: Date.now() - 3600000, source: 'system', content: '# 路演大纲\n\n1. 标题页\n2. 问题\n3. 解决方案\n4. 商业模式\n' }
+      ],
       detailedDescription: '<p>致力于解决大学生求职过程中的信息差和经验不足问题。</p><p>核心功能包括：AI 简历打分与优化、基于真实 JD 的模拟面试训练、个性化职业规划建议。</p>',
       visibility: 'public',
       allowFork: true
@@ -82,6 +116,10 @@ export const useAiWorkshopStore = defineStore('aiWorkshop', () => {
       status: 'active',
       progress: 40,
       team: [{ id: 'u1', name: 'User', avatar: '', role: 'owner' }],
+      files: [
+        { id: 'f-4', name: '产品方案.md', type: 'document', ext: 'md', updatedAt: Date.now() - 86400000 * 2, source: 'system', content: '# 产品方案\n\n（demo）\n' },
+        { id: 'f-5', name: '设备清单.csv', type: 'sheet', ext: 'csv', updatedAt: Date.now() - 86400000 * 3, source: 'system', content: '设备,位置,状态\n灯,客厅,在线\n空调,卧室,在线\n' }
+      ],
       detailedDescription: '<p>连接家中所有智能设备，提供统一的控制界面和自动化场景配置。</p>',
       visibility: 'private',
       allowFork: false
@@ -93,7 +131,7 @@ export const useAiWorkshopStore = defineStore('aiWorkshop', () => {
       category: 'SaaS',
       currentModule: 'idea',
       updatedAt: Date.now(),
-      cover: 'https://picsum.photos/seed/draft/800/400',
+      cover: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&auto=format&fit=crop&q=60',
       tags: ['AI', 'Writing'],
       techStack: [],
       status: 'draft',
@@ -312,7 +350,7 @@ export const useAiWorkshopStore = defineStore('aiWorkshop', () => {
   }
 
   // 更新模块数据
-  function updateModuleData(moduleKey: ProjectModule, data: Record<string, any>) {
+  function updateModuleData(moduleKey: ProjectModule, data: Record<string, unknown>) {
     const module = modules.value[moduleKey]
     module.data = { ...module.data, ...data }
     saveProject()
@@ -357,7 +395,7 @@ export const useAiWorkshopStore = defineStore('aiWorkshop', () => {
         category: '', 
         currentModule: 'home', 
         updatedAt: Date.now(),
-        cover: `https://picsum.photos/seed/${id}/800/400`,
+        cover: `https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=800&auto=format&fit=crop&q=60`,
         tags: [],
         techStack: [],
         status: 'draft',
@@ -408,8 +446,92 @@ export const useAiWorkshopStore = defineStore('aiWorkshop', () => {
     }
   }
 
+  // Actions
+  function addProject(project: Partial<ProjectSummary>) {
+    const newProject: ProjectSummary = {
+      id: `proj-${Date.now()}`,
+      name: project.name || '未命名项目',
+      description: project.description || '',
+      category: project.category || '未分类',
+      type: project.type || 'app',
+      currentModule: 'idea',
+      updatedAt: Date.now(),
+      status: 'active',
+      progress: 0,
+      team: [{ id: 'u1', name: 'User', avatar: '', role: 'owner' }],
+      visibility: 'private',
+      plugins: [],
+      files: [],
+      content: project.content || '',
+      ...project
+    }
+    projectList.value.unshift(newProject)
+    return newProject
+  }
+
+  function getProjectById(id: string) {
+    return projectList.value.find(p => p.id === id)
+  }
+
+  function updateProject(id: string, data: Partial<ProjectSummary>) {
+    const index = projectList.value.findIndex(p => p.id === id)
+    if (index !== -1) {
+      const existing = projectList.value[index]
+      if (!existing) return
+      projectList.value[index] = {
+        ...existing,
+        ...data,
+        id: existing.id,
+        name: data.name ?? existing.name,
+        description: data.description ?? existing.description,
+        category: data.category ?? existing.category,
+        currentModule: data.currentModule ?? existing.currentModule,
+        updatedAt: Date.now()
+      }
+    }
+  }
+
+  /**
+   * 获取项目内指定文件
+   * @param projectId - 项目 ID
+   * @param fileId - 文件 ID
+   */
+  function getProjectFileById(projectId: string, fileId: string) {
+    const project = getProjectById(projectId)
+    return project?.files?.find(f => f.id === fileId)
+  }
+
+  /**
+   * 更新项目内指定文件（局部更新）
+   * @param projectId - 项目 ID
+   * @param fileId - 文件 ID
+   * @param updates - 需要更新的字段
+   */
+  function updateProjectFile(projectId: string, fileId: string, updates: Partial<ProjectFile>) {
+    const project = getProjectById(projectId)
+    if (!project) return
+    const files = project.files ?? []
+    const index = files.findIndex(f => f.id === fileId)
+    if (index === -1) return
+    const existing = files[index]
+    if (!existing) return
+    const nextFiles = [...files]
+    nextFiles[index] = {
+      ...existing,
+      ...updates,
+      id: existing.id,
+      updatedAt: updates.updatedAt ?? Date.now()
+    }
+    updateProject(projectId, { files: nextFiles })
+  }
+
   return {
     projectList,
+    addProject,
+    getProjectById,
+    getProjectFileById,
+    updateProject,
+    updateProjectFile,
     currentProjectId,
     currentModule,
     projectInfo,

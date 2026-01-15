@@ -128,7 +128,7 @@
           </div>
         </div>
 
-        <div class="pagination-container" v-if="totalProjects > pageSize">
+        <div v-if="totalProjects > pageSize" class="pagination-container">
           <n-pagination
             v-model:page="page"
             :page-size="pageSize"
@@ -143,8 +143,9 @@
 
 <script setup lang="ts">
 import { ref, computed, h } from 'vue'
+import type { Component } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAiWorkshopStore, type ProjectModule } from '@/store/modules/aiWorkshop'
+import { useAiWorkshopStore, type ProjectModule, type ProjectSummary } from '@/store/modules/aiWorkshop'
 import { 
   Add, RocketOutline, DocumentsOutline, TimeOutline,
   CodeSlashOutline, ColorPaletteOutline, CreateOutline, BulbOutline,
@@ -246,7 +247,9 @@ const handlePageChange = (p: number) => {
   page.value = p
 }
 
-const handleAction = (key: string, project: any) => {
+type ProjectActionKey = 'delete' | 'edit' | 'clone'
+
+const handleAction = (key: ProjectActionKey, project: ProjectSummary) => {
   if (key === 'delete') {
     dialog.warning({
       title: '确认删除',
@@ -265,7 +268,7 @@ const handleAction = (key: string, project: any) => {
   }
 }
 
-const renderIcon = (icon: any) => {
+const renderIcon = (icon: Component) => {
   return () => h(NIcon, null, { default: () => h(icon) })
 }
 

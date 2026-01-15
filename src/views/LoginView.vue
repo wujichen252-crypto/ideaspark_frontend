@@ -56,7 +56,7 @@
             </div>
           </div>
 
-          <button class="action-btn" @click="handleRegister" :disabled="loading">
+          <button class="action-btn" :disabled="loading" @click="handleRegister">
             <span v-if="!loading">注册</span>
             <span v-else class="loader"></span>
           </button>
@@ -107,7 +107,7 @@
           
           <a href="#" class="forgot-password">忘记密码?</a>
           
-          <button class="action-btn" @click="handleLogin" :disabled="loading">
+          <button class="action-btn" :disabled="loading" @click="handleLogin">
             <span v-if="!loading">登录</span>
             <span v-else class="loader"></span>
           </button>
