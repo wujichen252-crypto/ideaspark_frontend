@@ -18,7 +18,8 @@
               <div class="card-content">
                 <p class="card-quote">“{{ item.quote }}”</p>
                 <div class="card-footer">
-                  <div class="css-avatar" :style="getAvatarStyle(item.author)">
+                  <img v-if="item.avatar" :src="item.avatar" class="card-avatar-img" />
+                  <div v-else class="css-avatar" :style="getAvatarStyle(item.author)">
                     {{ item.author.charAt(0) }}
                   </div>
                   <p class="card-author">{{ item.author }}</p>
@@ -38,7 +39,8 @@
               <div class="card-content">
                 <p class="card-quote">“{{ item.quote }}”</p>
                 <div class="card-footer">
-                  <div class="css-avatar" :style="getAvatarStyle(item.author)">
+                  <img v-if="item.avatar" :src="item.avatar" class="card-avatar-img" />
+                  <div v-else class="css-avatar" :style="getAvatarStyle(item.author)">
                     {{ item.author.charAt(0) }}
                   </div>
                   <p class="card-author">{{ item.author }}</p>
@@ -63,7 +65,8 @@
               <div class="card-content">
                 <p class="card-quote">“{{ item.quote }}”</p>
                 <div class="card-footer">
-                  <div class="css-avatar" :style="getAvatarStyle(item.author)">
+                  <img v-if="item.avatar" :src="item.avatar" class="card-avatar-img" />
+                  <div v-else class="css-avatar" :style="getAvatarStyle(item.author)">
                     {{ item.author.charAt(0) }}
                   </div>
                   <p class="card-author">{{ item.author }}</p>
@@ -83,7 +86,8 @@
               <div class="card-content">
                 <p class="card-quote">“{{ item.quote }}”</p>
                 <div class="card-footer">
-                  <div class="css-avatar" :style="getAvatarStyle(item.author)">
+                  <img v-if="item.avatar" :src="item.avatar" class="card-avatar-img" />
+                  <div v-else class="css-avatar" :style="getAvatarStyle(item.author)">
                     {{ item.author.charAt(0) }}
                   </div>
                   <p class="card-author">{{ item.author }}</p>
@@ -137,60 +141,74 @@ const getAvatarStyle = (name: string) => {
 // 模拟数据：14条
 const allData = [
   {
-    quote: '设计不仅仅是外观和感觉，设计是工作原理。',
-    author: 'Steve Jobs'
+    quote: 'IdeaSpark 的 AI PPT 功能简直是救星，帮我节省了数小时的排版时间！',
+    author: 'Alex Chen',
+    avatar: 'https://i.pravatar.cc/150?u=Alex'
   },
   {
-    quote: '简单是复杂的最终演变。',
-    author: 'Leonardo da Vinci'
+    quote: '捕捉灵感从未如此简单，碎片化的想法终于有了归宿。',
+    author: 'Sarah Wang',
+    avatar: 'https://i.pravatar.cc/150?u=Sarah'
   },
   {
-    quote: '优秀的软件作用于无形。',
-    author: 'John Allsopp'
+    quote: '在这里我找到了志同道合的创意伙伴，社区氛围非常棒。',
+    author: 'Jason Lee',
+    avatar: 'https://i.pravatar.cc/150?u=Jason'
   },
   {
-    quote: '代码是写给人看的，只是顺便让机器执行。',
-    author: 'Donald Knuth'
+    quote: '智能编辑器的润色功能让我的技术文档看起来更专业了。',
+    author: 'Emily Zhang',
+    avatar: 'https://i.pravatar.cc/150?u=Emily'
   },
   {
-    quote: '预测未来的最好方式就是去创造它。',
-    author: 'Alan Kay'
+    quote: '项目协同空间的设计非常直观，团队配合效率提升了 50%。',
+    author: 'David Liu',
+    avatar: 'https://i.pravatar.cc/150?u=David'
   },
   {
-    quote: '细节决定成败。',
-    author: 'Charles Eames'
+    quote: '每一个闪现的火花都值得被认真对待，这就是 IdeaSpark 的魅力。',
+    author: 'Linda Smith',
+    avatar: 'https://i.pravatar.cc/150?u=Linda'
   },
   {
-    quote: '少即是多。',
-    author: 'Ludwig Mies van der Rohe'
+    quote: '从想法到方案，AI 辅助的每一个步骤都充满了惊喜。',
+    author: 'Kevin Ho',
+    avatar: 'https://i.pravatar.cc/150?u=Kevin'
   },
   {
-    quote: '形式服从功能。',
-    author: 'Louis Sullivan'
+    quote: '简洁而不简单，这就是我一直在寻找的创意孵化器。',
+    author: 'Rachel Sun',
+    avatar: 'https://i.pravatar.cc/150?u=Rachel'
   },
   {
-    quote: '唯一不变的就是变化本身。',
-    author: 'Heraclitus'
+    quote: '在广场上看到了很多惊艳的作品，这里真的是灵感的源泉。',
+    author: 'Michael Tan',
+    avatar: 'https://i.pravatar.cc/150?u=Michael'
   },
   {
-    quote: '创造力就是把事物联系起来。',
-    author: 'Steve Jobs'
+    quote: 'API 接口非常丰富，扩展性极强，开发者必备。',
+    author: 'Thomas Brown',
+    avatar: 'https://i.pravatar.cc/150?u=Thomas'
   },
   {
-    quote: '好的设计是显而易见的，伟大的设计是透明的。',
-    author: 'Joe Sparano'
+    quote: '沉浸式的创作体验，让我能专注于内容本身。',
+    author: 'Sophie Green',
+    avatar: 'https://i.pravatar.cc/150?u=Sophie'
   },
   {
-    quote: '不要让我思考。',
-    author: 'Steve Krug'
+    quote: 'IdeaSpark 重新定义了灵感管理，推荐给所有内容创作者。',
+    author: 'Chris Miller',
+    avatar: 'https://i.pravatar.cc/150?u=Chris'
   },
   {
-    quote: '过早优化是万恶之源。',
-    author: 'Donald Knuth'
+    quote: '多端同步非常流畅，随时随地记录灵感。',
+    author: 'Anna White',
+    avatar: 'https://i.pravatar.cc/150?u=Anna'
   },
   {
-    quote: '保持饥饿，保持愚蠢。',
-    author: 'Steve Jobs'
+    quote: '用 AI 赋予创意生命，让每个人都能成为创造者。',
+    author: 'IdeaSpark 团队',
+    avatar: 'https://i.pravatar.cc/150?u=Team'
   }
 ]
 
@@ -377,6 +395,14 @@ onBeforeUnmount(() => {
 
 .card-avatar {
   border-radius: 0; /* 强制正方形 */
+}
+
+.card-avatar-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #333;
 }
 
 .card-author {

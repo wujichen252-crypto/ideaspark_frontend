@@ -51,7 +51,7 @@
     </div>
 
     <!-- Why Section -->
-    <div class="section why-section" id="why-section">
+    <div id="why-section" class="section why-section">
       <h2 class="section-title">为什么需要 AI 工坊？</h2>
       <p class="section-subtitle">创业失败，往往不是因为想法不行，而是卡在了这些地方</p>
       

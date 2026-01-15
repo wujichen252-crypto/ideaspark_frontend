@@ -43,8 +43,8 @@
       <!-- 左侧编辑器 -->
       <div class="editor-container" :class="{ 'chat-open': showChat }">
         <n-input
-          type="textarea"
           v-model:value="content"
+          type="textarea"
           placeholder="# 开始撰写你的文档...\n\n你可以点击右上角的对话按钮，让 AI 帮你生成内容。"
           class="markdown-editor"
           :autosize="{ minRows: 20 }"
@@ -53,7 +53,7 @@
       </div>
 
       <!-- 右侧 AI 对话栏 -->
-      <div class="chat-sidebar" v-show="showChat">
+      <div v-show="showChat" class="chat-sidebar">
         <AiChatArea 
           :session-id="projectId" 
           mode="sidebar" 
@@ -66,13 +66,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAiWorkshopStore } from '@/store/modules/aiWorkshop'
 import { 
   ArrowBackOutline, 
-  ChatboxEllipsesOutline,
-  SaveOutline
+  ChatboxEllipsesOutline
 } from '@vicons/ionicons5'
 import { NInput, NButton, NIcon, NDivider, NTag, useMessage } from 'naive-ui'
 import AiChatArea from '@/views/ai/components/AiChatArea.vue'
@@ -87,7 +86,7 @@ const projectTitle = ref('')
 const content = ref('')
 const showChat = ref(true)
 const saveStatus = ref<'saved' | 'saving' | 'unsaved'>('saved')
-let saveTimer: any = null
+let saveTimer: number | null = null
 
 // 初始化加载
 onMounted(() => {

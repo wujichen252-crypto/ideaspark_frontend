@@ -184,7 +184,7 @@
 
           <div class="md-body" :class="{ 'preview-open': mdViewMode === 'split', 'ai-open': showAi }">
             <input ref="markdownImageInputRef" class="md-hidden-file" type="file" accept="image/*" multiple @change="handleMarkdownImagePick" />
-            <div class="md-editor" ref="markdownEditorHostRef">
+            <div ref="markdownEditorHostRef" class="md-editor">
               <div v-if="mdViewMode === 'typora'" class="md-wysiwyg" @click="focusMarkdown">
                 <div
                   ref="mdTyporaEditorRef"
@@ -209,7 +209,7 @@
 
             <div v-if="mdViewMode === 'split'" class="md-preview">
               <n-card size="small" :bordered="false" class="md-preview-card" title="预览">
-                <div class="md-preview-content" v-html="markdownPreviewHtml"></div>
+                <div ref="markdownPreviewRef" class="md-preview-content"></div>
               </n-card>
             </div>
 
@@ -252,7 +252,15 @@
 
         <div v-else-if="editorKind === 'slides'" class="editor-slides">
           <div class="slides-sider">
-            <div class="slides-sider-title">页列表</div>
+            <div class="slides-sider-header">
+              <div class="slides-sider-title">页列表</div>
+              <n-space size="small">
+                <n-button size="tiny" secondary @click="addSlide">新增</n-button>
+                <n-button size="tiny" tertiary :disabled="slideBlocks.length <= 1" @click="removeSlide">
+                  删除
+                </n-button>
+              </n-space>
+            </div>
             <div class="slides-list">
               <div
                 v-for="(s, idx) in slideBlocks"
@@ -361,6 +369,7 @@ type AiChatExpose = {
 const showAi = ref(true)
 const chatRef = ref<AiChatExpose | null>(null)
 const markdownEditorHostRef = ref<HTMLElement | null>(null)
+const markdownPreviewRef = ref<HTMLElement | null>(null)
 const markdownSelection = ref<{ start: number; end: number }>({ start: 0, end: 0 })
 const markdownImageInputRef = ref<HTMLInputElement | null>(null)
 const mdTyporaEditorRef = ref<HTMLDivElement | null>(null)
@@ -415,6 +424,15 @@ const markdownPreviewHtml = computed(() => {
   return renderMarkdownPreview(content.value)
 })
 
+watch(
+  () => markdownPreviewHtml.value,
+  (html) => {
+    if (!markdownPreviewRef.value) return
+    markdownPreviewRef.value.innerHTML = html || ''
+  },
+  { immediate: true }
+)
+
 const viewModeOptions: DropdownOption[] = [
   { label: '所见即所得', key: 'typora' },
   { label: '分栏预览', key: 'split' },
@@ -435,6 +453,18 @@ const activeSlideContent = computed({
     content.value = updateSlideBlock(content.value, activeSlideIndex.value, val)
   }
 })
+
+watch(
+  () => slideBlocks.value.length,
+  (len) => {
+    if (len <= 0) {
+      activeSlideIndex.value = 0
+      return
+    }
+    if (activeSlideIndex.value > len - 1) activeSlideIndex.value = Math.max(0, len - 1)
+  },
+  { immediate: true }
+)
 
 watch(
   () => file.value,
@@ -551,7 +581,31 @@ function createDefaultContent(f: ProjectFile) {
   const ext = getFileExt(f).toLowerCase()
   if (ext === 'md') return `# ${f.name.replace(/\\.md$/i, '')}\n\n（开始编辑...）\n`
   if (ext === 'csv') return '列1,列2,列3\n数据1,数据2,数据3\n'
-  if (ext === 'ppt' || ext === 'pptx') return '# 演示大纲\n\n1. 标题页\n2. 问题\n3. 解决方案\n'
+  if (ext === 'ppt' || ext === 'pptx') {
+    return [
+      '# 标题页',
+      '',
+      '（填写项目名称 / 一句话价值主张）',
+      '',
+      '---',
+      '问题',
+      '',
+      '- 目标用户：',
+      '- 核心痛点：',
+      '',
+      '---',
+      '解决方案',
+      '',
+      '- 核心功能：',
+      '- 关键体验：',
+      '',
+      '---',
+      '商业模式',
+      '',
+      '- 付费方式：',
+      '- 增长路径：'
+    ].join('\n') + '\n'
+  }
   return ''
 }
 
@@ -2091,9 +2145,9 @@ function inlineMdToHtml(text: string) {
   return withLinks
     .replace(/&lt;br\s*\/?&gt;/gi, '<br />')
     .replace(/(`+)([^`]*?)\1/g, (_m, _tick, inner) => `<code>${inner}</code>`)
-    .replace(/~~([^~]+)~~/g, '<del>$1</del>')
-    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+    .replace(/~~([^\n]+?)~~/g, '<del>$1</del>')
+    .replace(/\*\*([^\n]+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/(^|[^*])\*([^\n*]+?)\*(?!\*)/g, (_m, prefix, inner) => `${prefix}<em>${inner}</em>`)
 }
 
 /**
@@ -2181,6 +2235,30 @@ function handleSlideInput() {
 }
 
 /**
+ * 新增一页幻灯片
+ */
+function addSlide() {
+  const blocks = parseSlideBlocks(content.value)
+  blocks.push('')
+  content.value = blocks.join('\n\n---\n\n') + '\n'
+  activeSlideIndex.value = blocks.length - 1
+  scheduleAutoSave()
+}
+
+/**
+ * 删除当前页幻灯片（至少保留 1 页）
+ */
+function removeSlide() {
+  const blocks = parseSlideBlocks(content.value)
+  if (blocks.length <= 1) return
+  const safeIndex = Math.min(Math.max(activeSlideIndex.value, 0), blocks.length - 1)
+  blocks.splice(safeIndex, 1)
+  content.value = blocks.join('\n\n---\n\n') + '\n'
+  activeSlideIndex.value = Math.min(safeIndex, blocks.length - 1)
+  scheduleAutoSave()
+}
+
+/**
  * 调度自动保存（防抖）
  */
 function scheduleAutoSave() {
@@ -2188,7 +2266,7 @@ function scheduleAutoSave() {
   if (saveTimer != null) window.clearTimeout(saveTimer)
   saveTimer = window.setTimeout(() => {
     saveTimer = null
-    persistFileContent()
+    persistFileContent({ silent: true })
   }, 800)
 }
 
@@ -2196,19 +2274,21 @@ function scheduleAutoSave() {
  * 手动保存
  */
 function handleSave() {
-  persistFileContent()
+  persistFileContent({ silent: false })
 }
 
 /**
  * 持久化文件内容到 store
+ * @param options - 保存选项
  */
-function persistFileContent() {
+function persistFileContent(options?: { silent?: boolean }) {
   if (!file.value) return
+  const silent = options?.silent !== false
   saveStatus.value = 'saving'
   store.updateProjectFile(projectId, file.value.id, { content: content.value, size: new Blob([content.value]).size })
   window.setTimeout(() => {
     saveStatus.value = 'saved'
-    message.success('已保存')
+    if (!silent) message.success('已保存')
   }, 250)
 }
 
@@ -2257,8 +2337,31 @@ function parseCsv(text: string) {
 function parseSlideBlocks(text: string) {
   const normalized = (text || '').replace(/\\r\\n/g, '\\n').trim()
   if (!normalized) return ['']
-  const blocks = normalized.split(/\\n\\s*\\n+/g).map(b => b.trim()).filter(Boolean)
-  return blocks.length ? blocks : ['']
+  const byDelimiter = normalized.split(/\\n\\s*---+\\s*\\n/g).map(b => b.trim()).filter(Boolean)
+  if (byDelimiter.length > 1) return byDelimiter
+
+  const byBlankLines = normalized.split(/\\n\\s*\\n+/g).map(b => b.trim()).filter(Boolean)
+  if (byBlankLines.length > 1) return byBlankLines
+
+  const lines = normalized.split('\\n').map(l => l.trimEnd())
+  const firstNonEmptyIndex = lines.findIndex(l => l.trim().length > 0)
+  if (firstNonEmptyIndex === -1) return ['']
+
+  const titleLine = lines[firstNonEmptyIndex] || ''
+  const restLines = lines.slice(firstNonEmptyIndex + 1)
+  const items: string[] = []
+  for (const ln of restLines) {
+    const m = ln.match(/^\\s*\\d+\\s*[.)、]\\s*(.+?)\\s*$/)
+    if (!m) continue
+    items.push((m[1] || '').trim())
+  }
+
+  if (items.length > 0) {
+    const title = titleLine.trim() ? [titleLine.trim()] : []
+    return [...(title.length ? [title.join('\\n')] : []), ...items]
+  }
+
+  return [normalized]
 }
 
 /**
@@ -2271,7 +2374,7 @@ function updateSlideBlock(fullText: string, index: number, nextBlock: string) {
   const blocks = parseSlideBlocks(fullText)
   const safeIndex = Math.min(Math.max(index, 0), blocks.length - 1)
   blocks[safeIndex] = (nextBlock || '').trim()
-  return blocks.join('\\n\\n') + '\\n'
+  return blocks.join('\\n\\n---\\n\\n') + '\\n'
 }
 
 /**
@@ -2581,11 +2684,21 @@ function slideSummary(block: string) {
   flex-direction: column;
 }
 
-.slides-sider-title {
+.slides-sider-header {
   padding: 12px 12px 8px;
   font-weight: 600;
   color: #0f172a;
   border-bottom: 1px solid #eef2f7;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.slides-sider-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .slides-list {

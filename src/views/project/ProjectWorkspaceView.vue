@@ -70,9 +70,18 @@
             <div class="home-hero" :style="{ backgroundImage: project.cover ? `url(${project.cover})` : '' }">
               <div class="home-hero-overlay"></div>
               <div class="home-hero-content">
-                <n-tag size="small" round :bordered="false" type="info">{{ project.category || '未分类' }}</n-tag>
                 <div class="home-hero-title">{{ project.name || '未命名项目' }}</div>
                 <div class="home-hero-subtitle">{{ project.description || '暂无一句话介绍...' }}</div>
+                <div class="home-hero-meta">
+                  <div class="meta-item">
+                    <n-icon><TimeOutline /></n-icon>
+                    <span>更新于 {{ formatDateTime(project.updatedAt) }}</span>
+                  </div>
+                  <div class="meta-item">
+                    <n-icon><PeopleOutline /></n-icon>
+                    <span>成员 {{ teamMembers.length }}</span>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -127,7 +136,7 @@
                     <div class="info-row">
                       <div class="label">标签</div>
                       <div class="value">
-                        <n-space size="small" v-if="(project.tags || []).length">
+                        <n-space v-if="(project.tags || []).length" size="small">
                           <n-tag v-for="t in project.tags" :key="t" size="small" round :bordered="false">
                             {{ t }}
                           </n-tag>
@@ -138,7 +147,7 @@
                     <div class="info-row">
                       <div class="label">关键要素</div>
                       <div class="value">
-                        <n-space size="small" v-if="(project.techStack || []).length">
+                        <n-space v-if="(project.techStack || []).length" size="small">
                           <n-tag v-for="t in project.techStack" :key="t" size="small" round :bordered="false" type="success">
                             {{ t }}
                           </n-tag>
@@ -396,13 +405,93 @@
                 {{ activePlugin.source === 'official' ? '官方插件' : '社区插件' }}
               </n-tag>
 
-              <n-input v-model:value="toolForm.title" placeholder="文件标题" />
-              <n-input
-                v-model:value="toolForm.content"
-                type="textarea"
-                :autosize="{ minRows: 14, maxRows: 22 }"
-                placeholder="输入或生成内容..."
-              />
+              <template v-if="activePlugin.id === 'tool_ppt'">
+                <n-input v-model:value="toolForm.title" placeholder="文件标题" />
+                <div class="ppt-editor">
+                  <div class="ppt-sider">
+                    <div class="ppt-sider-header">
+                      <div class="ppt-sider-title">页列表</div>
+                      <n-space size="small">
+                        <n-button size="tiny" type="primary" @click="openPptAiModal">
+                          <template #icon>
+                            <n-icon><SparklesOutline /></n-icon>
+                          </template>
+                          AI 生成
+                        </n-button>
+                        <n-button size="tiny" secondary @click="addPptSlide">新增</n-button>
+                        <n-button size="tiny" tertiary :disabled="pptSlideBlocks.length <= 1" @click="removeActivePptSlide">
+                          删除
+                        </n-button>
+                      </n-space>
+                    </div>
+                    <div class="ppt-slides">
+                      <div
+                        v-for="(s, idx) in pptSlideBlocks"
+                        :key="idx"
+                        class="ppt-slide-item"
+                        :class="{ active: idx === pptActiveSlideIndex }"
+                        @click="pptActiveSlideIndex = idx"
+                      >
+                        <div class="ppt-slide-item-title">第 {{ idx + 1 }} 页</div>
+                        <div class="ppt-slide-item-sub">{{ pptSlideSummary(s) }}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="ppt-main">
+                    <n-input
+                      v-model:value="pptActiveSlideContent"
+                      type="textarea"
+                      :autosize="{ minRows: 16, maxRows: 22 }"
+                      placeholder="每一页用空行分隔；在这里编辑当前页内容..."
+                      class="ppt-editor-input"
+                    />
+                  </div>
+                </div>
+
+                <n-modal v-model:show="showPptAiModal" preset="dialog" title="AI 生成 PPT（可编辑）" :mask-closable="!pptAiGenerating">
+                  <n-space vertical size="small">
+                    <n-form :model="pptAiForm" label-placement="left" label-width="80">
+                      <n-form-item label="主题" path="topic">
+                        <n-input v-model:value="pptAiForm.topic" placeholder="例如：大学生求职助手路演 PPT" />
+                      </n-form-item>
+                      <n-form-item label="页数" path="pageCount">
+                        <n-select v-model:value="pptAiForm.pageCount" :options="pptPageCountOptions" />
+                      </n-form-item>
+                      <n-form-item label="受众" path="audience">
+                        <n-input v-model:value="pptAiForm.audience" placeholder="例如：评委 / 投资人 / 老师" />
+                      </n-form-item>
+                      <n-form-item label="风格" path="style">
+                        <n-select v-model:value="pptAiForm.style" :options="pptStyleOptions" />
+                      </n-form-item>
+                      <n-form-item label="补充" path="extra">
+                        <n-input
+                          v-model:value="pptAiForm.extra"
+                          type="textarea"
+                          :autosize="{ minRows: 3, maxRows: 6 }"
+                          placeholder="例如：强调技术亮点、增加竞品对比、突出数据指标..."
+                        />
+                      </n-form-item>
+                      <n-form-item label="应用方式" path="applyMode">
+                        <n-select v-model:value="pptAiApplyMode" :options="pptApplyModeOptions" />
+                      </n-form-item>
+                    </n-form>
+                    <n-space justify="end">
+                      <n-button :disabled="pptAiGenerating" @click="showPptAiModal = false">取消</n-button>
+                      <n-button type="primary" :loading="pptAiGenerating" @click="generatePptByAi">生成并应用</n-button>
+                    </n-space>
+                  </n-space>
+                </n-modal>
+              </template>
+
+              <template v-else>
+                <n-input v-model:value="toolForm.title" placeholder="文件标题" />
+                <n-input
+                  v-model:value="toolForm.content"
+                  type="textarea"
+                  :autosize="{ minRows: 14, maxRows: 22 }"
+                  placeholder="输入或生成内容..."
+                />
+              </template>
 
               <n-space justify="space-between">
                 <n-button tertiary @click="fillTemplate(activePlugin.id)">生成模板</n-button>
@@ -425,7 +514,8 @@ import { useRoute, useRouter } from 'vue-router'
 import type { Component } from 'vue'
 import type { MenuOption } from 'naive-ui'
 import { useMessage, NEmpty, NButton, NIcon, NInput, NCard, NTag, NRadioGroup, NRadioButton, NDrawer, NDrawerContent, NSpace, NLayout, NLayoutSider, NLayoutContent, NMenu, NAvatar, NDivider, NList, NListItem, NForm, NFormItem, NSelect, NSwitch, NGrid, NGridItem, NModal } from 'naive-ui'
-import { ArrowBack, DocumentTextOutline, DocumentOutline, GridOutline, EaselOutline, ExtensionPuzzleOutline, HomeOutline, FolderOpenOutline, PeopleOutline, SettingsOutline } from '@vicons/ionicons5'
+import { ArrowBack, DocumentTextOutline, DocumentOutline, GridOutline, EaselOutline, ExtensionPuzzleOutline, HomeOutline, FolderOpenOutline, PeopleOutline, SettingsOutline, TimeOutline, SparklesOutline } from '@vicons/ionicons5'
+import request, { type Result } from '@/api/request'
 import { useAiWorkshopStore, type ProjectFile, type ProjectFileType } from '@/store/modules/aiWorkshop'
 
 const route = useRoute()
@@ -563,6 +653,58 @@ const activePlugin = computed(() => {
 })
 
 const toolForm = ref({ title: '', content: '' })
+const pptActiveSlideIndex = ref(0)
+const showPptAiModal = ref(false)
+const pptAiGenerating = ref(false)
+const pptAiApplyMode = ref<'replace' | 'append'>('replace')
+
+const pptAiForm = reactive({
+  topic: '',
+  pageCount: 8 as number,
+  audience: '',
+  style: 'pitch' as 'pitch' | 'report' | 'training',
+  extra: ''
+})
+
+const pptPageCountOptions = [
+  { label: '6 页', value: 6 },
+  { label: '8 页', value: 8 },
+  { label: '10 页', value: 10 },
+  { label: '12 页', value: 12 }
+]
+
+const pptStyleOptions = [
+  { label: '路演/创业', value: 'pitch' },
+  { label: '汇报/总结', value: 'report' },
+  { label: '培训/课程', value: 'training' }
+]
+
+const pptApplyModeOptions = [
+  { label: '替换当前全部页', value: 'replace' },
+  { label: '追加到末尾', value: 'append' }
+]
+
+const pptSlideBlocks = computed(() => parsePptSlideBlocks(toolForm.value.content))
+const pptActiveSlideContent = computed({
+  get() {
+    return pptSlideBlocks.value[pptActiveSlideIndex.value] ?? ''
+  },
+  set(val: string) {
+    toolForm.value.content = updatePptSlideBlock(toolForm.value.content, pptActiveSlideIndex.value, val)
+  }
+})
+
+watch(
+  () => pptSlideBlocks.value.length,
+  (len) => {
+    if (len <= 0) {
+      pptActiveSlideIndex.value = 0
+      return
+    }
+    if (pptActiveSlideIndex.value > len - 1) pptActiveSlideIndex.value = Math.max(0, len - 1)
+  },
+  { immediate: true }
+)
 
 const teamMembers = computed(() => project.value?.team ?? [])
 
@@ -932,9 +1074,10 @@ function openPlugin(pluginId: string) {
   if (selected && selected.source === 'official' && !isEnabled(pluginId)) {
     togglePlugin(pluginId)
   }
+  pptActiveSlideIndex.value = 0
   toolForm.value = {
     title: project.value?.name ? `${project.value.name} - ${selected?.name || '工具'}` : selected?.name || '工具',
-    content: ''
+    content: pluginId === 'tool_ppt' ? buildTemplateContent(pluginId) : ''
   }
   showToolDrawer.value = true
 }
@@ -963,17 +1106,36 @@ function buildTemplateContent(pluginId: string) {
   }
   if (pluginId === 'tool_ppt') {
     return [
-      '# 路演 PPT 大纲',
+      '标题页',
+      `- 项目：${project.value?.name || '（项目名称）'}`,
+      '- 一句话价值主张：',
       '',
-      '1. 标题页：项目名称 + 一句话价值主张',
-      '2. 问题：目标用户痛点',
-      '3. 解决方案：核心功能与体验',
-      '4. 亮点：差异化与壁垒',
-      '5. 商业模式：怎么赚钱/增长',
-      '6. 进度：里程碑与数据',
-      '7. 计划：下一步路线图',
-      '8. 团队：核心成员与分工',
-      '9. 总结：愿景与 Call to Action'
+      '问题',
+      '- 目标用户：',
+      '- 核心痛点：',
+      '',
+      '解决方案',
+      '- 核心功能：',
+      '- 关键体验：',
+      '',
+      '亮点',
+      '- 差异化：',
+      '- 壁垒：',
+      '',
+      '商业模式',
+      '- 付费方式：',
+      '- 增长路径：',
+      '',
+      '进度与计划',
+      '- 当前里程碑：',
+      '- 下一步：',
+      '',
+      '团队',
+      '- 成员与分工：',
+      '',
+      '总结',
+      '- 愿景：',
+      '- Call to Action：'
     ].join('\n')
   }
   if (pluginId === 'tool_word') {
@@ -1053,6 +1215,234 @@ function buildTemplateContent(pluginId: string) {
  */
 function fillTemplate(pluginId: string) {
   toolForm.value.content = buildTemplateContent(pluginId)
+  if (pluginId === 'tool_ppt') pptActiveSlideIndex.value = 0
+}
+
+/**
+ * 打开 PPT 的 AI 生成弹窗，并用当前项目/标题做默认填充
+ */
+function openPptAiModal() {
+  const fallback = project.value?.name ? `${project.value.name} 路演 PPT` : toolForm.value.title || '路演 PPT'
+  if (!pptAiForm.topic.trim()) pptAiForm.topic = fallback
+  if (!pptAiForm.audience.trim()) pptAiForm.audience = '评委 / 投资人'
+  showPptAiModal.value = true
+}
+
+type PptAiResponseData = { content: string }
+
+/**
+ * 生成 PPT 内容（优先请求后端 AI；失败则使用本地模拟生成）
+ */
+async function generatePptByAi() {
+  const topic = pptAiForm.topic.trim()
+  if (!topic) {
+    message.warning('请输入主题')
+    return
+  }
+
+  pptAiGenerating.value = true
+  try {
+    const content = await requestPptAiContent()
+    applyGeneratedPptContent(content)
+    showPptAiModal.value = false
+    message.success('已生成并应用')
+  } catch {
+    const fallback = mockGeneratePptContent({
+      topic,
+      pageCount: pptAiForm.pageCount,
+      audience: pptAiForm.audience.trim(),
+      style: pptAiForm.style,
+      extra: pptAiForm.extra.trim(),
+      projectName: project.value?.name || '',
+      projectDesc: project.value?.description || ''
+    })
+    applyGeneratedPptContent(fallback)
+    showPptAiModal.value = false
+    message.success('已生成并应用（本地模拟）')
+  } finally {
+    pptAiGenerating.value = false
+  }
+}
+
+/**
+ * 请求后端 AI 生成 PPT 的内容（按页用空行分隔）
+ */
+async function requestPptAiContent() {
+  const prompt = buildPptAiPrompt({
+    topic: pptAiForm.topic.trim(),
+    pageCount: pptAiForm.pageCount,
+    audience: pptAiForm.audience.trim(),
+    style: pptAiForm.style,
+    extra: pptAiForm.extra.trim(),
+    projectName: project.value?.name || '',
+    projectDesc: project.value?.description || ''
+  })
+
+  const res = await request.post<Result<PptAiResponseData>>('/ai/ppt', {
+    prompt,
+    meta: {
+      topic: pptAiForm.topic.trim(),
+      pageCount: pptAiForm.pageCount,
+      audience: pptAiForm.audience.trim(),
+      style: pptAiForm.style
+    }
+  })
+  const content = res.data.data?.content
+  if (!content || !content.trim()) throw new Error('Empty AI content')
+  return normalizePptText(content)
+}
+
+/**
+ * 应用生成结果到当前 PPT 编辑器
+ */
+function applyGeneratedPptContent(content: string) {
+  const normalized = normalizePptText(content)
+  if (pptAiApplyMode.value === 'append' && toolForm.value.content.trim()) {
+    const prevLen = parsePptSlideBlocks(toolForm.value.content).length
+    toolForm.value.content = `${normalizePptText(toolForm.value.content)}\n\n${normalized}\n`
+    pptActiveSlideIndex.value = prevLen
+    return
+  }
+  toolForm.value.content = `${normalized}\n`
+  pptActiveSlideIndex.value = 0
+}
+
+type MockPptGenInput = {
+  topic: string
+  pageCount: number
+  audience: string
+  style: 'pitch' | 'report' | 'training'
+  extra: string
+  projectName: string
+  projectDesc: string
+}
+
+/**
+ * 本地模拟生成 PPT 内容：用于无后端 AI 时的可用体验
+ */
+function mockGeneratePptContent(input: MockPptGenInput) {
+  const blocks = buildMockPptBlocks(input)
+  return blocks.join('\n\n') + '\n'
+}
+
+/**
+ * 将用户信息拼装成适合后端大模型的 Prompt
+ */
+function buildPptAiPrompt(input: MockPptGenInput) {
+  const styleLabelMap: Record<MockPptGenInput['style'], string> = {
+    pitch: '路演/创业',
+    report: '汇报/总结',
+    training: '培训/课程'
+  }
+  const ctx = [
+    input.projectName ? `项目名称：${input.projectName}` : '',
+    input.projectDesc ? `项目简介：${input.projectDesc}` : ''
+  ].filter(Boolean).join('\n')
+
+  return [
+    '你是一名 PPT 内容策划师，请输出“按页分隔”的 PPT 文本大纲。',
+    '要求：',
+    `- 主题：${input.topic}`,
+    `- 页数：${input.pageCount} 页`,
+    `- 受众：${input.audience || '通用受众'}`,
+    `- 风格：${styleLabelMap[input.style]}`,
+    '- 输出格式：每一页一个段落块，块与块之间必须用一个空行分隔；每页第一行为标题；后续用条目符号（-）列要点。',
+    input.extra ? `- 补充要求：${input.extra}` : '',
+    ctx ? `参考上下文：\n${ctx}` : '',
+    '现在开始输出。'
+  ].filter(Boolean).join('\n')
+}
+
+/**
+ * 生成模拟 PPT 各页块（每块代表一页）
+ */
+function buildMockPptBlocks(input: MockPptGenInput) {
+  const baseTitle = input.projectName || input.topic
+  const blocks: string[] = []
+
+  const candidates: Array<{ title: string; bullets: string[] }> = [
+    {
+      title: '标题页',
+      bullets: [
+        `- 主题：${input.topic}`,
+        baseTitle !== input.topic ? `- 项目：${baseTitle}` : '- 项目：',
+        input.audience ? `- 面向：${input.audience}` : '- 面向：'
+      ]
+    },
+    { title: '一句话价值主张', bullets: ['- 我们解决什么问题？', '- 给谁解决？', '- 产生什么价值？'] },
+    { title: '问题与痛点', bullets: ['- 目标用户是谁？', '- 现状是什么？', '- 痛点与成本有哪些？'] },
+    { title: '解决方案', bullets: ['- 核心思路', '- 关键能力/功能', '- 使用流程（3 步）'] },
+    { title: '产品形态与亮点', bullets: ['- 核心功能模块', '- 差异化亮点', '- 技术/资源壁垒'] },
+    { title: '市场与场景', bullets: ['- 典型使用场景', '- 市场规模/机会', '- 竞争格局（可写 2-3 个）'] },
+    { title: '商业模式', bullets: ['- 收费方式', '- 增长路径', '- 成本结构与毛利（可选）'] },
+    { title: '数据与进展', bullets: ['- 当前进度/里程碑', '- 已验证的结果（数据/反馈）', '- 下一步要验证什么？'] },
+    { title: '路线图', bullets: ['- 1-2 周', '- 1-2 月', '- 3-6 月'] },
+    { title: '团队', bullets: ['- 成员与分工', '- 关键经验/优势', '- 需要的资源/协作'] },
+    { title: '总结与行动', bullets: ['- 我们的愿景', '- 现在需要什么支持？', '- 谢谢'] }
+  ]
+
+  const pageCount = Math.min(Math.max(Math.floor(input.pageCount), 1), 20)
+  const picked = candidates.slice(0, Math.min(pageCount, candidates.length))
+
+  for (const item of picked) {
+    const body = [item.title, ...item.bullets].join('\n')
+    blocks.push(body)
+  }
+
+  while (blocks.length < pageCount) {
+    const idx = blocks.length + 1
+    blocks.push(`补充页 ${idx}\n- 要点 1\n- 要点 2\n- 要点 3`)
+  }
+
+  return blocks
+}
+
+/**
+ * 规范化 PPT 文本：统一换行并确保按空行分隔页
+ */
+function normalizePptText(text: string) {
+  const normalized = (text || '').replace(/\r\n/g, '\n')
+  const blocks = parsePptSlideBlocks(normalized)
+  return blocks.map(b => b.trim()).filter(Boolean).join('\n\n')
+}
+
+function parsePptSlideBlocks(text: string) {
+  const normalized = (text || '').replace(/\r\n/g, '\n').trim()
+  if (!normalized) return ['']
+  const blocks = normalized.split(/\n\s*\n+/g).map(b => b.trim()).filter(Boolean)
+  return blocks.length ? blocks : ['']
+}
+
+function updatePptSlideBlock(fullText: string, index: number, nextBlock: string) {
+  const blocks = parsePptSlideBlocks(fullText)
+  const safeIndex = Math.min(Math.max(index, 0), blocks.length - 1)
+  blocks[safeIndex] = (nextBlock || '').trim()
+  return blocks.join('\n\n') + '\n'
+}
+
+function pptSlideSummary(block: string) {
+  const firstLine = (block || '').split('\n')[0] || ''
+  return firstLine.slice(0, 24)
+}
+
+function addPptSlide() {
+  const blocks = parsePptSlideBlocks(toolForm.value.content)
+  blocks.push('')
+  toolForm.value.content = blocks.join('\n\n') + '\n'
+  pptActiveSlideIndex.value = blocks.length - 1
+}
+
+function removeActivePptSlide() {
+  const blocks = parsePptSlideBlocks(toolForm.value.content)
+  if (blocks.length <= 1) {
+    toolForm.value.content = ''
+    pptActiveSlideIndex.value = 0
+    return
+  }
+  const safeIndex = Math.min(Math.max(pptActiveSlideIndex.value, 0), blocks.length - 1)
+  blocks.splice(safeIndex, 1)
+  toolForm.value.content = blocks.join('\n\n') + '\n'
+  pptActiveSlideIndex.value = Math.min(safeIndex, blocks.length - 1)
 }
 
 /**
@@ -1263,6 +1653,7 @@ function downloadBlob(filename: string, blob: Blob) {
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, rgba(17, 24, 39, 0.25) 0%, rgba(17, 24, 39, 0.9) 100%);
+  backdrop-filter: blur(2px);
 }
 
 .home-hero-content {
@@ -1289,6 +1680,23 @@ function downloadBlob(filename: string, blob: Blob) {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.home-hero-meta {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.home-hero-meta .meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
 }
 
 .home-grid {
@@ -1525,5 +1933,81 @@ function downloadBlob(filename: string, blob: Blob) {
 
 .tool-body {
   padding: 4px 0;
+}
+
+.ppt-editor {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 10px;
+  min-height: 0;
+}
+
+.ppt-sider {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ppt-sider-header {
+  padding: 10px 10px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.ppt-sider-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.ppt-slides {
+  padding: 8px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ppt-slide-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 8px;
+  cursor: pointer;
+  background: #fff;
+}
+
+.ppt-slide-item.active {
+  border-color: #18a058;
+  box-shadow: 0 0 0 2px rgba(24, 160, 88, 0.12);
+}
+
+.ppt-slide-item-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.ppt-slide-item-sub {
+  font-size: 12px;
+  color: #6b7280;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ppt-main {
+  min-height: 0;
+}
+
+.ppt-editor-input {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 </style>

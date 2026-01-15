@@ -41,8 +41,8 @@
           <!-- 导航菜单 -->
           <div class="nav-menu">
             <n-menu
-              :options="menuOptions"
               v-model:value="activeKey"
+              :options="menuOptions"
               :indent="24"
             />
           </div>
@@ -103,7 +103,7 @@
 
             <div class="detail-grid mt-6">
               <n-card title="项目描述" size="medium" class="desc-card">
-                <div class="html-content" v-html="projectInfo.detailedDescription"></div>
+                <div class="html-content">{{ projectDescriptionText }}</div>
               </n-card>
               
               <div class="right-col">
@@ -153,7 +153,7 @@
                      </div>
                    </div>
                    <template #suffix>
-                     <div class="actions" v-if="member.id !== 'me'">
+                     <div v-if="member.id !== 'me'" class="actions">
                        <n-button size="small" type="error" secondary>移除</n-button>
                      </div>
                    </template>
@@ -191,6 +191,7 @@
 
 <script setup lang="ts">
 import { ref, computed, h } from 'vue'
+import type { Component } from 'vue'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useAiWorkshopStore } from '@/store/modules/aiWorkshop'
@@ -231,9 +232,23 @@ const handleBack = () => {
 }
 
 // 菜单配置
-const renderIcon = (icon: any) => {
+const renderIcon = (icon: Component) => {
   return () => h(NIcon, null, { default: () => h(icon) })
 }
+
+const htmlToText = (html: string) => {
+  const normalized = (html || '')
+    .replace(/<\s*br\s*\/?>/gi, '\n')
+    .replace(/<\/\s*p\s*>/gi, '\n')
+    .replace(/<\/\s*div\s*>/gi, '\n')
+  return normalized.replace(/<[^>]*>/g, '')
+}
+
+const projectDescriptionText = computed(() => {
+  const raw = projectInfo.value.detailedDescription || ''
+  const text = htmlToText(raw)
+  return text.trim().length > 0 ? text : '暂无详细描述'
+})
 
 const menuOptions = [
   {

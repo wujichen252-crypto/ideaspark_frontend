@@ -1,23 +1,23 @@
 <template>
-  <section class="horizontal-scroll-section" ref="sectionRef">
-    <div class="pin-wrap" ref="pinWrapRef">
+  <section ref="sectionRef" class="horizontal-scroll-section">
+    <div ref="pinWrapRef" class="pin-wrap">
       <!-- 左侧固定内容 (Overlay) -->
       <div class="content-left">
         <div class="content-left__inner">
           <h2 class="section-title">
-            从创作到发布<br />
-            AI 贯穿全流程
+            意念方舟：<br />
+            让每个灵感都有归宿
           </h2>
           <p class="section-subtitle">
-            打破传统工作流的束缚，让每一个灵感瞬间落地。<br />
-            向右滑动，探索智能创作的全流程。
+            我们相信，每一个微小的想法都蕴含着改变世界的力量。<br />
+            向右滑动，开启属于你的创意航行。
           </p>
         </div>
       </div>
 
       <!-- 右侧滚动容器 (Full Width) -->
       <div class="scroll-wrapper">
-        <div class="scroll-content" ref="trackRef">
+        <div ref="trackRef" class="scroll-content">
           <!-- 占位 Spacer：宽度与左侧内容一致，并增加额外缓冲 -->
           <div class="spacer"></div>
 
@@ -85,39 +85,39 @@ type ScrollCard = {
 const cards: ScrollCard[] = [
   {
     id: '01',
-    title: '灵感生成',
-    desc: '输入简单的文本描述，AI 即刻生成多种风格的创意草图。',
-    cssClass: 'visual-flow'
+    title: '起源：微光闪烁',
+    desc: '每个伟大的项目都始于一个瞬间的“闪念”。意念方舟为你提供最纯粹的捕捉空间，确保没有任何一个火花会因遗忘而熄灭。',
+    image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800'
   },
   {
     id: '02',
-    title: '智能建模',
-    desc: '自动拓扑与 UV 展开，从草图到高精度 3D 模型只需一步。',
-    cssClass: 'visual-grid'
+    title: '连接：意念聚合',
+    desc: '碎片化的想法在方舟中汇聚。通过 AI 逻辑引擎，我们帮助你发现创意之间的隐藏联系，将孤岛连成大陆。',
+    image: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?auto=format&fit=crop&q=80&w=800'
   },
   {
     id: '03',
-    title: '材质匹配',
-    desc: '基于物理的 PBR 材质库，AI 智能匹配纹理与光泽。',
-    cssClass: 'visual-pulse'
+    title: '赋能：人机共生',
+    desc: 'AI 不是创作者的替代者，而是最懂你的副驾驶。它为你润色文字、构建框架，让你的创造力突破生理极限。',
+    image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800'
   },
   {
     id: '04',
-    title: '场景搭建',
-    desc: '智能布局算法，自动生成符合逻辑的场景道具与环境光照。',
-    cssClass: 'visual-waves'
+    title: '协作：众行致远',
+    desc: '一个人的火花是微弱的，一群人的火花是耀眼的。在共享的协作空间里，灵感在碰撞中产生聚变。',
+    image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800'
   },
   {
     id: '05',
-    title: '动画绑定',
-    desc: '无需手动刷权重，AI 自动识别骨骼节点并完成蒙皮绑定。',
-    cssClass: 'visual-particles'
+    title: '落地：由虚入实',
+    desc: '从抽象的草稿到具象的成果。无论是精美的演示文稿还是严密的逻辑文档，意念方舟助你完成最后的一跃。',
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800'
   },
   {
     id: '06',
-    title: '多端发布',
-    desc: '一键导出 GLB、USDZ 等通用格式，无缝对接 Unity 或 Web。',
-    cssClass: 'visual-noise'
+    title: '愿景：无限可能',
+    desc: '我们不只是在构建工具，我们是在构建未来的创作范式。让每一次记录，都成为改变未来的起点。',
+    image: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&q=80&w=800'
   }
 ]
 
@@ -352,7 +352,21 @@ onUnmounted(() => {
   justify-content: center;
 }
 
-/* 视觉特效容器 */
+/* 图片样式 */
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.33, 1, 0.68, 1);
+  filter: brightness(0.8) contrast(1.1); /* 略微压暗并增加对比度，显得深邃 */
+}
+
+.card-item:hover .card-image {
+  transform: scale(1.05);
+  filter: brightness(1) contrast(1.1); /* 悬停时恢复亮度 */
+}
+
+/* 视觉特效容器 (保留结构以防万一，但隐藏旧的 CSS 效果) */
 .card-visual {
   width: 100%;
   height: 100%;
@@ -366,110 +380,150 @@ onUnmounted(() => {
   height: 100%;
 }
 
-/* 1. 流动光效 */
-.visual-flow {
-  background: linear-gradient(135deg, #1e1e2e, #2d2d44);
+/* 1. 起源：闪烁的星火 */
+.visual-spark {
+  background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
 }
-.visual-flow .visual-inner {
-  background: linear-gradient(45deg, transparent 0%, rgba(74, 222, 128, 0.2) 50%, transparent 100%);
+.visual-spark .visual-inner {
+  width: 4px;
+  height: 4px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 20px 2px #fff, 0 0 40px 4px #4ade80;
+  animation: spark-pulse 2s infinite ease-in-out;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* 2. 连接：神经网络 */
+.visual-neural {
+  background: #000;
+  overflow: hidden;
+}
+.visual-neural .visual-inner {
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(74, 222, 128, 0.2) 1px, transparent 1px),
+    radial-gradient(circle at 80% 40%, rgba(74, 222, 128, 0.2) 1px, transparent 1px),
+    radial-gradient(circle at 40% 80%, rgba(74, 222, 128, 0.2) 1px, transparent 1px),
+    radial-gradient(circle at 70% 70%, rgba(74, 222, 128, 0.2) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: neural-float 10s infinite linear;
+}
+.visual-neural::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg, transparent 45%, rgba(74, 222, 128, 0.1) 50%, transparent 55%);
   background-size: 200% 200%;
-  animation: shimmer 3s infinite linear;
+  animation: neural-scan 3s infinite linear;
 }
 
-/* 2. 网格扫描 */
-.visual-grid {
-  background: #111;
-  background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-  linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-.visual-grid .visual-inner {
-  background: linear-gradient(to bottom, transparent 0%, rgba(59, 130, 246, 0.3) 50%, transparent 100%);
-  background-size: 100% 200%;
-  animation: scan 4s infinite linear;
-}
-
-/* 3. 脉冲圆环 */
-.visual-pulse {
+/* 3. 赋能：AI 核心 */
+.visual-ai-core {
   background: #000;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.visual-pulse .visual-inner {
-  width: 50%;
-  height: 50%;
-  border-radius: 50%;
-  background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
-  animation: pulse 2s infinite ease-in-out;
+.visual-ai-core .visual-inner {
+  width: 60px;
+  height: 60px;
+  border: 2px solid rgba(74, 222, 128, 0.5);
+  border-radius: 38% 62% 63% 37% / 41% 44% 56% 59%;
+  background: rgba(74, 222, 128, 0.1);
+  box-shadow: inset 0 0 20px rgba(74, 222, 128, 0.2);
+  animation: ai-morph 8s infinite linear;
 }
 
-/* 4. 波浪 */
-.visual-waves {
-  background: linear-gradient(180deg, #0f172a, #1e293b);
-}
-.visual-waves .visual-inner {
-  background: repeating-radial-gradient(
-    circle at 50% 100%,
-    transparent 0,
-    rgba(6, 182, 212, 0.1) 10px,
-    transparent 20px
-  );
-  animation: waves 4s infinite linear;
-  transform-origin: bottom center;
-}
-
-/* 5. 粒子噪声 */
-.visual-particles {
+/* 4. 协作：和谐共振 */
+.visual-harmony {
   background: #000;
 }
-.visual-particles .visual-inner {
-  background-image: radial-gradient(#fbbf24 1px, transparent 1px);
+.visual-harmony .visual-inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.visual-harmony .visual-inner::before,
+.visual-harmony .visual-inner::after {
+  content: '';
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  border-radius: 50%;
+  animation: harmony-ripple 4s infinite cubic-bezier(0, 0.2, 0.8, 1);
+}
+.visual-harmony .visual-inner::after {
+  animation-delay: -2s;
+}
+
+/* 5. 落地：由虚入实 */
+.visual-manifest {
+  background: #000;
+  background-image: linear-gradient(rgba(74, 222, 128, 0.05) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(74, 222, 128, 0.05) 1px, transparent 1px);
   background-size: 20px 20px;
-  animation: particles 10s infinite linear;
+}
+.visual-manifest .visual-inner {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent, rgba(74, 222, 128, 0.2));
+  transform: perspective(500px) rotateX(60deg);
+  animation: manifest-scroll 5s infinite linear;
 }
 
-/* 6. 动态噪声 */
-.visual-noise {
-  background: #18181b;
+/* 6. 愿景：无限地平线 */
+.visual-horizon {
+  background: #000;
+  overflow: hidden;
 }
-.visual-noise .visual-inner {
-  background: repeating-linear-gradient(
-    45deg,
-    transparent,
-    transparent 10px,
-    rgba(236, 72, 153, 0.1) 10px,
-    rgba(236, 72, 153, 0.1) 20px
-  );
-  background-size: 200% 200%;
-  animation: shift 5s infinite linear;
+.visual-horizon .visual-inner {
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 50%, rgba(74, 222, 128, 0.3) 0%, transparent 70%);
+}
+.visual-horizon::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -50%;
+  width: 200%;
+  height: 1px;
+  background: rgba(74, 222, 128, 0.5);
+  box-shadow: 0 0 10px rgba(74, 222, 128, 0.8);
 }
 
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+@keyframes spark-pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+  50% { transform: translate(-50%, -50%) scale(2); opacity: 1; box-shadow: 0 0 30px 4px #fff, 0 0 60px 8px #4ade80; }
 }
-@keyframes scan {
-  0% { background-position: 0 -100%; }
-  100% { background-position: 0 200%; }
+@keyframes neural-float {
+  from { background-position: 0 0; }
+  to { background-position: 60px 60px; }
 }
-@keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 0.6; }
-  50% { transform: scale(1.5); opacity: 1; }
+@keyframes neural-scan {
+  0% { background-position: -200% -200%; }
+  100% { background-position: 200% 200%; }
 }
-@keyframes waves {
-  0% { transform: scale(1); opacity: 0.5; }
-  50% { transform: scale(1.2); opacity: 1; }
-  100% { transform: scale(1); opacity: 0.5; }
+@keyframes ai-morph {
+  0% { border-radius: 38% 62% 63% 37% / 41% 44% 56% 59%; transform: rotate(0deg); }
+  50% { border-radius: 50% 50% 20% 80% / 25% 80% 20% 75%; }
+  100% { border-radius: 38% 62% 63% 37% / 41% 44% 56% 59%; transform: rotate(360deg); }
 }
-@keyframes particles {
-  0% { background-position: 0 0; }
-  100% { background-position: 100px 100px; }
+@keyframes harmony-ripple {
+  0% { width: 0; height: 0; opacity: 1; }
+  100% { width: 200px; height: 200px; opacity: 0; }
 }
-@keyframes shift {
-  0% { background-position: 0 0; }
-  100% { background-position: 100% 100%; }
+@keyframes manifest-scroll {
+  from { background-position: 0 0; }
+  to { background-position: 0 40px; }
 }
 
 .placeholder-text {

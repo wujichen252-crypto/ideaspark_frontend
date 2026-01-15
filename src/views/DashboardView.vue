@@ -9,20 +9,20 @@
         :width="240"
         :collapsed="collapsed"
         show-trigger
-        @collapse="collapsed = true"
-        @expand="collapsed = false"
         class="console-sider"
         :native-scrollbar="false"
+        @collapse="collapsed = true"
+        @expand="collapsed = false"
       >
         <div class="sider-sticky-wrapper">
-          <div class="user-profile-mini" v-if="!collapsed" @click="$router.push('/profile')">
+          <div v-if="!collapsed" class="user-profile-mini" @click="$router.push('/profile')">
             <n-avatar round size="medium" :src="userStore.userInfo?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Console'" />
             <div class="user-info">
               <span class="username">{{ userStore.userInfo?.username || '创造者' }}</span>
               <span class="role">控制台</span>
             </div>
           </div>
-          <div class="user-profile-mini collapsed" v-else @click="$router.push('/profile')">
+          <div v-else class="user-profile-mini collapsed" @click="$router.push('/profile')">
              <n-avatar round size="small" :src="userStore.userInfo?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Console'" />
           </div>
           
@@ -186,11 +186,12 @@
                 </div>
               </template>
               
-              <n-tabs type="line" animated v-model:value="projectTab">
+              <n-tabs v-model:value="projectTab" type="line" animated>
                 <n-tab-pane name="all" tab="全部项目" />
-                <n-tab-pane name="published" tab="已发布" />
-                <n-tab-pane name="draft" tab="草稿箱" />
-                <n-tab-pane name="reviewing" tab="审核中" />
+                <n-tab-pane name="active" tab="进行中" />
+                <n-tab-pane name="completed" tab="已完成" />
+                <n-tab-pane name="paused" tab="已暂停" />
+                <n-tab-pane name="archived" tab="已归档" />
               </n-tabs>
 
               <n-data-table
@@ -314,12 +315,13 @@
 
 <script setup lang="ts">
 import { ref, h, computed, onMounted, nextTick, watch } from 'vue'
+import type { Component } from 'vue'
 import { useUserStore } from '@/store'
 import { 
   NIcon, NTag, NButton, NAvatar, 
   NGrid, NGridItem, NCard, NForm, NFormItem, 
-  NInput, NSelect, NSwitch, NList, NListItem, NThing,
-  NTabs, NTabPane, NStatistic, NDivider,
+  NInput, NSelect, NSwitch,
+  NTabs, NTabPane, NStatistic,
   NTimeline, NTimelineItem
 } from 'naive-ui'
 import type { MenuOption, DataTableColumns } from 'naive-ui'
@@ -335,7 +337,6 @@ import {
   HeartOutline,
   CubeOutline,
   WalletOutline,
-  TrendingUpOutline,
   TrendingDownOutline,
   CreateOutline,
   TrashOutline,
@@ -355,7 +356,7 @@ const analyticsRanges = [
 ]
 
 // --- Projects Data ---
-const projectTab = ref('all') // all, published, draft
+const projectTab = ref<'all' | 'active' | 'completed' | 'paused' | 'archived'>('all')
 
 // 系统设置数据
 const systemSettings = ref({
@@ -373,7 +374,7 @@ const themeOptions = [
 ]
 
 // 菜单配置
-function renderIcon(icon: any) {
+function renderIcon(icon: Component) {
   return () => h(NIcon, null, { default: () => h(icon) })
 }
 
@@ -518,18 +519,18 @@ onMounted(() => {
 interface ProjectRow {
   key: number
   name: string
-  status: string
+  status: 'active' | 'completed' | 'paused' | 'archived'
   views: number
   likes: number
   updateTime: string
 }
 
 const projectData = ref<ProjectRow[]>([
-  { key: 1, name: 'AI 绘画助手', status: 'published', views: 1200, likes: 340, updateTime: '2024-03-20' },
-  { key: 2, name: 'Vue3 组件库', status: 'draft', views: 0, likes: 0, updateTime: '2024-03-18' },
-  { key: 3, name: 'React 仪表盘', status: 'published', views: 890, likes: 120, updateTime: '2024-03-15' },
-  { key: 4, name: 'Node.js 爬虫实战', status: 'reviewing', views: 45, likes: 12, updateTime: '2024-03-10' },
-  { key: 5, name: 'Flutter 电商 App', status: 'published', views: 2300, likes: 560, updateTime: '2024-03-01' },
+  { key: 1, name: 'AI 绘画助手', status: 'active', views: 1200, likes: 340, updateTime: '2024-03-20' },
+  { key: 2, name: 'Vue3 组件库', status: 'paused', views: 0, likes: 0, updateTime: '2024-03-18' },
+  { key: 3, name: 'React 仪表盘', status: 'completed', views: 890, likes: 120, updateTime: '2024-03-15' },
+  { key: 4, name: 'Node.js 爬虫实战', status: 'active', views: 45, likes: 12, updateTime: '2024-03-10' },
+  { key: 5, name: 'Flutter 电商 App', status: 'archived', views: 2300, likes: 560, updateTime: '2024-03-01' },
 ])
 
 const filteredProjects = computed(() => {
@@ -537,15 +538,25 @@ const filteredProjects = computed(() => {
   return projectData.value.filter(p => p.status === projectTab.value)
 })
 
+/**
+ * 获取项目状态的展示信息（标签类型/文案）
+ * @param status - 项目状态
+ */
+function getProjectStatusMeta(status: ProjectRow['status']) {
+  if (status === 'active') return { type: 'success' as const, text: '进行中' }
+  if (status === 'completed') return { type: 'info' as const, text: '已完成' }
+  if (status === 'paused') return { type: 'warning' as const, text: '已暂停' }
+  return { type: 'default' as const, text: '已归档' }
+}
+
 const projectColumns: DataTableColumns<ProjectRow> = [
   { title: '项目名称', key: 'name' },
   { 
     title: '状态', 
     key: 'status',
     render(row) {
-      const type = row.status === 'published' ? 'success' : row.status === 'draft' ? 'default' : 'warning'
-      const text = row.status === 'published' ? '已发布' : row.status === 'draft' ? '草稿' : '审核中'
-      return h(NTag, { type: type as any, size: 'small', bordered: false }, { default: () => text })
+      const { type, text } = getProjectStatusMeta(row.status)
+      return h(NTag, { type, size: 'small', bordered: false }, { default: () => text })
     }
   },
   { title: '浏览', key: 'views' },

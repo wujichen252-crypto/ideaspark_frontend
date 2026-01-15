@@ -14,16 +14,23 @@
           <p>告诉我你想做什么，我来帮你规划项目</p>
         </div>
         
-        <div class="messages-container" ref="messagesRef">
+        <div ref="messagesRef" class="messages-container">
           <div v-for="msg in messages" :key="msg.id" class="message-item" :class="msg.role">
             <div class="avatar">
-              <n-avatar :src="msg.role === 'ai' ? 'https://api.dicebear.com/7.x/bottts/svg?seed=ai' : undefined" 
+              <n-avatar
+:src="msg.role === 'ai' ? 'https://api.dicebear.com/7.x/bottts/svg?seed=ai' : undefined" 
                        :color="msg.role === 'user' ? '#18a058' : undefined">
                 {{ msg.role === 'user' ? '我' : 'AI' }}
               </n-avatar>
             </div>
             <div class="content">
-              <div class="bubble" :class="{ loading: false }" v-html="renderMarkdown(msg.content)"></div>
+              <div class="bubble" :class="{ loading: false }">
+                <template v-for="(token, tIdx) in tokenizeChatText(msg.content)" :key="tIdx">
+                  <strong v-if="token.kind === 'bold'">{{ token.text }}</strong>
+                  <br v-else-if="token.kind === 'br'" />
+                  <span v-else>{{ token.text }}</span>
+                </template>
+              </div>
             </div>
           </div>
           <div v-if="loading" class="message-item ai">
@@ -44,10 +51,10 @@
             type="textarea"
             placeholder="例如：我想策划一场校园歌手大赛，或者开发一个电商网站..."
             :autosize="{ minRows: 2, maxRows: 4 }"
-            @keydown.enter.prevent="sendMessage"
             :disabled="loading || isFinished"
+            @keydown.enter.prevent="sendMessage"
           />
-          <n-button type="primary" class="send-btn" @click="sendMessage" :disabled="!inputValue.trim() || loading || isFinished">
+          <n-button type="primary" class="send-btn" :disabled="!inputValue.trim() || loading || isFinished" @click="sendMessage">
             <template #icon>
               <n-icon><PaperPlaneOutline /></n-icon>
             </template>
@@ -97,21 +104,21 @@
             </n-form-item>
 
             <n-divider />
-            <plugin-selector v-model:modelValue="selectedPlugins" />
+            <plugin-selector v-model:model-value="selectedPlugins" />
 
             <n-divider />
             <div class="draft-actions">
-              <n-button secondary block @click="saveDraft" :loading="savingDraft">
+              <n-button secondary block :loading="savingDraft" @click="saveDraft">
                 保存为草稿
               </n-button>
             </div>
 
-            <div class="action-area" v-if="canCreate">
+            <div v-if="canCreate" class="action-area">
               <n-divider />
               <n-alert title="项目信息已就绪" type="success" style="margin-bottom: 16px;">
                 AI 已收集足够信息，可以开始项目了。
               </n-alert>
-              <n-button type="primary" block size="large" @click="createProject" :loading="creating">
+              <n-button type="primary" block size="large" :loading="creating" @click="createProject">
                 生成项目并进入看板
               </n-button>
             </div>
@@ -127,7 +134,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, watch } from 'vue'
+import { ref, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAiWorkshopStore } from '@/store/modules/aiWorkshop'
 import { PaperPlaneOutline, ArrowBack, SparklesOutline } from '@vicons/ionicons5'
@@ -176,20 +183,32 @@ const scrollToBottom = () => {
   })
 }
 
-// Simple Markdown Renderer
-const renderMarkdown = (text: string) => {
-  if (!text) return ''
-  // Escape HTML first to prevent XSS (basic)
-  let html = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;").replace(/'/g, "&#039;")
-  
-  // Bold **text**
-  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-  
-  // Line breaks
-  html = html.replace(/\n/g, '<br>')
-  
-  return html
+type ChatToken = { kind: 'text' | 'bold' | 'br'; text?: string }
+
+const tokenizeBold = (input: string): ChatToken[] => {
+  const tokens: ChatToken[] = []
+  const boldRegex = /\*\*(.*?)\*\*/g
+  let lastIndex = 0
+  let match: RegExpExecArray | null
+  while ((match = boldRegex.exec(input)) !== null) {
+    const start = match.index
+    const end = start + match[0].length
+    if (start > lastIndex) tokens.push({ kind: 'text', text: input.slice(lastIndex, start) })
+    tokens.push({ kind: 'bold', text: match[1] || '' })
+    lastIndex = end
+  }
+  if (lastIndex < input.length) tokens.push({ kind: 'text', text: input.slice(lastIndex) })
+  return tokens
+}
+
+const tokenizeChatText = (text: string): ChatToken[] => {
+  const lines = (text || '').split('\n')
+  const out: ChatToken[] = []
+  for (let i = 0; i < lines.length; i += 1) {
+    out.push(...tokenizeBold(lines[i] || ''))
+    if (i < lines.length - 1) out.push({ kind: 'br' })
+  }
+  return out
 }
 
 const conversationStep = ref(0) // 0: init, 1: clarifying, 2: ready

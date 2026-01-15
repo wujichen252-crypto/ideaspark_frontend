@@ -35,7 +35,7 @@
       <!-- 文档预览与编辑 -->
       <n-grid-item :span="2">
         <n-card :title="currentDoc?.title || '选择文档预览'" size="small" class="h-full">
-          <template #header-extra v-if="currentDoc">
+          <template v-if="currentDoc" #header-extra>
             <n-space>
               <n-button size="tiny" secondary type="primary" @click="askAI(`帮我润色这篇文档：${currentDoc.title}`)">
                 <template #icon><n-icon><SparklesOutline /></n-icon></template>
@@ -50,8 +50,8 @@
           
           <div v-if="currentDoc" class="doc-preview">
             <n-input
-              type="textarea"
               v-model:value="currentDoc.content"
+              type="textarea"
               :autosize="{ minRows: 15 }"
               class="doc-editor-full"
               placeholder="文档内容..."

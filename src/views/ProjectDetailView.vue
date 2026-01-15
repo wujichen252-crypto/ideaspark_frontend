@@ -23,7 +23,7 @@
             <p class="project-summary">{{ projectData.summary }}</p>
             
             <div class="project-meta">
-              <div class="author-info" @click="router.push(`/user/${projectData.authorId}`)" style="cursor: pointer">
+              <div class="author-info" style="cursor: pointer" @click="router.push(`/user/${projectData.authorId}`)">
                 <n-avatar round size="medium" :src="projectData.authorAvatar" />
                 <div class="author-details">
                   <span class="name">{{ projectData.author }}</span>
@@ -76,7 +76,7 @@
           <!-- 项目截图轮播 -->
           <div class="section-card gallery-section">
             <n-carousel show-arrow autoplay draggable>
-              <div class="carousel-img" v-for="(img, index) in projectData.screenshots" :key="index">
+              <div v-for="(img, index) in projectData.screenshots" :key="index" class="carousel-img">
                  <img :src="img" class="gallery-image" />
               </div>
             </n-carousel>
@@ -85,7 +85,7 @@
           <!-- 项目介绍 -->
           <div class="section-card description-section">
             <h2 class="section-title">项目介绍</h2>
-            <div class="markdown-body" v-html="projectData.description"></div>
+            <div ref="descriptionRef" class="markdown-body"></div>
           </div>
 
           <!-- 功能特性 -->
@@ -140,7 +140,7 @@
 
           <!-- 作者简介 -->
           <div class="sidebar-card author-card">
-            <div class="author-header" @click="router.push(`/user/${projectData.authorId}`)" style="cursor: pointer">
+            <div class="author-header" style="cursor: pointer" @click="router.push(`/user/${projectData.authorId}`)">
               <n-avatar round size="large" :src="projectData.authorAvatar" />
               <div class="author-basic">
                 <span class="name">{{ projectData.author }}</span>
@@ -157,7 +157,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { 
   ArrowBackOutline, 
@@ -202,6 +202,7 @@ interface ProjectDetail {
 const route = useRoute()
 const router = useRouter()
 const projectId = route.params.id as string
+const descriptionRef = ref<HTMLElement | null>(null)
 
 // 模拟项目详情数据
 // 实际开发中应根据 projectId 调用 API 获取
@@ -246,6 +247,15 @@ const projectData = ref<ProjectDetail>({
   version: '2.0.1',
   lastUpdate: '2小时前'
 })
+
+watch(
+  () => projectData.value.description,
+  (html) => {
+    if (!descriptionRef.value) return
+    descriptionRef.value.innerHTML = html || ''
+  },
+  { immediate: true }
+)
 
 onMounted(() => {
   window.scrollTo(0, 0)

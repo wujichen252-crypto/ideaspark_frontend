@@ -2,7 +2,7 @@ import axios from 'axios'
 import type { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 
 // Define response structure
-export interface Result<T = any> {
+export interface Result<T = unknown> {
   code: number
   message: string
   data: T
@@ -31,7 +31,7 @@ service.interceptors.request.use(
 // Response interceptor
 service.interceptors.response.use(
   (response: AxiosResponse) => {
-    const res = response.data as Result
+    const res = response.data as Result<unknown>
     // You can adjust this check based on your actual API response structure
     if (res.code !== 0) {
       // Handle business errors

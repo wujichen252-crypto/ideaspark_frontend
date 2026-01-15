@@ -36,10 +36,10 @@
           <!-- 图片上传 -->
           <n-form-item label="图片/视频" path="images">
             <n-upload
+              v-model:file-list="fileList"
               action="https://www.mocky.io/v2/5e4bafc63100007100d8b70f"
               list-type="image-card"
               :max="9"
-              v-model:file-list="fileList"
               @finish="handleUploadFinish"
             >
               点击上传
@@ -72,8 +72,8 @@
 
         <template #action>
           <div class="form-actions">
-            <n-button @click="$router.back()" size="large">取消</n-button>
-            <n-button type="primary" size="large" @click="handleSubmit" :loading="submitting">
+            <n-button size="large" @click="$router.back()">取消</n-button>
+            <n-button type="primary" size="large" :loading="submitting" @click="handleSubmit">
               立即发布
             </n-button>
           </div>
@@ -118,7 +118,7 @@ const topicOptions = [
   { label: '设计灵感', value: '设计灵感' }
 ]
 
-const handleUploadFinish = ({ file, event }: { file: UploadFileInfo; event?: ProgressEvent }) => {
+const handleUploadFinish = ({ file }: { file: UploadFileInfo; event?: ProgressEvent }) => {
   message.success('上传成功 (Mock)')
   return file
 }

@@ -3,7 +3,7 @@
     <div class="hero-fullbleed">
       <div class="hero" role="region" aria-label="Hero Section" @mousemove="handleHeroMouseMove">
         <!-- Replaced Video with CSS Dynamic Background -->
-        <div class="hero__background" ref="heroBackground">
+        <div ref="heroBackground" class="hero__background">
           <div class="parallax-wrapper">
             <div class="stars-layer"></div>
             <div class="shooting-stars">
@@ -33,7 +33,7 @@
     </div>
 
     <!-- 新增内容占位区 -->
-    <section class="section-content" ref="futureSection">
+    <section ref="futureSection" class="section-content">
       <n-space vertical align="center" size="large">
         <h2 class="section-title">未来功能探索</h2>
         <p class="section-desc">此处将展示更多核心功能与业务模块，敬请期待。</p>
@@ -80,7 +80,6 @@
 <script setup lang="ts">
 import { defineAsyncComponent, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useUserStore } from '@/store'
 import ImpactSection from '@/components/ImpactSection.vue' // Static import to ensure consistency
 
 // Lazy loaded components
@@ -91,7 +90,6 @@ const IdeaSparkSection = defineAsyncComponent(() => import('@/components/IdeaSpa
 // const ImpactSection = defineAsyncComponent(() => import('@/components/ImpactSection.vue')) // Moved to static
 
 const router = useRouter()
-const userStore = useUserStore()
 // Removed unused video refs
 // const heroVideo = ref<HTMLVideoElement | null>(null)
 

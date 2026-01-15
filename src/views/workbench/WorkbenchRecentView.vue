@@ -72,7 +72,7 @@
                   <n-dropdown 
                     trigger="click" 
                     :options="cardOptions" 
-                    @select="(key) => handleCardAction(key, project.id)"
+                    @select="(key) => handleCardAction(key)"
                     @click.stop
                   >
                     <n-button text size="tiny" class="more-btn" @click.stop>
@@ -192,7 +192,11 @@ const selectedCategory = ref('')
 // 创建项目相关
 const showCreateModal = ref(false)
 const createFormRef = ref(null)
-const createForm = reactive({
+const createForm = reactive<{
+  name: string
+  visibility: 'private' | 'public'
+  type: 'app' | 'document'
+}>({
   name: '',
   visibility: 'private',
   type: 'app'
@@ -217,8 +221,8 @@ const handleCreateProject = () => {
   
   const newProject = aiStore.addProject({
     name: createForm.name,
-    visibility: createForm.visibility as any,
-    type: createForm.type as any,
+    visibility: createForm.visibility,
+    type: createForm.type,
     category: createForm.type === 'document' ? '文档' : '应用'
   })
   
@@ -320,7 +324,7 @@ const handleOpenProject = (id: string) => {
 }
 
 // 处理卡片操作
-const handleCardAction = (key: string, id: string) => {
+const handleCardAction = (key: string) => {
   if (key === 'share') {
     message.success('分享链接已复制到剪贴板')
   } else if (key === 'remove') {

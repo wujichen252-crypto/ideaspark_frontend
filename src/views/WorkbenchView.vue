@@ -10,10 +10,10 @@
       >
         <n-menu
           :value="activeKey"
-          @update:value="handleMenuUpdate"
           :options="menuOptions"
           :indent="24"
           class="workbench-menu"
+          @update:value="handleMenuUpdate"
         />
       </n-layout-sider>
 
@@ -22,9 +22,9 @@
         <!-- 团队/个人空间视图 -->
         <WorkbenchTeamView 
           v-if="activeKey === 'personal-space' || activeKey.startsWith('team-')"
-          :teamId="activeKey"
-          :teamName="teams.find(t => t.id === activeKey)?.name"
-          :isPersonal="activeKey === 'personal-space'"
+          :team-id="activeKey"
+          :team-name="teams.find(t => t.id === activeKey)?.name"
+          :is-personal="activeKey === 'personal-space'"
         />
         
         <!-- 资源社区视图 -->
@@ -35,9 +35,6 @@
 
         <!-- 所有项目视图 -->
         <WorkbenchProjectsView v-else-if="activeKey === 'projects'" />
-
-        <!-- 草稿箱视图 -->
-        <WorkbenchDraftView v-else-if="activeKey === 'drafts'" />
 
         <!-- 其他视图占位 -->
         <div v-else class="content-placeholder">
@@ -84,7 +81,7 @@
         </div>
         <template #footer>
           <div class="modal-footer">
-            <n-button type="primary" size="large" @click="handleCreateTeam" :disabled="!createTeamName">
+            <n-button type="primary" size="large" :disabled="!createTeamName" @click="handleCreateTeam">
               创建团队
             </n-button>
           </div>
@@ -114,7 +111,7 @@
           <p class="input-label">请在下方输入要解散的团队名称</p>
           <n-input
             v-model:value="dissolveTeamNameInput"
-            :placeholder="currentOperatingTeam?.label || '输入团队名称'"
+            :placeholder="currentOperatingTeam?.name || '输入团队名称'"
             size="large"
             :status="dissolveError ? 'error' : undefined"
           />
@@ -126,8 +123,8 @@
               type="error"
               size="large"
               class="confirm-btn"
-              @click="handleDissolveTeam"
               :disabled="!dissolveTeamNameInput"
+              @click="handleDissolveTeam"
             >
               确认解散
             </n-button>
@@ -173,8 +170,6 @@ import { NIcon, NAvatar, NModal, NCard, NInput, NButton, NDropdown, useMessage }
 import type { MenuOption } from 'naive-ui'
 import {
   TimeOutline,
-  DocumentTextOutline,
-  StarOutline,
   GridOutline,
   AddOutline,
   CloseOutline,
@@ -186,7 +181,6 @@ import { useUserStore } from '@/store'
 import WorkbenchTeamView from './workbench/WorkbenchTeamView.vue'
 import WorkbenchCommunityView from './workbench/WorkbenchCommunityView.vue'
 import WorkbenchRecentView from './workbench/WorkbenchRecentView.vue'
-import WorkbenchDraftView from './workbench/WorkbenchDraftView.vue'
 import WorkbenchProjectsView from './workbench/WorkbenchProjectsView.vue'
 
 // 引入 User Store
@@ -206,15 +200,21 @@ const showDropdown = ref(false)
 const dropdownX = ref(0)
 const dropdownY = ref(0)
 
+interface Team {
+  id: string
+  name: string
+  isPersonal: boolean
+}
+
 // 表单数据
 const createTeamName = ref('')
 const dissolveTeamNameInput = ref('')
 const renameTeamName = ref('')
 const dissolveError = ref(false)
-const currentOperatingTeam = ref<any>(null)
+const currentOperatingTeam = ref<Team | null>(null)
 
 // 模拟团队数据 (实际应从 Store 获取)
-const teams = ref([
+const teams = ref<Team[]>([
   { id: 'personal-space', name: userStore.userInfo?.username || '无迹尘', isPersonal: true }
 ])
 
@@ -238,7 +238,7 @@ const teamActionOptions = [
 ]
 
 // 处理菜单点击
-function handleMenuUpdate(key: string, item: MenuOption) {
+function handleMenuUpdate(key: string) {
   if (key === 'create-team') {
     createTeamName.value = ''
     showCreateModal.value = true
@@ -248,7 +248,7 @@ function handleMenuUpdate(key: string, item: MenuOption) {
 }
 
 // 处理右键菜单
-function handleContextMenu(e: MouseEvent, team: any) {
+function handleContextMenu(e: MouseEvent, team: Team) {
   e.preventDefault() // 阻止默认右键菜单
   e.stopPropagation()
   showDropdown.value = false
@@ -271,7 +271,7 @@ function handleDropdownSelect(key: string) {
   const team = currentOperatingTeam.value
   
   if (key === 'rename') {
-    renameTeamName.value = team.name // 注意这里用 team.name 而不是 label
+    renameTeamName.value = team?.name || ''
     showRenameModal.value = true
   } else if (key === 'dissolve') {
     dissolveTeamNameInput.value = ''
@@ -305,8 +305,11 @@ function handleDissolveTeam() {
     return
   }
   
+  const team = currentOperatingTeam.value
+  if (!team) return
+
   // 模拟删除
-  const index = teams.value.findIndex(t => t.id === currentOperatingTeam.value.id)
+  const index = teams.value.findIndex(t => t.id === team.id)
   if (index > -1) {
     teams.value.splice(index, 1)
     message.success('团队已解散')
@@ -320,7 +323,10 @@ function handleDissolveTeam() {
 function handleRenameTeam() {
   if (!renameTeamName.value) return
   
-  const team = teams.value.find(t => t.id === currentOperatingTeam.value.id)
+  const operatingTeam = currentOperatingTeam.value
+  if (!operatingTeam) return
+
+  const team = teams.value.find(t => t.id === operatingTeam.id)
   if (team) {
     team.name = renameTeamName.value
     message.success('重命名成功')
@@ -341,16 +347,6 @@ const menuOptions = computed<MenuOption[]>(() => {
       label: '所有项目',
       key: 'projects',
       icon: renderIcon(FolderOutline)
-    },
-    {
-      label: '我的草稿',
-      key: 'drafts',
-      icon: renderIcon(DocumentTextOutline)
-    },
-    {
-      label: '我的收藏',
-      key: 'favorites',
-      icon: renderIcon(StarOutline)
     },
     {
       label: '资源社区',

@@ -57,7 +57,7 @@
       <div class="profile-tabs">
         <n-tabs type="line" animated size="large">
           <n-tab-pane name="projects" :tab="`公开项目 (${userData.projects.length})`">
-            <div class="projects-grid" v-if="userData.projects.length > 0">
+            <div v-if="userData.projects.length > 0" class="projects-grid">
               <div 
                 v-for="item in userData.projects" 
                 :key="item.id" 
@@ -77,7 +77,7 @@
                 </div>
               </div>
             </div>
-            <div class="empty-state" v-else>
+            <div v-else class="empty-state">
               <n-empty description="该用户暂无公开项目" />
             </div>
           </n-tab-pane>
@@ -107,7 +107,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { 
   AddOutline, 
   ChatbubbleOutline, 
@@ -116,7 +116,6 @@ import {
   HeartOutline
 } from '@vicons/ionicons5'
 
-const route = useRoute()
 const router = useRouter()
 // const userId = route.params.id // 实际开发中用于API请求
 

@@ -36,7 +36,12 @@
           </div>
           
           <!-- Normal Text -->
-          <div v-else class="text-content" v-html="formatText(segment.content || '')"></div>
+          <div v-else class="text-content">
+            <template v-for="(token, tIdx) in tokenizeText(segment.content || '')" :key="tIdx">
+              <strong v-if="token.type === 'bold'">{{ token.content }}</strong>
+              <span v-else>{{ token.content }}</span>
+            </template>
+          </div>
         </template>
         
         <!-- Loading Indicator -->
@@ -45,7 +50,7 @@
         </div>
       </div>
       
-      <div class="message-actions" v-if="message.role === 'ai' && message.status !== 'loading'">
+      <div v-if="message.role === 'ai' && message.status !== 'loading'" class="message-actions">
         <n-button size="tiny" quaternary circle @click="handleSaveText">
           <template #icon><n-icon><SaveOutline /></n-icon></template>
         </n-button>
@@ -124,11 +129,26 @@ const parsedContent = computed(() => {
   return segments
 })
 
-function formatText(text: string) {
-  // Simple bold formatting
-  let formatted = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-  // Convert newlines to <br> is handled by white-space: pre-wrap, so mostly fine.
-  return formatted
+function tokenizeText(text: string) {
+  const tokens: { type: 'text' | 'bold'; content: string }[] = []
+  const input = text || ''
+  const boldRegex = /\*\*(.*?)\*\*/g
+
+  let lastIndex = 0
+  let match: RegExpExecArray | null
+  while ((match = boldRegex.exec(input)) !== null) {
+    const start = match.index
+    const end = start + match[0].length
+    if (start > lastIndex) {
+      tokens.push({ type: 'text', content: input.slice(lastIndex, start) })
+    }
+    tokens.push({ type: 'bold', content: match[1] || '' })
+    lastIndex = end
+  }
+  if (lastIndex < input.length) {
+    tokens.push({ type: 'text', content: input.slice(lastIndex) })
+  }
+  return tokens
 }
 
 function copyCode(code: string) {

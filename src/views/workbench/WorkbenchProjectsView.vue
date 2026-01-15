@@ -148,6 +148,7 @@
 import { ref, computed, reactive, h } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAiWorkshopStore } from '@/store'
+import type { ProjectSummary } from '@/store/modules/aiWorkshop'
 import { 
   ImageOutline, 
   CodeSlashOutline, 
@@ -188,7 +189,13 @@ const selectedCategory = ref('')
 // 创建项目相关
 const showCreateModal = ref(false)
 const createFormRef = ref(null)
-const createForm = reactive({
+type CreateProjectForm = {
+  name: string
+  visibility: NonNullable<ProjectSummary['visibility']>
+  type: NonNullable<ProjectSummary['type']>
+}
+
+const createForm = reactive<CreateProjectForm>({
   name: '',
   visibility: 'private',
   type: 'app'
@@ -213,8 +220,8 @@ const handleCreateProject = () => {
   
   const newProject = aiStore.addProject({
     name: createForm.name,
-    visibility: createForm.visibility as any,
-    type: createForm.type as any,
+    visibility: createForm.visibility,
+    type: createForm.type,
     category: createForm.type === 'document' ? '文档' : '应用'
   })
   

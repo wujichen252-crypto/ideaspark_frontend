@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted, nextTick, watch, computed } from 'vue'
 import type { MenuOption } from 'naive-ui'
 import { useRouter, useRoute } from 'vue-router'
-import { PersonOutline, SearchOutline } from '@vicons/ionicons5'
+import { PersonOutline } from '@vicons/ionicons5'
 import gsap from 'gsap'
 
 import { useUserStore } from '@/store'
@@ -211,7 +211,7 @@ function initAnimation() {
           </div>
 
           <!-- 滚动后 Logo -->
-          <div class="scrolled-logo-container" ref="scrolledLogoRef">
+          <div ref="scrolledLogoRef" class="scrolled-logo-container">
              <svg class="art-pattern" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <mask id="hollow-mask">
@@ -229,30 +229,30 @@ function initAnimation() {
                 </mask>
               </defs>
               <rect
-                x="15" y="15" width="50" height="50" rx="8"
+                ref="solidSquareRef" x="15" y="15" width="50" height="50"
+                rx="8"
                 fill="#4ADE80"
                 mask="url(#hollow-mask)"
                 class="solid-square"
-                ref="solidSquareRef"
               />
             </svg>
           </div>
 
           <!-- 初始 Logo -->
-          <div class="initial-logo-container" ref="initialLogoRef">
-            <div class="logo-icon-wrapper" ref="logoIconRef">
+          <div ref="initialLogoRef" class="initial-logo-container">
+            <div ref="logoIconRef" class="logo-icon-wrapper">
               <div class="logo-icon">
                 <div class="logo-spark"></div>
               </div>
             </div>
             <div class="logo-content">
-              <div class="logo-title" ref="logoTitleRef">
+              <div ref="logoTitleRef" class="logo-title">
                 <span class="logo-title-char">意</span>
                 <span class="logo-title-char">念</span>
                 <span class="logo-title-char">方</span>
                 <span class="logo-title-char">舟</span>
               </div>
-              <div class="logo-subtitle" ref="subtitleRef">IDEASPARK</div>
+              <div ref="subtitleRef" class="logo-subtitle">IDEASPARK</div>
             </div>
           </div>
         </div>
@@ -261,21 +261,17 @@ function initAnimation() {
       <!-- 2. Center: Menu -->
       <div class="header-center">
         <n-menu
+          v-model:value="activeKey"
           mode="horizontal"
           :options="menuOptions"
-          v-model:value="activeKey"
-          @update:value="onUpdateMenu"
           class="custom-menu"
+          @update:value="onUpdateMenu"
         />
       </div>
 
       <!-- 3. Right: User Actions -->
       <div class="header-right">
-        <n-space align="center" :size="16" v-if="route.path !== '/'">
-          <n-button circle quaternary class="icon-btn">
-             <template #icon><n-icon><SearchOutline /></n-icon></template>
-          </n-button>
-          
+        <n-space v-if="route.path !== '/'" align="center" :size="16">
           <!-- 已登录状态 -->
           <n-dropdown
             v-if="userStore.isLoggedIn"

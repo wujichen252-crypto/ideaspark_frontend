@@ -14,13 +14,25 @@ export interface StageChecklistItem {
   tags?: string[]
 }
 
+export type ArtifactType = 'document' | 'image' | 'code' | 'link' | 'other'
+
+export interface Artifact {
+  id: string
+  name: string
+  type: ArtifactType
+  createdAt: number
+  updatedAt?: number
+  url?: string
+  content?: string
+}
+
 export interface ModuleData {
   key: ProjectModule
   label: string
   description: string
   checklist: StageChecklistItem[]
-  artifacts: any[] // 产出物
-  data?: Record<string, any> // 模块内表单数据
+  artifacts: Artifact[] // 产出物
+  data?: Record<string, unknown> // 模块内表单数据
 }
 
 export type ProjectFileType = 'document' | 'sheet' | 'slide' | 'image' | 'other'
@@ -119,7 +131,7 @@ export const useAiWorkshopStore = defineStore('aiWorkshop', () => {
       category: 'SaaS',
       currentModule: 'idea',
       updatedAt: Date.now(),
-      cover: 'https://picsum.photos/seed/draft/800/400',
+      cover: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&auto=format&fit=crop&q=60',
       tags: ['AI', 'Writing'],
       techStack: [],
       status: 'draft',
@@ -338,7 +350,7 @@ export const useAiWorkshopStore = defineStore('aiWorkshop', () => {
   }
 
   // 更新模块数据
-  function updateModuleData(moduleKey: ProjectModule, data: Record<string, any>) {
+  function updateModuleData(moduleKey: ProjectModule, data: Record<string, unknown>) {
     const module = modules.value[moduleKey]
     module.data = { ...module.data, ...data }
     saveProject()
@@ -383,7 +395,7 @@ export const useAiWorkshopStore = defineStore('aiWorkshop', () => {
         category: '', 
         currentModule: 'home', 
         updatedAt: Date.now(),
-        cover: `https://picsum.photos/seed/${id}/800/400`,
+        cover: `https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=800&auto=format&fit=crop&q=60`,
         tags: [],
         techStack: [],
         status: 'draft',

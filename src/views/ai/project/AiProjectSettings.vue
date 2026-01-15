@@ -1,6 +1,6 @@
 <template>
   <div class="ai-project-settings" :class="{ embedded }">
-    <div class="settings-header-bar" v-if="!embedded">
+    <div v-if="!embedded" class="settings-header-bar">
       <n-page-header @back="handleBack">
         <template #title>
           <span class="page-title">项目设置</span>
@@ -8,7 +8,7 @@
       </n-page-header>
     </div>
     <div class="settings-container">
-      <div class="settings-sidebar" v-if="!embedded">
+      <div v-if="!embedded" class="settings-sidebar">
         <div class="sidebar-title">项目设置</div>
         <n-menu
           v-model:value="activeKey"
@@ -48,7 +48,7 @@
                     >
                       <n-button>上传图片</n-button>
                     </n-upload>
-                    <div class="cover-preview mt-2" v-if="formModel.cover">
+                    <div v-if="formModel.cover" class="cover-preview mt-2">
                       <img :src="formModel.cover" alt="Cover Preview" @error="handleImageError" />
                       <div class="cover-actions">
                         <n-button size="tiny" type="error" ghost @click="formModel.cover = ''">移除</n-button>
@@ -78,7 +78,7 @@
                 </n-grid>
                 
                 <div class="form-actions">
-                  <n-button type="primary" @click="handleSave" :loading="saving">保存更改</n-button>
+                  <n-button type="primary" :loading="saving" @click="handleSave">保存更改</n-button>
                 </div>
               </n-form>
             </n-card>
@@ -149,7 +149,7 @@
                 </n-form-item>
 
                 <div class="form-actions">
-                  <n-button type="primary" @click="handleSave" :loading="saving">保存配置</n-button>
+                  <n-button type="primary" :loading="saving" @click="handleSave">保存配置</n-button>
                 </div>
               </n-form>
             </n-card>
@@ -176,6 +176,7 @@
 
 <script setup lang="ts">
 import { ref, watch, h } from 'vue'
+import type { Component } from 'vue'
 import { useMessage, useDialog, NIcon, type UploadCustomRequestOptions, type FormInst } from 'naive-ui'
 import { useRouter } from 'vue-router'
 import { useAiWorkshopStore } from '@/store/modules/aiWorkshop'
@@ -199,7 +200,7 @@ const saving = ref(false)
 const formRef = ref<FormInst | null>(null)
 
 // Menu Options
-function renderIcon(icon: any) {
+function renderIcon(icon: Component) {
   return () => h(NIcon, null, { default: () => h(icon) })
 }
 
@@ -222,17 +223,20 @@ const menuOptions = [
 ]
 
 // Form Data
+type ProjectStatus = 'active' | 'completed' | 'paused' | 'draft'
+type ProjectVisibility = 'public' | 'private'
+
 const formModel = ref({
   name: '',
   category: '',
   description: '',
   cover: '',
-  status: 'active',
+  status: 'active' as ProjectStatus,
   progress: 0,
   techStack: [] as string[],
   tags: [] as string[],
   detailedDescription: '',
-  visibility: 'private',
+  visibility: 'private' as ProjectVisibility,
   allowFork: false
 })
 
@@ -312,7 +316,7 @@ const handleUploadCover = async ({ file, onFinish, onError }: UploadCustomReques
       }
       reader.readAsDataURL(file.file)
     }
-  } catch (err) {
+  } catch {
     message.error('上传出错')
     onError()
   }
@@ -333,17 +337,17 @@ const handleSave = async () => {
       category: formModel.value.category,
       description: formModel.value.description,
       cover: formModel.value.cover,
-      status: formModel.value.status as any,
+      status: formModel.value.status,
       progress: formModel.value.progress,
       techStack: formModel.value.techStack,
       tags: formModel.value.tags,
       detailedDescription: formModel.value.detailedDescription,
-      visibility: formModel.value.visibility as any,
+      visibility: formModel.value.visibility,
       allowFork: formModel.value.allowFork
     })
     
     message.success('设置已保存')
-  } catch (errors) {
+  } catch {
     message.error('请检查表单填写是否正确')
   } finally {
     saving.value = false
