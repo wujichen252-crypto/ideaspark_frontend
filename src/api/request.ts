@@ -1,11 +1,45 @@
 import axios from 'axios'
-import type { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
+import type { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
+import { setActivePinia } from 'pinia'
+import { createDiscreteApi } from 'naive-ui'
+import router from '@/router'
+import store, { useUserStore } from '@/store'
 
 // Define response structure
 export interface Result<T = unknown> {
   code: number
   message: string
   data: T
+}
+
+const { message } = createDiscreteApi(['message'])
+
+/**
+ * 获取当前可用的鉴权 Token
+ * @description 优先从 Pinia UserStore 读取；不可用时回退到 localStorage
+ */
+function getAuthToken(): string | null {
+  try {
+    setActivePinia(store)
+    const userStore = useUserStore()
+    return userStore.token
+  } catch {
+    return localStorage.getItem('token')
+  }
+}
+
+/**
+ * 清理本地登录状态
+ * @description 优先调用 UserStore.logout；不可用时仅移除 localStorage token
+ */
+function clearAuthState(): void {
+  try {
+    setActivePinia(store)
+    const userStore = useUserStore()
+    userStore.logout()
+  } catch {
+    localStorage.removeItem('token')
+  }
 }
 
 const service: AxiosInstance = axios.create({
@@ -16,11 +50,10 @@ const service: AxiosInstance = axios.create({
 // Request interceptor
 service.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // TODO: Add token here if it exists
-    // const token = useUserStore().token
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`
-    // }
+    const token = getAuthToken()
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
     return config
   },
   (error) => {
@@ -34,14 +67,35 @@ service.interceptors.response.use(
     const res = response.data as Result<unknown>
     // You can adjust this check based on your actual API response structure
     if (res.code !== 0) {
-      // Handle business errors
-      console.error(res.message || 'Error')
-      return Promise.reject(new Error(res.message || 'Error'))
+      const msg = res.message || '请求失败'
+      message.error(msg)
+      return Promise.reject(new Error(msg))
     }
     return response
   },
   (error) => {
-    console.error('Request Error:', error)
+    const axiosError = error as AxiosError
+    const status = axiosError.response?.status
+
+    if (axiosError.code === 'ERR_CANCELED') {
+      return Promise.reject(error)
+    }
+
+    if (status === 401) {
+      message.error('登录已过期，请重新登录')
+      clearAuthState()
+      if (router.currentRoute.value.name !== 'Login') {
+        router.push('/login')
+      }
+      return Promise.reject(error)
+    }
+
+    const serverMessage =
+      (axiosError.response?.data as { message?: string } | undefined)?.message ||
+      axiosError.message ||
+      '网络异常，请稍后重试'
+
+    message.error(serverMessage)
     return Promise.reject(error)
   }
 )

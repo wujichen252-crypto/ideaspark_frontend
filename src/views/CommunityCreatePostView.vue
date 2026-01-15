@@ -88,6 +88,7 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMessage, type UploadFileInfo } from 'naive-ui'
 import { CloseOutline } from '@vicons/ionicons5'
+import { COMMUNITY_TOPIC_OPTIONS } from '@/constants/community'
 
 const router = useRouter()
 const message = useMessage()
@@ -110,19 +111,20 @@ const rules = {
   }
 }
 
-const topicOptions = [
-  { label: 'Vue3', value: 'Vue3' },
-  { label: 'TypeScript', value: 'TypeScript' },
-  { label: 'AI创作', value: 'AI创作' },
-  { label: '前端开发', value: '前端开发' },
-  { label: '设计灵感', value: '设计灵感' }
-]
+const topicOptions = COMMUNITY_TOPIC_OPTIONS
 
+/**
+ * 处理上传结束事件（Mock）
+ * @param payload - 上传完成的文件信息
+ */
 const handleUploadFinish = ({ file }: { file: UploadFileInfo; event?: ProgressEvent }) => {
   message.success('上传成功 (Mock)')
   return file
 }
 
+/**
+ * 提交发布（Mock）
+ */
 const handleSubmit = () => {
   if (!formValue.content) {
     message.warning('请输入正文内容')

@@ -14,6 +14,7 @@ declare module 'vue' {
     DoubleScrollSection: typeof import('./components/DoubleScrollSection.vue')['default']
     DraftBox: typeof import('./components/ai/DraftBox.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
+    HeroSection: typeof import('./components/home/HeroSection.vue')['default']
     HorizontalScrollSection: typeof import('./components/HorizontalScrollSection.vue')['default']
     IdeaSparkSection: typeof import('./components/IdeaSparkSection.vue')['default']
     ImpactSection: typeof import('./components/ImpactSection.vue')['default']
@@ -60,10 +61,12 @@ declare module 'vue' {
     NTag: typeof import('naive-ui')['NTag']
     NTooltip: typeof import('naive-ui')['NTooltip']
     NUpload: typeof import('naive-ui')['NUpload']
+    ParallaxBackground: typeof import('./components/home/ParallaxBackground.vue')['default']
     PluginCard: typeof import('./components/PluginCard.vue')['default']
     PluginSelector: typeof import('./components/ai/PluginSelector.vue')['default']
     PrivacySection: typeof import('./components/PrivacySection.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    ShootingStars: typeof import('./components/home/ShootingStars.vue')['default']
   }
 }
