@@ -18,7 +18,7 @@
               <div class="card-content">
                 <p class="card-quote">“{{ item.quote }}”</p>
                 <div class="card-footer">
-                  <img v-if="item.avatar" :src="item.avatar" class="card-avatar-img" />
+                  <img v-if="item.avatar" :src="item.avatar" class="card-avatar-img" loading="lazy" decoding="async" fetchpriority="low" />
                   <div v-else class="css-avatar" :style="getAvatarStyle(item.author)">
                     {{ item.author.charAt(0) }}
                   </div>
@@ -39,7 +39,7 @@
               <div class="card-content">
                 <p class="card-quote">“{{ item.quote }}”</p>
                 <div class="card-footer">
-                  <img v-if="item.avatar" :src="item.avatar" class="card-avatar-img" />
+                  <img v-if="item.avatar" :src="item.avatar" class="card-avatar-img" loading="lazy" decoding="async" fetchpriority="low" />
                   <div v-else class="css-avatar" :style="getAvatarStyle(item.author)">
                     {{ item.author.charAt(0) }}
                   </div>
@@ -65,7 +65,7 @@
               <div class="card-content">
                 <p class="card-quote">“{{ item.quote }}”</p>
                 <div class="card-footer">
-                  <img v-if="item.avatar" :src="item.avatar" class="card-avatar-img" />
+                  <img v-if="item.avatar" :src="item.avatar" class="card-avatar-img" loading="lazy" decoding="async" fetchpriority="low" />
                   <div v-else class="css-avatar" :style="getAvatarStyle(item.author)">
                     {{ item.author.charAt(0) }}
                   </div>
@@ -86,7 +86,7 @@
               <div class="card-content">
                 <p class="card-quote">“{{ item.quote }}”</p>
                 <div class="card-footer">
-                  <img v-if="item.avatar" :src="item.avatar" class="card-avatar-img" />
+                  <img v-if="item.avatar" :src="item.avatar" class="card-avatar-img" loading="lazy" decoding="async" fetchpriority="low" />
                   <div v-else class="css-avatar" :style="getAvatarStyle(item.author)">
                     {{ item.author.charAt(0) }}
                   </div>

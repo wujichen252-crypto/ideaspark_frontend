@@ -1,7 +1,22 @@
 <template>
   <div class="hero-fullbleed">
-    <div class="hero" role="region" aria-label="Hero Section" @mousemove="handleMouseMove">
-      <ParallaxBackground ref="bgRef" />
+    <div class="hero" role="region" aria-label="Hero Section">
+      <div class="hero__media" aria-hidden="true">
+        <div v-if="!shouldRenderVideo" class="hero__poster" :style="posterStyle"></div>
+        <video
+          v-else
+          class="hero__video"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="none"
+          :poster="props.posterSrc"
+        >
+          <source :src="props.videoSrc" type="video/mp4" />
+        </video>
+      </div>
+      <div class="hero__overlay" aria-hidden="true"></div>
 
       <div class="hero__content">
         <h1 class="title-reveal">IdeaSpark</h1>
@@ -18,22 +33,56 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import ParallaxBackground from './ParallaxBackground.vue'
+import { computed, onMounted, ref } from 'vue'
+import heroVideoUrl from '@/assets/videos/hero.mp4'
 
-defineProps<{
-  onStart: () => void
-}>()
+const props = withDefaults(
+  defineProps<{
+    onStart: () => void
+    videoSrc?: string
+    posterSrc?: string
+    enableVideo?: boolean
+  }>(),
+  {
+    videoSrc: heroVideoUrl,
+    posterSrc: undefined,
+    enableVideo: true
+  }
+)
 
-const bgRef = ref<InstanceType<typeof ParallaxBackground> | null>(null)
+const shouldRenderVideo = ref(false)
+const reduceMotion = ref(false)
+const saveData = ref(false)
 
-/**
- * 处理首屏鼠标移动，驱动背景视差
- * @param e 鼠标事件
- */
-function handleMouseMove(e: MouseEvent) {
-  bgRef.value?.setMousePosition(e.clientX, e.clientY)
-}
+const allowVideo = computed(() => props.enableVideo && !reduceMotion.value && !saveData.value)
+
+const posterStyle = computed(() => {
+  if (!props.posterSrc) return undefined
+  return { backgroundImage: `url(${props.posterSrc})` }
+})
+
+onMounted(() => {
+  const reduceMq = window.matchMedia?.('(prefers-reduced-motion: reduce)')
+  reduceMotion.value = reduceMq?.matches ?? false
+
+  const connection = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection
+  const effectiveType = connection?.effectiveType
+  saveData.value = Boolean(connection?.saveData) || effectiveType === '2g' || effectiveType === 'slow-2g'
+
+  const schedule = () => {
+    if (allowVideo.value) shouldRenderVideo.value = true
+  }
+
+  const ric = (window as Window & { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => void })
+    .requestIdleCallback
+
+  if (ric) {
+    ric(schedule, { timeout: 1500 })
+    return
+  }
+
+  window.setTimeout(schedule, 800)
+})
 </script>
 
 <style scoped>
@@ -50,6 +99,46 @@ function handleMouseMove(e: MouseEvent) {
   justify-content: flex-start;
   padding: 60px;
   box-sizing: border-box;
+}
+
+.hero__media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero__poster {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(900px 540px at 30% 35%, rgba(74, 222, 128, 0.18), rgba(0, 0, 0, 0) 60%),
+    radial-gradient(900px 540px at 70% 65%, rgba(59, 130, 246, 0.12), rgba(0, 0, 0, 0) 60%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.75));
+  background-size: cover;
+  background-position: center;
+  filter: saturate(1.02) contrast(1.02);
+}
+
+.hero__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.02);
+  filter: saturate(1.05) contrast(1.05);
+}
+
+.hero__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.45) 0%,
+    rgba(0, 0, 0, 0.35) 40%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
 }
 
 .hero__content {
@@ -172,4 +261,3 @@ function handleMouseMove(e: MouseEvent) {
   }
 }
 </style>
-
