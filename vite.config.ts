@@ -4,12 +4,14 @@ import { resolve } from 'path'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
+import { imagetools } from 'vite-imagetools'
 
 // https://vite.dev/config/
 export default defineConfig({
   base: '/',
   plugins: [
     vue(),
+    imagetools(),
     AutoImport({
       imports: [
         'vue',
