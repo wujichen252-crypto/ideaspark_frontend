@@ -111,7 +111,7 @@ import { ArrowBackOutline as ArrowBack, LockClosedOutline, MailOutline, PhonePor
 <style scoped>
 .account-settings-page {
   min-height: 100vh;
-  padding-top: 84px;
+  padding-top: 76px;
   background-color: #f5f7f9;
 }
 

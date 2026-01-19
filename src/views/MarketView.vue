@@ -381,7 +381,7 @@ $border-color: #e5e7eb;
 
 .market-header {
   background-color: $card-bg;
-  padding: 84px 20px 24px; /* Added top padding (64px header + 20px) */
+  padding: 76px 20px 24px; /* Added top padding (56px header + 20px) */
   border-bottom: 1px solid $border-color;
   
   .header-content {
@@ -676,7 +676,7 @@ $border-color: #e5e7eb;
     }
     
     @media (max-width: 1024px) {
-      padding: 84px 16px 24px;
+      padding: 76px 16px 24px;
       
       .hero-card {
         padding: 32px;

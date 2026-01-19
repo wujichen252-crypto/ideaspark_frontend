@@ -145,7 +145,7 @@ const handleSubmit = () => {
 .create-post-container {
   min-height: 100vh;
   background-color: #f5f7fa;
-  padding-top: 84px;
+  padding-top: 76px;
   padding-bottom: 40px;
   display: flex;
   justify-content: center;

@@ -133,7 +133,7 @@ const handleValidateButtonClick = (e: MouseEvent) => {
 <style scoped>
 .edit-profile-page {
   min-height: 100vh;
-  padding-top: 84px;
+  padding-top: 76px;
   background-color: #f5f7f9;
 }
 
