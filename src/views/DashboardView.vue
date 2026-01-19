@@ -591,13 +591,13 @@ const projectColumns: DataTableColumns<ProjectRow> = [
 .console-container {
   height: 100vh;
   background-color: #f5f7fa;
-  padding-top: 64px;
+  padding-top: 56px;
   box-sizing: border-box;
   overflow: hidden;
 }
 
 .console-layout {
-  height: calc(100vh - 64px);
+  height: calc(100vh - 56px);
 }
 
 .console-sider {
@@ -612,7 +612,7 @@ const projectColumns: DataTableColumns<ProjectRow> = [
   .sider-sticky-wrapper {
     position: sticky;
     top: 0;
-    max-height: calc(100vh - 64px);
+    max-height: calc(100vh - 56px);
     overflow-y: auto;
   }
   

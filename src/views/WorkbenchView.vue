@@ -402,7 +402,7 @@ const menuOptions = computed<MenuOption[]>(() => {
 <style scoped lang="scss">
 .workbench-container {
   height: 100vh;
-  padding-top: 64px; /* 避开 Fixed Header */
+  padding-top: 56px; /* 避开 Fixed Header */
   display: flex;
   box-sizing: border-box;
 }

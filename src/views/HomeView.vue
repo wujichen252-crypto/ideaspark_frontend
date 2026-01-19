@@ -7,7 +7,9 @@
       <div class="showcase-wrap">
         <div class="showcase-header">
           <h2 class="section-title">产品理念与能力全景</h2>
-          <p class="section-desc">用“从灵感到落地”的完整链路，沉淀可交付、可复用、可协作的项目资产。</p>
+          <p class="section-desc">
+            用“从灵感到落地”的完整链路，沉淀可交付、可复用、可协作的项目资产。
+          </p>
         </div>
 
         <n-grid class="showcase-grid" cols="1 m:2" :x-gap="24" :y-gap="24" responsive="screen">
@@ -24,7 +26,9 @@
                 </div>
               </div>
               <div class="pill-row">
-                <n-tag v-for="t in conceptTags" :key="t" size="small" round :bordered="false">{{ t }}</n-tag>
+                <n-tag v-for="t in conceptTags" :key="t" size="small" round :bordered="false">{{
+                  t
+                }}</n-tag>
               </div>
             </n-card>
           </n-grid-item>
@@ -52,7 +56,7 @@
 
     <!-- 横向滚动模块 -->
     <div ref="horizontalSentinel" class="lazy-sentinel" aria-hidden="true"></div>
-    <section class="lazy-section" style="content-visibility: visible; contain-intrinsic-size: auto;">
+    <section class="lazy-section" style="content-visibility: visible; contain-intrinsic-size: auto">
       <HorizontalScrollSection v-if="isHorizontalReady" />
     </section>
 
@@ -84,8 +88,13 @@
 
 <script setup lang="ts">
 import { defineAsyncComponent, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import ImpactSection from '@/components/ImpactSection.vue' // Static import to ensure consistency
 import HeroSection from '@/components/home/HeroSection.vue'
+import { useUserStore } from '@/store'
+
+const router = useRouter()
+const userStore = useUserStore()
 
 // Lazy loaded components
 const loadHorizontalScrollSection = () => import('@/components/HorizontalScrollSection.vue')
@@ -144,7 +153,11 @@ const coreFeatures: CoreFeature[] = [
 ]
 
 function handleHeroCta() {
-  futureSection.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  if (!userStore.isLoggedIn) {
+    router.push('/login')
+    return
+  }
+  router.push('/dashboard')
 }
 
 /**
@@ -152,7 +165,9 @@ function handleHeroCta() {
  * @description 省流/弱网（2g/slow-2g）不主动预加载，避免抢占关键资源带宽
  */
 function canPrefetch() {
-  const connection = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection
+  const connection = (
+    navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }
+  ).connection
   const effectiveType = connection?.effectiveType
   const saveData = Boolean(connection?.saveData)
   return !saveData && effectiveType !== '2g' && effectiveType !== 'slow-2g'
@@ -180,8 +195,8 @@ const createObserver = (target: HTMLElement | null, onEnter: () => void, rootMar
   }
 
   const observer = new IntersectionObserver(
-    entries => {
-      if (entries.some(e => e.isIntersecting)) {
+    (entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
         onEnter()
         observer.disconnect()
       }
@@ -196,20 +211,44 @@ onMounted(() => {
   const prefetchEnabled = canPrefetch()
 
   if (prefetchEnabled) {
-    createObserver(horizontalSentinel.value, () => prefetchChunk(loadHorizontalScrollSection), '2400px 0px')
-    createObserver(doubleScrollSentinel.value, () => prefetchChunk(loadDoubleScrollSection), '2200px 0px')
+    createObserver(
+      horizontalSentinel.value,
+      () => prefetchChunk(loadHorizontalScrollSection),
+      '2400px 0px'
+    )
+    createObserver(
+      doubleScrollSentinel.value,
+      () => prefetchChunk(loadDoubleScrollSection),
+      '2200px 0px'
+    )
     createObserver(privacySentinel.value, () => prefetchChunk(loadPrivacySection), '2200px 0px')
     createObserver(ideaSparkSentinel.value, () => prefetchChunk(loadIdeaSparkSection), '2200px 0px')
   }
 
-  createObserver(horizontalSentinel.value, () => (isHorizontalReady.value = true), prefetchEnabled ? '1400px 0px' : '700px 0px')
-  createObserver(doubleScrollSentinel.value, () => (isDoubleScrollReady.value = true), prefetchEnabled ? '1200px 0px' : '800px 0px')
-  createObserver(privacySentinel.value, () => (isPrivacyReady.value = true), prefetchEnabled ? '1200px 0px' : '800px 0px')
-  createObserver(ideaSparkSentinel.value, () => (isIdeaSparkReady.value = true), prefetchEnabled ? '1200px 0px' : '800px 0px')
+  createObserver(
+    horizontalSentinel.value,
+    () => (isHorizontalReady.value = true),
+    prefetchEnabled ? '1400px 0px' : '700px 0px'
+  )
+  createObserver(
+    doubleScrollSentinel.value,
+    () => (isDoubleScrollReady.value = true),
+    prefetchEnabled ? '1200px 0px' : '800px 0px'
+  )
+  createObserver(
+    privacySentinel.value,
+    () => (isPrivacyReady.value = true),
+    prefetchEnabled ? '1200px 0px' : '800px 0px'
+  )
+  createObserver(
+    ideaSparkSentinel.value,
+    () => (isIdeaSparkReady.value = true),
+    prefetchEnabled ? '1200px 0px' : '800px 0px'
+  )
 })
 
 onBeforeUnmount(() => {
-  observers.forEach(o => o.disconnect())
+  observers.forEach((o) => o.disconnect())
   observers = []
 })
 </script>
@@ -263,6 +302,10 @@ onBeforeUnmount(() => {
 
 .showcase-header {
   margin-bottom: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .showcase-card {
@@ -345,7 +388,9 @@ onBeforeUnmount(() => {
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.02);
-  transition: border-color 0.18s ease, background 0.18s ease;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease;
 }
 
 .feature-item:hover {
@@ -396,6 +441,7 @@ onBeforeUnmount(() => {
   color: #ccc;
   max-width: 600px;
   line-height: 1.6;
+  margin: 12px auto 0;
 }
 
 @media (max-width: 768px) {
@@ -406,7 +452,7 @@ onBeforeUnmount(() => {
   .section-title {
     font-size: 1.8rem;
   }
-  
+
   .section-content {
     padding: var(--home-section-padding-y-mobile) var(--home-section-padding-x-mobile);
   }
@@ -415,5 +461,4 @@ onBeforeUnmount(() => {
     grid-template-columns: 1fr;
   }
 }
-
 </style>

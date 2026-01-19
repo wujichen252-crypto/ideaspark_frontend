@@ -2,7 +2,6 @@
   <div class="community-container">
     <div class="main-content">
       <div class="community-layout">
-        
         <!-- 左侧导航栏 (Left Sidebar) -->
         <div class="sidebar-column left-sidebar hidden-on-mobile">
           <div class="sidebar-sticky">
@@ -33,7 +32,13 @@
                   </template>
                   <div class="group-item__main">
                     <span class="group-name">{{ group.name }}</span>
-                    <n-tag v-if="activeGroupId === group.id" size="small" round type="success" class="group-active-tag">
+                    <n-tag
+                      v-if="activeGroupId === group.id"
+                      size="small"
+                      round
+                      type="success"
+                      class="group-active-tag"
+                    >
                       已进入
                     </n-tag>
                   </div>
@@ -45,15 +50,21 @@
 
         <!-- 中间动态流 (Center Feed) -->
         <div class="feed-column">
-          
           <!-- 发布框 -->
           <n-card :bordered="false" class="create-post-card mb-6">
             <div class="create-post-input">
-              <n-avatar circle size="medium" :src="userStore.userInfo?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Guest'" />
-              <n-input 
+              <n-avatar
+                circle
+                size="medium"
+                :src="
+                  userStore.userInfo?.avatar ||
+                  'https://api.dicebear.com/7.x/avataaars/svg?seed=Guest'
+                "
+              />
+              <n-input
                 v-model:value="quickContent"
-                placeholder="分享你的创意和灵感..." 
-                type="textarea" 
+                placeholder="分享你的创意和灵感..."
+                type="textarea"
                 :autosize="{ minRows: 1, maxRows: 3 }"
                 class="input-area"
               />
@@ -79,7 +90,13 @@
 
           <div class="feed-toolbar mb-6">
             <div class="feed-tabs">
-              <n-tabs v-model:value="activeFeedKey" type="segment" size="medium" animated @update:value="handleFeedChange">
+              <n-tabs
+                v-model:value="activeFeedKey"
+                type="segment"
+                size="medium"
+                animated
+                @update:value="handleFeedChange"
+              >
                 <n-tab-pane name="recommend" tab="推荐" />
                 <n-tab-pane name="following" tab="关注" />
                 <n-tab-pane name="hot" tab="热榜" />
@@ -87,7 +104,12 @@
               </n-tabs>
             </div>
             <div class="feed-search">
-              <n-input v-model:value="postSearchKeyword" placeholder="搜索动态 / 作者 / 标签..." clearable round>
+              <n-input
+                v-model:value="postSearchKeyword"
+                placeholder="搜索动态 / 作者 / 标签..."
+                clearable
+                round
+              >
                 <template #prefix>
                   <n-icon :component="SearchOutline" />
                 </template>
@@ -101,7 +123,12 @@
               <div class="group-hero__content">
                 <div class="group-hero__top">
                   <div class="group-hero__meta">
-                    <n-avatar :src="activeGroup.icon" size="large" shape="square" class="group-hero__avatar" />
+                    <n-avatar
+                      :src="activeGroup.icon"
+                      size="large"
+                      shape="square"
+                      class="group-hero__avatar"
+                    />
                     <div class="group-hero__text">
                       <div class="group-hero__title">{{ activeGroup.name }}</div>
                       <div class="group-hero__desc">{{ activeGroup.description }}</div>
@@ -154,10 +181,10 @@
 
           <!-- 动态列表 -->
           <div class="feed-list">
-            <n-card 
-              v-for="post in filteredPosts" 
-              :key="post.id" 
-              :bordered="false" 
+            <n-card
+              v-for="post in filteredPosts"
+              :key="post.id"
+              :bordered="false"
               class="post-card mb-6"
               hoverable
               @click="goToPost(post.id)"
@@ -186,10 +213,14 @@
               <div class="post-content">
                 <p class="text">{{ post.content }}</p>
                 <!-- 图片网格 -->
-                <div v-if="post.images && post.images.length" class="image-grid" :class="`grid-${Math.min(post.images.length, 3)}`">
-                  <div 
-                    v-for="(img, idx) in post.images" 
-                    :key="idx" 
+                <div
+                  v-if="post.images && post.images.length"
+                  class="image-grid"
+                  :class="`grid-${Math.min(post.images.length, 3)}`"
+                >
+                  <div
+                    v-for="(img, idx) in post.images"
+                    :key="idx"
                     class="image-item"
                     :style="{ backgroundImage: `url(${img})` }"
                   ></div>
@@ -214,7 +245,12 @@
 
               <template #action>
                 <div class="post-footer">
-                  <n-button text class="action-btn" :class="{ active: post.isLiked }" @click.stop="handleToggleLike(post.id)">
+                  <n-button
+                    text
+                    class="action-btn"
+                    :class="{ active: post.isLiked }"
+                    @click.stop="handleToggleLike(post.id)"
+                  >
                     <template #icon>
                       <n-icon :component="post.isLiked ? Heart : HeartOutline" />
                     </template>
@@ -235,7 +271,7 @@
             <div v-if="!filteredPosts.length" class="feed-empty">
               <n-empty description="未找到相关动态" />
             </div>
-            
+
             <div class="loading-trigger">
               <n-spin v-if="loading" size="small" />
               <span v-else class="no-more">没有更多了</span>
@@ -246,13 +282,20 @@
         <!-- 右侧小部件 (Right Sidebar) -->
         <div class="sidebar-column right-sidebar hidden-on-mobile">
           <div class="sidebar-sticky">
-            
             <!-- 个人卡片 -->
             <n-card class="user-card mb-6" :bordered="false">
               <div class="user-summary">
                 <div class="bg-cover"></div>
                 <div class="avatar-row">
-                  <n-avatar round :size="64" :src="userStore.userInfo?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Guest'" class="user-avatar" />
+                  <n-avatar
+                    round
+                    :size="64"
+                    :src="
+                      userStore.userInfo?.avatar ||
+                      'https://api.dicebear.com/7.x/avataaars/svg?seed=Guest'
+                    "
+                    class="user-avatar"
+                  />
                 </div>
                 <div class="info-row">
                   <h3 class="name">{{ userStore.userInfo?.username || '未登录用户' }}</h3>
@@ -281,7 +324,11 @@
                 <n-button text type="primary" size="small" @click="handleMoreTopics">更多</n-button>
               </template>
               <n-list hoverable clickable>
-                <n-list-item v-for="(topic, index) in hotTopics" :key="index" @click="handleClickHotTopic(topic.name)">
+                <n-list-item
+                  v-for="(topic, index) in hotTopics"
+                  :key="index"
+                  @click="handleClickHotTopic(topic.name)"
+                >
                   <div class="topic-item">
                     <span class="rank" :class="`rank-${index + 1}`">{{ index + 1 }}</span>
                     <span class="topic-name">#{{ topic.name }}</span>
@@ -319,7 +366,6 @@
               <a href="#">关于我们</a> · <a href="#">社区规范</a> · <a href="#">隐私政策</a>
               <p>© 2024 IdeaSpark Community</p>
             </div>
-
           </div>
         </div>
       </div>
@@ -345,9 +391,9 @@
       <n-form ref="formRef" :model="formValue" :rules="rules">
         <!-- 标题输入 (可选) -->
         <n-form-item label="标题 (可选)" path="title">
-          <n-input 
-            v-model:value="formValue.title" 
-            placeholder="给你的动态起个标题..." 
+          <n-input
+            v-model:value="formValue.title"
+            placeholder="给你的动态起个标题..."
             maxlength="50"
             show-count
           />
@@ -403,11 +449,9 @@
       </n-form>
 
       <template #footer>
-        <div class="form-actions" style="display: flex; justify-content: flex-end; gap: 12px;">
+        <div class="form-actions" style="display: flex; justify-content: flex-end; gap: 12px">
           <n-button @click="showCreateModal = false">取消</n-button>
-          <n-button type="primary" :loading="submitting" @click="handleSubmit">
-            立即发布
-          </n-button>
+          <n-button type="primary" :loading="submitting" @click="handleSubmit"> 立即发布 </n-button>
         </div>
       </template>
     </n-card>
@@ -431,7 +475,12 @@
 
       <div class="explore-groups-content">
         <div class="explore-groups-toolbar">
-          <n-input v-model:value="exploreGroupKeyword" placeholder="搜索圈子名称 / 关键词..." clearable round>
+          <n-input
+            v-model:value="exploreGroupKeyword"
+            placeholder="搜索圈子名称 / 关键词..."
+            clearable
+            round
+          >
             <template #prefix>
               <n-icon :component="SearchOutline" />
             </template>
@@ -440,7 +489,11 @@
 
         <div class="explore-groups-list">
           <n-list hoverable clickable>
-            <n-list-item v-for="g in filteredDiscoverGroups" :key="g.id" @click="handleEnterExploreGroup(g.id)">
+            <n-list-item
+              v-for="g in filteredDiscoverGroups"
+              :key="g.id"
+              @click="handleEnterExploreGroup(g.id)"
+            >
               <div class="explore-group-item">
                 <n-avatar :src="g.icon" size="small" shape="square" />
                 <div class="explore-group-item__main">
@@ -458,7 +511,12 @@
                   </div>
                 </div>
                 <div class="explore-group-item__actions">
-                  <n-button size="small" round type="primary" @click.stop="handleEnterExploreGroup(g.id)">
+                  <n-button
+                    size="small"
+                    round
+                    type="primary"
+                    @click.stop="handleEnterExploreGroup(g.id)"
+                  >
                     进入
                   </n-button>
                 </div>
@@ -482,10 +540,10 @@ import { useRouter } from 'vue-router'
 import { NIcon, useMessage, type UploadFileInfo } from 'naive-ui'
 import type { MenuOption } from 'naive-ui'
 import { COMMUNITY_TOPIC_OPTIONS } from '@/constants/community'
-import { 
-  HeartOutline, 
-  Heart, 
-  ChatbubbleOutline, 
+import {
+  HeartOutline,
+  Heart,
+  ChatbubbleOutline,
   ShareSocialOutline,
   ImageOutline,
   CodeSlashOutline,
@@ -632,7 +690,11 @@ function openExploreGroupsModal(): void {
  * 构建动态的可搜索文本（作者 + 内容 + 标签）。
  * @param post - 动态数据
  */
-function buildPostSearchText(post: { author: { name: string }; content: string; tags?: string[] }): string {
+function buildPostSearchText(post: {
+  author: { name: string }
+  content: string
+  tags?: string[]
+}): string {
   const tagText = (post.tags || []).join(' ')
   return `${post.author.name} ${post.content} ${tagText}`
 }
@@ -642,7 +704,10 @@ function buildPostSearchText(post: { author: { name: string }; content: string; 
  * @param keyword - 关键字（已规范化）
  * @param post - 动态数据
  */
-function isPostMatched(keyword: string, post: { author: { name: string }; content: string; tags?: string[] }): boolean {
+function isPostMatched(
+  keyword: string,
+  post: { author: { name: string }; content: string; tags?: string[] }
+): boolean {
   if (!keyword) return true
   return normalizeSearchText(buildPostSearchText(post)).includes(keyword)
 }
@@ -674,7 +739,9 @@ function isPostInActiveGroup(post: CommunityPost): boolean {
 
 const filteredPosts = computed(() => {
   const keyword = normalizeSearchText(postSearchKeyword.value)
-  const base = posts.value.filter((p) => isPostInFeed(p) && isPostInActiveGroup(p) && isPostMatched(keyword, p))
+  const base = posts.value.filter(
+    (p) => isPostInFeed(p) && isPostInActiveGroup(p) && isPostMatched(keyword, p)
+  )
   if (activeFeedKey.value !== 'hot') return base
   return [...base].sort((a, b) => b.stats.likes - a.stats.likes)
 })
@@ -693,21 +760,21 @@ const handleSubmit = () => {
     message.warning('请输入正文内容')
     return
   }
-  
+
   submitting.value = true
   // Simulate API call
   setTimeout(() => {
     submitting.value = false
     message.success('发布成功！')
     showCreateModal.value = false
-    
+
     // Mock adding post (Optimistic update)
     posts.value.unshift({
       id: Date.now(),
-      author: { 
+      author: {
         id: String(userStore.userInfo?.id || 'me'),
-        name: userStore.userInfo?.username || '我', 
-        avatar: userStore.userInfo?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Me' 
+        name: userStore.userInfo?.username || '我',
+        avatar: userStore.userInfo?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Me'
       },
       publishTime: '刚刚',
       content: formValue.content,
@@ -717,7 +784,7 @@ const handleSubmit = () => {
       isLiked: false,
       channel: activeFeedKey.value === 'qa' ? 'qa' : 'recommend'
     })
-    
+
     // Reset form
     quickContent.value = ''
     formValue.title = ''
@@ -740,7 +807,7 @@ const menuOptions: MenuOption[] = [
   { label: '综合推荐', key: 'recommend', icon: renderIcon(CompassOutline) },
   { label: '热门榜单', key: 'hot', icon: renderIcon(FlameOutline) },
   { label: '关注动态', key: 'following', icon: renderIcon(PeopleOutline) },
-  { label: '技术问答', key: 'qa', icon: renderIcon(CodeWorkingOutline) },
+  { label: '技术问答', key: 'qa', icon: renderIcon(CodeWorkingOutline) }
 ]
 
 /**
@@ -771,10 +838,30 @@ const myGroups: CommunityGroup[] = [
     activeCount: 468,
     postCount: 3269,
     activeUsers: [
-      { id: 11, name: '小满', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=VueUser1', activity: '正在讨论 defineModel' },
-      { id: 12, name: '阿七', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=VueUser2', activity: '发布了组件封装' },
-      { id: 13, name: 'Nina', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=VueUser3', activity: '解答了表单联动' },
-      { id: 14, name: 'Ray', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=VueUser4', activity: '分享了性能优化' }
+      {
+        id: 11,
+        name: '小满',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=VueUser1',
+        activity: '正在讨论 defineModel'
+      },
+      {
+        id: 12,
+        name: '阿七',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=VueUser2',
+        activity: '发布了组件封装'
+      },
+      {
+        id: 13,
+        name: 'Nina',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=VueUser3',
+        activity: '解答了表单联动'
+      },
+      {
+        id: 14,
+        name: 'Ray',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=VueUser4',
+        activity: '分享了性能优化'
+      }
     ]
   },
   {
@@ -788,10 +875,30 @@ const myGroups: CommunityGroup[] = [
     activeCount: 312,
     postCount: 2145,
     activeUsers: [
-      { id: 21, name: 'Kite', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=AIUser1', activity: '分享了提示词模板' },
-      { id: 22, name: '花生', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=AIUser2', activity: '更新了 LoRA 推荐' },
-      { id: 23, name: 'Sora', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=AIUser3', activity: '发布了作品集' },
-      { id: 24, name: 'Bobo', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=AIUser4', activity: '在做风格对比' }
+      {
+        id: 21,
+        name: 'Kite',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=AIUser1',
+        activity: '分享了提示词模板'
+      },
+      {
+        id: 22,
+        name: '花生',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=AIUser2',
+        activity: '更新了 LoRA 推荐'
+      },
+      {
+        id: 23,
+        name: 'Sora',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=AIUser3',
+        activity: '发布了作品集'
+      },
+      {
+        id: 24,
+        name: 'Bobo',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=AIUser4',
+        activity: '在做风格对比'
+      }
     ]
   },
   {
@@ -805,10 +912,30 @@ const myGroups: CommunityGroup[] = [
     activeCount: 790,
     postCount: 5412,
     activeUsers: [
-      { id: 31, name: 'Mia', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=FEUser1', activity: '整理了闭包题' },
-      { id: 32, name: 'Zero', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=FEUser2', activity: '复盘了性能面试' },
-      { id: 33, name: '小白', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=FEUser3', activity: '分享了项目亮点' },
-      { id: 34, name: 'Lynn', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=FEUser4', activity: '答疑了事件循环' }
+      {
+        id: 31,
+        name: 'Mia',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=FEUser1',
+        activity: '整理了闭包题'
+      },
+      {
+        id: 32,
+        name: 'Zero',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=FEUser2',
+        activity: '复盘了性能面试'
+      },
+      {
+        id: 33,
+        name: '小白',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=FEUser3',
+        activity: '分享了项目亮点'
+      },
+      {
+        id: 34,
+        name: 'Lynn',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=FEUser4',
+        activity: '答疑了事件循环'
+      }
     ]
   }
 ]
@@ -825,10 +952,30 @@ const discoverGroups: CommunityGroup[] = [
     activeCount: 521,
     postCount: 4870,
     activeUsers: [
-      { id: 111, name: 'Cora', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=DesignActive1', activity: '分享了配色方案' },
-      { id: 112, name: 'Luca', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=DesignActive2', activity: '在讨论信息架构' },
-      { id: 113, name: 'Yuki', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=DesignActive3', activity: '发布了组件规范' },
-      { id: 114, name: '阿布', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=DesignActive4', activity: '做了动效拆解' }
+      {
+        id: 111,
+        name: 'Cora',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=DesignActive1',
+        activity: '分享了配色方案'
+      },
+      {
+        id: 112,
+        name: 'Luca',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=DesignActive2',
+        activity: '在讨论信息架构'
+      },
+      {
+        id: 113,
+        name: 'Yuki',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=DesignActive3',
+        activity: '发布了组件规范'
+      },
+      {
+        id: 114,
+        name: '阿布',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=DesignActive4',
+        activity: '做了动效拆解'
+      }
     ]
   },
   {
@@ -842,10 +989,30 @@ const discoverGroups: CommunityGroup[] = [
     activeCount: 240,
     postCount: 1698,
     activeUsers: [
-      { id: 121, name: 'Tom', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ToolActive1', activity: '更新了插件清单' },
-      { id: 122, name: '小鱼', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ToolActive2', activity: '分享了工作流' },
-      { id: 123, name: 'Noah', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ToolActive3', activity: '在做效率对比' },
-      { id: 124, name: 'Momo', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ToolActive4', activity: '提问了工具选型' }
+      {
+        id: 121,
+        name: 'Tom',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ToolActive1',
+        activity: '更新了插件清单'
+      },
+      {
+        id: 122,
+        name: '小鱼',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ToolActive2',
+        activity: '分享了工作流'
+      },
+      {
+        id: 123,
+        name: 'Noah',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ToolActive3',
+        activity: '在做效率对比'
+      },
+      {
+        id: 124,
+        name: 'Momo',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ToolActive4',
+        activity: '提问了工具选型'
+      }
     ]
   },
   {
@@ -859,10 +1026,30 @@ const discoverGroups: CommunityGroup[] = [
     activeCount: 358,
     postCount: 2796,
     activeUsers: [
-      { id: 131, name: 'Vera', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=TSActive1', activity: '整理了泛型套路' },
-      { id: 132, name: 'Ken', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=TSActive2', activity: '在做类型体操' },
-      { id: 133, name: 'Eli', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=TSActive3', activity: '分享了工程模板' },
-      { id: 134, name: '阿南', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=TSActive4', activity: '答疑了联合类型' }
+      {
+        id: 131,
+        name: 'Vera',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=TSActive1',
+        activity: '整理了泛型套路'
+      },
+      {
+        id: 132,
+        name: 'Ken',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=TSActive2',
+        activity: '在做类型体操'
+      },
+      {
+        id: 133,
+        name: 'Eli',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=TSActive3',
+        activity: '分享了工程模板'
+      },
+      {
+        id: 134,
+        name: '阿南',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=TSActive4',
+        activity: '答疑了联合类型'
+      }
     ]
   }
 ]
@@ -883,7 +1070,9 @@ const isActiveGroupJoined = computed<boolean>(() => {
 const filteredDiscoverGroups = computed(() => {
   const keyword = normalizeSearchText(exploreGroupKeyword.value)
   if (!keyword) return discoverGroups
-  return discoverGroups.filter((g) => normalizeSearchText(`${g.name} ${g.description} ${g.keyword}`).includes(keyword))
+  return discoverGroups.filter((g) =>
+    normalizeSearchText(`${g.name} ${g.description} ${g.keyword}`).includes(keyword)
+  )
 })
 
 /**
@@ -941,9 +1130,14 @@ function handleToggleJoinActiveGroup(): void {
 const posts = ref<CommunityPost[]>([
   {
     id: 1,
-    author: { id: '101', name: 'TechHunter', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=TechHunter' },
+    author: {
+      id: '101',
+      name: 'TechHunter',
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=TechHunter'
+    },
     publishTime: '2小时前',
-    content: '刚才试用了一下 IdeaSpark 的 AI Logo 生成器，效果出乎意料的好！直接生成了矢量图，省了我找设计师的钱 😂 强烈推荐给大家尝试一下！',
+    content:
+      '刚才试用了一下 IdeaSpark 的 AI Logo 生成器，效果出乎意料的好！直接生成了矢量图，省了我找设计师的钱 😂 强烈推荐给大家尝试一下！',
     images: [
       'https://picsum.photos/seed/logo1/400/300',
       'https://picsum.photos/seed/logo2/400/300'
@@ -955,9 +1149,14 @@ const posts = ref<CommunityPost[]>([
   },
   {
     id: 2,
-    author: { id: '102', name: 'FrontendMaster', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Frontend' },
+    author: {
+      id: '102',
+      name: 'FrontendMaster',
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Frontend'
+    },
     publishTime: '5小时前',
-    content: 'Vue 3.4 发布的 defineModel 宏真的太好用了，双向绑定代码量减少了至少 30%。分享一段我封装的通用 Input 组件代码，大家看看有没有改进空间。',
+    content:
+      'Vue 3.4 发布的 defineModel 宏真的太好用了，双向绑定代码量减少了至少 30%。分享一段我封装的通用 Input 组件代码，大家看看有没有改进空间。',
     images: [], // 纯文本/代码
     tags: ['Vue3', '前端', '经验分享'],
     stats: { likes: 89, comments: 12 },
@@ -966,9 +1165,14 @@ const posts = ref<CommunityPost[]>([
   },
   {
     id: 3,
-    author: { id: '103', name: 'DesignDaily', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Design' },
+    author: {
+      id: '103',
+      name: 'DesignDaily',
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Design'
+    },
     publishTime: '昨天',
-    content: '分享一组极简主义风格的 UI 配色方案，适合用在后台管理系统或者 SaaS 产品中。#UI设计 #配色',
+    content:
+      '分享一组极简主义风格的 UI 配色方案，适合用在后台管理系统或者 SaaS 产品中。#UI设计 #配色',
     images: [
       'https://picsum.photos/seed/color1/400/300',
       'https://picsum.photos/seed/color2/400/300',
@@ -981,7 +1185,11 @@ const posts = ref<CommunityPost[]>([
   },
   {
     id: 4,
-    author: { id: '104', name: 'QAHacker', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=QA' },
+    author: {
+      id: '104',
+      name: 'QAHacker',
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=QA'
+    },
     publishTime: '3天前',
     content: '问答：Vue3 项目里如何优雅处理表单联动校验？大家有推荐的最佳实践或封装方式吗？',
     images: [],
@@ -1003,9 +1211,27 @@ const hotTopics: HotTopicItem[] = [
 
 // 模拟数据：推荐关注
 const recommendedUsers = ref<RecommendedUser[]>([
-  { id: 101, name: '尤雨溪', desc: 'Vue.js 作者', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Evan', isFollowed: true },
-  { id: 102, name: 'AI前沿', desc: '分享最新 AI 资讯', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=AIPro', isFollowed: false },
-  { id: 103, name: 'CSS魔法', desc: 'CSS 动效专家', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=CSS', isFollowed: false }
+  {
+    id: 101,
+    name: '尤雨溪',
+    desc: 'Vue.js 作者',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Evan',
+    isFollowed: true
+  },
+  {
+    id: 102,
+    name: 'AI前沿',
+    desc: '分享最新 AI 资讯',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=AIPro',
+    isFollowed: false
+  },
+  {
+    id: 103,
+    name: 'CSS魔法',
+    desc: 'CSS 动效专家',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=CSS',
+    isFollowed: false
+  }
 ])
 
 /**
@@ -1104,7 +1330,9 @@ function handleMoreTopics(): void {
  * @param post - 动态数据
  */
 function getPostActionOptions(post: CommunityPost): MenuOption[] {
-  const isMine = String(post.author.id) === String(userStore.userInfo?.id || 'me') || post.author.name === (userStore.userInfo?.username || '我')
+  const isMine =
+    String(post.author.id) === String(userStore.userInfo?.id || 'me') ||
+    post.author.name === (userStore.userInfo?.username || '我')
   const base: MenuOption[] = [
     { label: '复制链接', key: 'copy-link' },
     { label: '举报', key: 'report' }
@@ -1157,7 +1385,7 @@ function handleToggleFollowUser(userId: number): void {
 .community-container {
   min-height: 100vh;
   background-color: #f5f7fa;
-  padding-top: 84px; /* 留出 Header 高度 */
+  padding-top: 76px; /* 留出 Header 高度 */
   padding-bottom: 40px;
 }
 
@@ -1197,7 +1425,7 @@ function handleToggleFollowUser(userId: number): void {
 }
 
 /* 消除 Button 点击后的黑框/Focus 样式 */
-:deep(.n-button:focus), 
+:deep(.n-button:focus),
 :deep(.n-button:active) {
   outline: none !important;
   box-shadow: none !important;
@@ -1219,12 +1447,14 @@ function handleToggleFollowUser(userId: number): void {
 .left-sidebar {
   .sidebar-sticky {
     position: sticky;
-    top: 84px;
+    top: 76px;
   }
-  
+
   .group-item {
     border-radius: 10px;
-    transition: background-color 0.15s ease, transform 0.15s ease;
+    transition:
+      background-color 0.15s ease,
+      transform 0.15s ease;
   }
 
   .group-item--active {
@@ -1259,13 +1489,13 @@ function handleToggleFollowUser(userId: number): void {
     gap: 12px;
     margin-bottom: 12px;
     cursor: pointer;
-    
+
     .input-area {
       background: #f9fafb;
       cursor: pointer;
     }
   }
-  
+
   .create-post-actions {
     display: flex;
     justify-content: space-between;
@@ -1396,7 +1626,12 @@ function handleToggleFollowUser(userId: number): void {
 .group-hero__overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(15, 23, 42, 0.85) 0%, rgba(15, 23, 42, 0.35) 55%, rgba(15, 23, 42, 0.15) 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(15, 23, 42, 0.85) 0%,
+    rgba(15, 23, 42, 0.35) 55%,
+    rgba(15, 23, 42, 0.15) 100%
+  );
 }
 
 .group-hero__content {
@@ -1534,16 +1769,16 @@ function handleToggleFollowUser(userId: number): void {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    
+
     .user-info {
       display: flex;
       align-items: center;
       gap: 12px;
-      
+
       .meta {
         display: flex;
         flex-direction: column;
-        
+
         .username {
           font-weight: 600;
           color: #1f2937;
@@ -1564,18 +1799,24 @@ function handleToggleFollowUser(userId: number): void {
       line-height: 1.6;
       margin-bottom: 12px;
     }
-    
+
     .image-grid {
       display: grid;
       gap: 8px;
       margin-bottom: 12px;
       border-radius: 8px;
       overflow: hidden;
-      
-      &.grid-1 { grid-template-columns: 1fr; }
-      &.grid-2 { grid-template-columns: 1fr 1fr; }
-      &.grid-3 { grid-template-columns: 1fr 1fr 1fr; }
-      
+
+      &.grid-1 {
+        grid-template-columns: 1fr;
+      }
+      &.grid-2 {
+        grid-template-columns: 1fr 1fr;
+      }
+      &.grid-3 {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+
       .image-item {
         aspect-ratio: 16/9;
         background-size: cover;
@@ -1592,15 +1833,15 @@ function handleToggleFollowUser(userId: number): void {
     border-top: 1px solid #f3f4f6;
     padding-top: 12px;
     margin-top: 4px;
-    
+
     .action-btn {
       color: #6b7280;
       flex: 1;
-      
+
       &:hover {
         color: #18a058;
       }
-      
+
       &.active {
         color: #d03050;
       }
@@ -1634,7 +1875,7 @@ function handleToggleFollowUser(userId: number): void {
 .loading-trigger {
   text-align: center;
   padding: 20px 0;
-  
+
   .no-more {
     color: #9ca3af;
     font-size: 13px;
@@ -1645,32 +1886,32 @@ function handleToggleFollowUser(userId: number): void {
 .right-sidebar {
   .sidebar-sticky {
     position: sticky;
-    top: 84px;
+    top: 76px;
   }
 
   .user-card {
     .user-summary {
       text-align: center;
       position: relative;
-      
+
       .bg-cover {
         height: 60px;
         background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
         margin: -16px -16px 0; /* 抵消 card padding */
         border-radius: 12px 12px 0 0;
       }
-      
+
       .avatar-row {
         margin-top: -32px;
         margin-bottom: 8px;
         position: relative;
         z-index: 1;
       }
-      
+
       .user-avatar {
         border: 4px solid #fff;
       }
-      
+
       .info-row {
         margin-bottom: 16px;
         .name {
@@ -1689,15 +1930,15 @@ function handleToggleFollowUser(userId: number): void {
           margin-top: 4px;
         }
       }
-      
+
       .stats-row {
         display: flex;
         justify-content: space-around;
-        
+
         .stat {
           display: flex;
           flex-direction: column;
-          
+
           .num {
             font-weight: 700;
             color: #1f2937;
@@ -1717,24 +1958,30 @@ function handleToggleFollowUser(userId: number): void {
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    
+
     .rank {
       width: 20px;
       font-weight: bold;
       color: #999;
       font-style: italic;
-      
-      &.rank-1 { color: #d03050; }
-      &.rank-2 { color: #f0a020; }
-      &.rank-3 { color: #f0a020; }
+
+      &.rank-1 {
+        color: #d03050;
+      }
+      &.rank-2 {
+        color: #f0a020;
+      }
+      &.rank-3 {
+        color: #f0a020;
+      }
     }
-    
+
     .topic-name {
       flex: 1;
       margin-left: 8px;
       color: #333;
     }
-    
+
     .hot-val {
       font-size: 12px;
       color: #9ca3af;
@@ -1746,13 +1993,13 @@ function handleToggleFollowUser(userId: number): void {
     align-items: center;
     gap: 10px;
     width: 100%;
-    
+
     .info {
       flex: 1;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      
+
       .name {
         font-size: 14px;
         font-weight: 600;
@@ -1772,7 +2019,7 @@ function handleToggleFollowUser(userId: number): void {
     font-size: 12px;
     color: #9ca3af;
     text-align: center;
-    
+
     a {
       color: #9ca3af;
       text-decoration: none;
@@ -1780,7 +2027,7 @@ function handleToggleFollowUser(userId: number): void {
         color: #666;
       }
     }
-    
+
     p {
       margin-top: 4px;
     }
@@ -1792,9 +2039,9 @@ function handleToggleFollowUser(userId: number): void {
   .hidden-on-mobile {
     display: none !important;
   }
-  
+
   .community-container {
-    padding-top: 64px;
+    padding-top: 56px;
   }
 }
 </style>

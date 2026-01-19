@@ -317,7 +317,7 @@ function initAnimation() {
   left: 0;
   right: 0;
   z-index: 1000;
-  height: 64px;
+  height: 56px;
   display: flex;
   align-items: center;
   background: transparent;
@@ -326,7 +326,7 @@ function initAnimation() {
 
   /* 滚动状态 / 内部页面状态 (暗灰色主题) */
   &.is-scrolled {
-    height: 64px; /* 保持 64px 高度，与页面 padding-top 对齐 */
+    height: 56px; /* 保持高度，与页面 padding-top 对齐 */
     background: rgba(24, 24, 28, 0.98); /* 略微增加不透明度 */
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);

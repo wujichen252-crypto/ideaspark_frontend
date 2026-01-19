@@ -10,8 +10,8 @@ import AiChatArea from './components/AiChatArea.vue'
 
 <style scoped>
 .ai-chat-view {
-  height: calc(100vh - 64px);
-  margin-top: 64px;
+  height: calc(100vh - 56px);
+  margin-top: 56px;
   background-color: #fff;
 }
 </style>
