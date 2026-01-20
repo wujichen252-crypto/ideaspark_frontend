@@ -181,12 +181,12 @@ const handleValidateButtonClick = (e: MouseEvent) => {
 }
 
 .preview-role {
-  color: #666;
+  color: #6b7280;
   font-size: 0.9em;
 }
 
 .preview-bio {
-  color: #444;
+  color: #374151;
   line-height: 1.5;
 }
 </style>
