@@ -29,9 +29,10 @@
           <n-menu
             :collapsed="collapsed"
             :collapsed-width="64"
-            :collapsed-icon-size="22"
+            :collapsed-icon-size="20"
             :options="menuOptions"
             :value="activeKey"
+            class="console-menu"
             @update:value="handleMenuUpdate"
           />
         </div>
@@ -78,11 +79,11 @@
                       <template #icon><n-icon :component="CubeOutline" /></template>
                       进入 AI 工坊
                     </n-button>
-                    <n-button secondary type="info" @click="$router.push('/market')">
+                    <n-button secondary type="primary" @click="$router.push('/market')">
                       <template #icon><n-icon :component="FolderOpenOutline" /></template>
                       浏览项目市场
                     </n-button>
-                    <n-button secondary type="success" @click="$router.push('/community')">
+                    <n-button secondary type="primary" @click="$router.push('/community')">
                       <template #icon><n-icon :component="HeartOutline" /></template>
                       查看社区动态
                     </n-button>
@@ -153,7 +154,7 @@
                          您发布的《AI 绘画助手》已通过审核上线。
                        </template>
                      </n-timeline-item>
-                     <n-timeline-item type="info" title="收到新评论" time="2小时前">
+                     <n-timeline-item title="收到新评论" time="2小时前">
                        @DesignMaster 评论了您的项目《Vue3 组件库》。
                      </n-timeline-item>
                      <n-timeline-item type="warning" title="系统通知" time="昨天">
@@ -206,7 +207,7 @@
           <!-- 3. 数据分析 (Analytics) -->
           <div v-else-if="activeKey === 'analytics'" class="view-analytics">
              <div class="analytics-header mb-6" style="display: flex; justify-content: space-between; align-items: center;">
-               <h2 style="margin: 0; font-size: 20px;">用户行为分析</h2>
+               <h2 style="margin: 0; font-size: 20px; font-weight: 600;">用户行为分析</h2>
                <n-select v-model:value="analyticsRange" :options="analyticsRanges" style="width: 140px;" size="small" />
              </div>
 
@@ -215,7 +216,7 @@
                 <n-grid-item>
                   <n-card size="small" :bordered="false">
                     <n-statistic label="活跃用户数" value="18,930">
-                      <template #prefix><n-icon color="#2080f0"><EyeOutline /></n-icon></template>
+                      <template #prefix><n-icon color="#22C55E"><EyeOutline /></n-icon></template>
                       <template #suffix><span style="font-size: 12px; color: #18a058;">+8.3%</span></template>
                     </n-statistic>
                   </n-card>
@@ -223,7 +224,7 @@
                 <n-grid-item>
                   <n-card size="small" :bordered="false">
                     <n-statistic label="新增用户数" value="3,201">
-                       <template #prefix><n-icon color="#8a2be2"><CubeOutline /></n-icon></template>
+                       <template #prefix><n-icon color="#22C55E"><CubeOutline /></n-icon></template>
                        <template #suffix><span style="font-size: 12px; color: #18a058;">+5.0%</span></template>
                     </n-statistic>
                   </n-card>
@@ -231,14 +232,14 @@
                 <n-grid-item>
                   <n-card size="small" :bordered="false">
                     <n-statistic label="平均访问深度" value="3.2 页/次">
-                       <template #prefix><n-icon color="#f0a020"><StatsChartOutline /></n-icon></template>
+                       <template #prefix><n-icon color="#22C55E"><StatsChartOutline /></n-icon></template>
                     </n-statistic>
                   </n-card>
                 </n-grid-item>
                 <n-grid-item>
                   <n-card size="small" :bordered="false">
                     <n-statistic label="复访率" value="42.7%">
-                       <template #prefix><n-icon color="#d03050"><TrendingDownOutline /></n-icon></template>
+                       <template #prefix><n-icon color="#22C55E"><TrendingDownOutline /></n-icon></template>
                        <template #suffix><span style="font-size: 12px; color: #18a058;">+2.1%</span></template>
                     </n-statistic>
                   </n-card>
@@ -268,7 +269,7 @@
           <div v-else-if="activeKey === 'settings'" class="view-settings">
             <n-card title="系统设置" :bordered="false">
               <template #header-extra>
-                <n-tag type="info" size="small">控制台</n-tag>
+                <n-tag type="primary" size="small">控制台</n-tag>
               </template>
               
               <n-tabs type="line" animated>
@@ -400,23 +401,43 @@ const pieChartRef = ref<HTMLElement | null>(null)
 const barChartRef = ref<HTMLElement | null>(null)
 const analyticsLineChartRef = ref<HTMLElement | null>(null)
 
+const accentGreen = '#22C55E'
+const accentGray = '#374151'
+const accentGreenSoft = 'rgba(34, 197, 94, 0.12)'
+const accentGraySoft = 'rgba(55, 65, 81, 0.08)'
+const axisTextColor = '#9ca3af'
+const axisLineColor = '#eef0f2'
+const splitLineColor = '#f3f4f6'
+
 // 初始化图表
 const initCharts = () => {
   if (activeKey.value === 'overview' && trafficChartRef.value) {
     const myChart = echarts.init(trafficChartRef.value)
     myChart.setOption({
+      backgroundColor: '#ffffff',
       tooltip: { trigger: 'axis' },
       grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-      xAxis: { type: 'category', boundaryGap: false, data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
-      yAxis: { type: 'value' },
+      xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        axisLabel: { color: axisTextColor },
+        axisLine: { lineStyle: { color: axisLineColor } }
+      },
+      yAxis: {
+        type: 'value',
+        axisLabel: { color: axisTextColor },
+        axisLine: { lineStyle: { color: axisLineColor } },
+        splitLine: { lineStyle: { color: splitLineColor } }
+      },
       series: [
         {
           name: '浏览量',
           type: 'line',
           stack: 'Total',
           smooth: true,
-          areaStyle: { color: '#e6f7ff' },
-          lineStyle: { color: '#1890ff' },
+          areaStyle: { color: accentGreenSoft },
+          lineStyle: { color: accentGreen },
           data: [120, 132, 101, 134, 90, 230, 210]
         },
         {
@@ -424,8 +445,8 @@ const initCharts = () => {
           type: 'line',
           stack: 'Total',
           smooth: true,
-          areaStyle: { color: '#f6ffed' },
-          lineStyle: { color: '#52c41a' },
+          areaStyle: { color: accentGraySoft },
+          lineStyle: { color: accentGray },
           data: [220, 182, 191, 234, 290, 330, 310]
         }
       ]
@@ -439,25 +460,37 @@ const initCharts = () => {
         if (analyticsLineChartRef.value) {
           const chart = echarts.init(analyticsLineChartRef.value)
           chart.setOption({
+            backgroundColor: '#ffffff',
             tooltip: { trigger: 'axis' },
             grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-            xAxis: { type: 'category', boundaryGap: false, data: ['1日', '5日', '10日', '15日', '20日', '25日', '30日'] },
-            yAxis: { type: 'value' },
+            xAxis: {
+              type: 'category',
+              boundaryGap: false,
+              data: ['1日', '5日', '10日', '15日', '20日', '25日', '30日'],
+              axisLabel: { color: axisTextColor },
+              axisLine: { lineStyle: { color: axisLineColor } }
+            },
+            yAxis: {
+              type: 'value',
+              axisLabel: { color: axisTextColor },
+              axisLine: { lineStyle: { color: axisLineColor } },
+              splitLine: { lineStyle: { color: splitLineColor } }
+            },
             series: [
               {
                 name: '活跃用户',
                 type: 'line',
                 smooth: true,
-                itemStyle: { color: '#8884d8' },
-                areaStyle: { color: 'rgba(136, 132, 216, 0.2)' },
+                itemStyle: { color: accentGreen },
+                areaStyle: { color: accentGreenSoft },
                 data: [150, 230, 224, 218, 135, 147, 260]
               },
               {
                 name: '新增用户',
                 type: 'line',
                 smooth: true,
-                itemStyle: { color: '#82ca9d' },
-                areaStyle: { color: 'rgba(130, 202, 157, 0.2)' },
+                itemStyle: { color: accentGray },
+                areaStyle: { color: accentGraySoft },
                 data: [280, 360, 340, 320, 250, 270, 410]
               }
             ]
@@ -468,8 +501,10 @@ const initCharts = () => {
         if (pieChartRef.value) {
             const pieChart = echarts.init(pieChartRef.value)
             pieChart.setOption({
+                backgroundColor: '#ffffff',
                 tooltip: { trigger: 'item' },
                 legend: { top: '5%', left: 'center' },
+                color: ['#22C55E', '#86efac', '#bbf7d0', '#e5e7eb', '#9ca3af'],
                 series: [
                     {
                         name: '访问来源',
@@ -495,11 +530,30 @@ const initCharts = () => {
         if (barChartRef.value) {
             const barChart = echarts.init(barChartRef.value)
             barChart.setOption({
+                 backgroundColor: '#ffffff',
                  tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
                  grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-                 xAxis: { type: 'category', data: ['Vue', 'React', 'Angular', 'Svelte', 'Solid'] },
-                 yAxis: { type: 'value' },
-                 series: [{ data: [120, 200, 150, 80, 70], type: 'bar', showBackground: true, backgroundStyle: { color: 'rgba(180, 180, 180, 0.2)' } }]
+                 xAxis: {
+                   type: 'category',
+                   data: ['Vue', 'React', 'Angular', 'Svelte', 'Solid'],
+                   axisLabel: { color: axisTextColor },
+                   axisLine: { lineStyle: { color: axisLineColor } }
+                 },
+                 yAxis: {
+                   type: 'value',
+                   axisLabel: { color: axisTextColor },
+                   axisLine: { lineStyle: { color: axisLineColor } },
+                   splitLine: { lineStyle: { color: splitLineColor } }
+                 },
+                 series: [
+                   {
+                     data: [120, 200, 150, 80, 70],
+                     type: 'bar',
+                     showBackground: true,
+                     itemStyle: { color: accentGreen },
+                     backgroundStyle: { color: 'rgba(0, 0, 0, 0.06)' }
+                   }
+                 ]
             })
              window.addEventListener('resize', () => barChart.resize())
         }
@@ -544,8 +598,8 @@ const filteredProjects = computed(() => {
  */
 function getProjectStatusMeta(status: ProjectRow['status']) {
   if (status === 'active') return { type: 'success' as const, text: '进行中' }
-  if (status === 'completed') return { type: 'info' as const, text: '已完成' }
-  if (status === 'paused') return { type: 'warning' as const, text: '已暂停' }
+  if (status === 'completed') return { type: 'default' as const, text: '已完成' }
+  if (status === 'paused') return { type: 'default' as const, text: '已暂停' }
   return { type: 'default' as const, text: '已归档' }
 }
 
@@ -580,7 +634,7 @@ const projectColumns: DataTableColumns<ProjectRow> = [
              }
           }
         }, { icon: () => h(NIcon, null, { default: () => h(CreateOutline) }) }),
-        h(NButton, { size: 'tiny', secondary: true, type: 'error', circle: true }, { icon: () => h(NIcon, null, { default: () => h(TrashOutline) }) })
+        h(NButton, { size: 'tiny', secondary: true, type: 'default', circle: true }, { icon: () => h(NIcon, null, { default: () => h(TrashOutline) }) })
       ])
     }
   }
@@ -607,6 +661,45 @@ const projectColumns: DataTableColumns<ProjectRow> = [
   
   :deep(.n-layout-sider-scroll-container) {
     overflow: visible !important; /* Allow sticky to work */
+  }
+
+  :deep(.console-menu) {
+    --n-item-text-color: #888888;
+    --n-item-text-color-hover: #111827;
+    --n-item-text-color-active: #22c55e;
+    --n-item-icon-color: #888888;
+    --n-item-icon-color-hover: #111827;
+    --n-item-icon-color-active: #22c55e;
+    --n-item-color-hover: rgba(0, 0, 0, 0.03);
+    --n-item-color-active: rgba(34, 197, 94, 0.12);
+    --n-item-color-active-hover: rgba(34, 197, 94, 0.14);
+    --n-item-border-radius: 10px;
+    padding: 6px 8px;
+  }
+
+  :deep(.console-menu .n-menu-item-content) {
+    margin: 2px 0;
+    position: relative;
+    height: 40px;
+  }
+
+  :deep(.console-menu .n-menu-item-content::before) {
+    width: 3px !important;
+    left: 0 !important;
+    right: auto !important;
+    border-radius: 3px !important;
+    background-color: transparent !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  :deep(.console-menu .n-menu-item-content--selected::before) {
+    background-color: #22c55e !important;
+  }
+
+  :deep(.console-menu .n-menu-item-content-header) {
+    font-weight: 500;
+    letter-spacing: 0.2px;
   }
 
   .sider-sticky-wrapper {
@@ -656,7 +749,7 @@ const projectColumns: DataTableColumns<ProjectRow> = [
 
 .console-content {
   background-color: #f5f7fa;
-  padding: 24px;
+  padding: 28px;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -672,7 +765,7 @@ const projectColumns: DataTableColumns<ProjectRow> = [
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
   
   .header-actions {
     display: flex;
@@ -683,12 +776,14 @@ const projectColumns: DataTableColumns<ProjectRow> = [
 
 /* Overview Styles */
 .welcome-card {
-  background: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
+  background:
+    radial-gradient(900px circle at 18% 18%, rgba(34, 197, 94, 0.24), transparent 60%),
+    linear-gradient(135deg, #0b0f0d 0%, #111827 45%, #0b0f0d 100%);
   border-radius: 16px;
   padding: 32px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 10px 20px rgba(142, 197, 252, 0.2);
+  box-shadow: 0 14px 32px rgba(17, 24, 39, 0.14);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -702,6 +797,7 @@ const projectColumns: DataTableColumns<ProjectRow> = [
       margin: 0 0 12px 0;
       color: #fff;
       font-size: 28px;
+      font-weight: 600;
       text-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     p {
@@ -762,13 +858,15 @@ const projectColumns: DataTableColumns<ProjectRow> = [
 
 .stat-card {
   border-radius: 16px;
-  transition: all 0.3s ease;
-  border: 1px solid transparent;
+  background-color: #ffffff;
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0,0,0,0.08);
-    border-color: rgba(0,0,0,0.05);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(17, 24, 39, 0.08);
+    border-color: rgba(0, 0, 0, 0.08);
   }
 
   :deep(.n-card__content) {
@@ -786,43 +884,55 @@ const projectColumns: DataTableColumns<ProjectRow> = [
     align-items: center;
     justify-content: center;
     font-size: 28px;
-    transition: transform 0.3s ease;
-    
-    &.blue { background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%); color: #0050b3; }
-    &.green { background: linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%); color: #389e0d; }
-    &.purple { background: linear-gradient(135deg, #f9f0ff 0%, #efdbff 100%); color: #531dab; }
-    &.orange { background: linear-gradient(135deg, #fff7e6 0%, #ffe7ba 100%); color: #d46b08; }
+    background: #f3f4f6;
+    color: #888888;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
   &:hover .stat-icon {
-    transform: scale(1.1);
+    background: rgba(34, 197, 94, 0.12);
+    color: #22c55e;
   }
   
   .stat-info {
     flex: 1;
     .label { color: #666; font-size: 13px; margin-bottom: 4px; }
-    .value { font-size: 24px; font-weight: 700; color: #1f1f1f; line-height: 1.2; }
+    .value { font-size: 24px; font-weight: 600; color: #111827; line-height: 1.2; }
     .trend { 
       font-size: 12px; 
       color: #999;
       margin-top: 4px;
-      &.up { color: #52c41a; }
-      &.down { color: #ff4d4f; }
+      &.up { color: #22c55e; }
+      &.down { color: #ef4444; }
     }
   }
 }
 
 .chart-card {
-  border-radius: 12px;
+  border-radius: 16px;
   height: 100%;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+
+  :deep(.n-card-header) {
+    font-weight: 600;
+  }
 }
 
 .activity-card {
-  border-radius: 12px;
+  border-radius: 16px;
   height: 100%;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+
+  :deep(.n-card-header) {
+    font-weight: 600;
+  }
 }
 
-.mb-6 { margin-bottom: 24px; }
+.mb-6 { margin-bottom: 32px; }
 .ml-4 { margin-left: 16px; }
 
 @media (max-width: 768px) {

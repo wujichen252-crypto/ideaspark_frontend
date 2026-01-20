@@ -227,7 +227,7 @@ function handleRegister() {
 
 <style scoped lang="scss">
 @use 'sass:color';
-@import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;600;700;800&display=swap');
 
 /* 全局变量 - 黑白主题 */
 $primary-color: #0a0a0a;
@@ -249,10 +249,39 @@ $glass-bg: rgba(255, 255, 255, 0.92);
   flex-direction: column;
   height: 100vh;
   padding-top: 0; /* Removed padding to allow full screen centering */
-  background: $bg-color;
-  font-family: 'Montserrat', sans-serif;
+  background:
+    radial-gradient(1200px circle at 20% -10%, rgba(0, 0, 0, 0.035), transparent 60%),
+    radial-gradient(800px circle at 80% 110%, rgba(0, 0, 0, 0.045), transparent 60%),
+    linear-gradient(180deg, #ece7de 0%, #e9e5dc 60%, #e6e1d8 100%);
+  font-family:
+    'Inter',
+    'HarmonyOS Sans SC',
+    'HarmonyOS Sans',
+    'PingFang SC',
+    'Microsoft YaHei',
+    'Noto Sans SC',
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    Arial,
+    sans-serif;
   overflow: hidden;
   position: relative;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+}
+
+/* 微噪点纹理覆盖层（极弱强度） */
+.login-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.06;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100%' height='100%'><filter id='noise'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncA type='table' tableValues='0 0 0 0 0 0 0 0 0 0.08'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(%23noise)'/></svg>");
 }
 
 /* --- 动态流体背景（黑白版） --- */
@@ -267,8 +296,8 @@ $glass-bg: rgba(255, 255, 255, 0.92);
 .aurora-blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.35;
+  filter: blur(100px);
+  opacity: 0.12;
   animation: float 10s infinite ease-in-out;
 }
 
@@ -277,7 +306,7 @@ $glass-bg: rgba(255, 255, 255, 0.92);
   left: -10%;
   width: 50vw;
   height: 50vw;
-  background: #cfc8bb;
+  background: #ddd7cd;
   animation-delay: 0s;
 }
 
@@ -286,7 +315,7 @@ $glass-bg: rgba(255, 255, 255, 0.92);
   right: -10%;
   width: 60vw;
   height: 60vw;
-  background: #ded7cb;
+  background: #e6e1d8;
   animation-delay: -2s;
 }
 
@@ -295,7 +324,7 @@ $glass-bg: rgba(255, 255, 255, 0.92);
   left: 40%;
   width: 40vw;
   height: 40vw;
-  background: radial-gradient(circle, #d6cec1 0%, #e9e5dc 100%);
+  background: radial-gradient(circle, #e3ded4 0%, #e9e5dc 100%);
   transform: translate(-50%, -50%);
   animation-delay: -4s;
 }
@@ -339,7 +368,7 @@ $glass-bg: rgba(255, 255, 255, 0.92);
   display: flex;
   justify-content: center;
   flex-direction: column;
-  padding: 0 50px;
+  padding: 0 clamp(24px, 4vw, 64px);
   height: 100%;
   text-align: center;
   color: $text-color;
@@ -403,7 +432,10 @@ $glass-bg: rgba(255, 255, 255, 0.92);
 }
 
 .overlay {
-  background: $primary-color;
+  background:
+    radial-gradient(800px circle at 75% 20%, rgba(255, 255, 255, 0.08), transparent 55%),
+    radial-gradient(600px circle at 15% 90%, rgba(255, 255, 255, 0.05), transparent 60%),
+    linear-gradient(135deg, #0a0a0a 0%, #0f0f0f 45%, #0b0b0b 100%);
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 0 0;
@@ -416,6 +448,16 @@ $glass-bg: rgba(255, 255, 255, 0.92);
   transition: transform 0.6s ease-in-out;
 }
 
+.overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.045;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100%' height='100%'><filter id='noise'><feTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncA type='table' tableValues='0 0 0 0 0 0 0 0 0 0.1'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(%23noise)'/></svg>");
+}
+
 .container.right-panel-active .overlay {
   transform: translateX(50%);
 }
@@ -426,7 +468,7 @@ $glass-bg: rgba(255, 255, 255, 0.92);
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  padding: 0 40px;
+  padding: 0 clamp(28px, 3.5vw, 56px);
   text-align: center;
   top: 0;
   height: 100%;
@@ -454,9 +496,11 @@ $glass-bg: rgba(255, 255, 255, 0.92);
 
 /* --- 元素样式 --- */
 h1 {
-  font-weight: bold;
-  margin: 0 0 10px 0;
+  font-weight: 800;
+  margin: 0 0 12px 0;
   font-size: 2rem;
+  letter-spacing: 0.06em;
+  line-height: 1.15;
   color: $text-color;
 }
 
@@ -467,9 +511,9 @@ h1 {
 
 p {
   font-size: 14px;
-  font-weight: 300;
-  line-height: 20px;
-  letter-spacing: 0.5px;
+  font-weight: 400;
+  line-height: 1.75;
+  letter-spacing: 0.02em;
   margin: 20px 0 30px;
   color: $text-secondary;
 }
@@ -481,6 +525,7 @@ p {
 span.divider-text {
   font-size: 12px;
   margin: 15px 0;
+  letter-spacing: 0.06em;
   color: #999;
 }
 
