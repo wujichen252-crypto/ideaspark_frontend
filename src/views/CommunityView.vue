@@ -15,7 +15,7 @@
 
             <n-card title="我的圈子" :bordered="false" size="small" class="mt-4 group-card">
               <template #header-extra>
-                <n-button text type="primary" size="small" @click="openExploreGroupsModal">
+                <n-button text type="primary" size="small" color="#000" @click="openExploreGroupsModal">
                   去逛
                 </n-button>
               </template>
@@ -36,7 +36,7 @@
                       v-if="activeGroupId === group.id"
                       size="small"
                       round
-                      type="success"
+                      :color="{ color: '#000', textColor: '#fff', borderColor: '#000' }"
                       class="group-active-tag"
                     >
                       已进入
@@ -84,7 +84,7 @@
                   表情
                 </n-button>
               </n-space>
-              <n-button type="primary" size="small" round @click="openCreateModal">发布</n-button>
+              <n-button type="primary" size="small" round color="#000" @click="openCreateModal">发布</n-button>
             </div>
           </n-card>
 
@@ -139,7 +139,7 @@
                     <n-button
                       size="small"
                       round
-                      :type="isActiveGroupJoined ? 'default' : 'primary'"
+                      :color="isActiveGroupJoined ? undefined : '#000'"
                       :ghost="isActiveGroupJoined"
                       @click="handleToggleJoinActiveGroup"
                     >
@@ -233,8 +233,7 @@
                     size="small"
                     round
                     class="mr-2"
-                    type="primary"
-                    secondary
+                    :bordered="false"
                     clickable
                     @click.stop="handleClickTag(tag)"
                   >
@@ -321,7 +320,7 @@
             <!-- 热门话题 -->
             <n-card title="热门话题" :bordered="false" size="small" class="mb-6">
               <template #header-extra>
-                <n-button text type="primary" size="small" @click="handleMoreTopics">更多</n-button>
+                <n-button text type="primary" size="small" color="#000" @click="handleMoreTopics">更多</n-button>
               </template>
               <n-list hoverable clickable>
                 <n-list-item
@@ -515,6 +514,7 @@
                     size="small"
                     round
                     type="primary"
+                    color="#000"
                     @click.stop="handleEnterExploreGroup(g.id)"
                   >
                     进入
@@ -1839,11 +1839,11 @@ function handleToggleFollowUser(userId: number): void {
       flex: 1;
 
       &:hover {
-        color: #18a058;
+        color: #374151;
       }
 
       &.active {
-        color: #d03050;
+        color: #000;
       }
     }
   }
@@ -1922,8 +1922,8 @@ function handleToggleFollowUser(userId: number): void {
         }
         .role {
           font-size: 12px;
-          color: #18a058;
-          background: #e6f7ef;
+          color: #fff;
+          background: #000;
           padding: 2px 8px;
           border-radius: 10px;
           display: inline-block;
@@ -1966,13 +1966,13 @@ function handleToggleFollowUser(userId: number): void {
       font-style: italic;
 
       &.rank-1 {
-        color: #d03050;
+        color: #1f2937;
       }
       &.rank-2 {
-        color: #f0a020;
+        color: #374151;
       }
       &.rank-3 {
-        color: #f0a020;
+        color: #4b5563;
       }
     }
 

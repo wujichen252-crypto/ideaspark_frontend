@@ -42,7 +42,7 @@
                     <n-badge :value="allProjects.length" type="info" class="group-count" />
                   </div>
                   <div class="header-right">
-                    <n-button type="primary" size="small" @click="openCreateModal">
+                    <n-button type="primary" color="#000" size="small" @click="openCreateModal">
                       <template #icon><n-icon :component="AddOutline" /></template>
                       创建项目
                     </n-button>
@@ -57,7 +57,7 @@
                     @click="handleOpenProject(project.id)"
                   >
                     <div class="file-icon">
-                       <n-icon :component="DocumentText" color="#8b5cf6" size="24" />
+                       <n-icon :component="DocumentText" color="#6b7280" size="24" />
                     </div>
                     <div class="card-info">
                       <div class="card-title-row">
@@ -178,7 +178,7 @@
                    <n-radio-button value="fonts" label="字体库" />
                  </n-radio-group>
                  <div class="resources-tools">
-                   <n-button type="primary" size="small" @click="openCreateResourceModal">
+                   <n-button type="primary" color="#000" size="small" @click="openCreateResourceModal">
                      新建{{ resourceKindLabel }}
                    </n-button>
                    <n-input
@@ -197,7 +197,7 @@
                  <div v-for="r in filteredResources" :key="r.id" class="resource-row">
                    <div class="resource-main">
                      <div class="resource-icon">
-                       <n-icon :component="r.kind === 'repo' ? FolderOpenOutline : TextOutline" size="22" color="#10b981" />
+                      <n-icon :component="r.kind === 'repo' ? FolderOpenOutline : TextOutline" size="22" color="#3f3f46" />
                      </div>
                      <div class="resource-info">
                        <div class="resource-title">{{ r.name }}</div>
@@ -217,7 +217,7 @@
                  <n-empty :description="`暂无${resourceKindLabel}`">
                    <template #extra>
                      <n-space>
-                       <n-button type="primary" @click="openCreateResourceModal">新建{{ resourceKindLabel }}</n-button>
+                       <n-button type="primary" color="#000" @click="openCreateResourceModal">新建{{ resourceKindLabel }}</n-button>
                        <n-button quaternary @click="resetResourceFilters">清除搜索</n-button>
                      </n-space>
                    </template>
@@ -255,7 +255,7 @@
                  <template #footer>
                    <n-space justify="end">
                      <n-button @click="showCreateResourceModal = false">取消</n-button>
-                     <n-button type="primary" @click="handleCreateResource">确认创建</n-button>
+                   <n-button type="primary" color="#000" @click="handleCreateResource">确认创建</n-button>
                    </n-space>
                  </template>
                </n-card>
@@ -310,12 +310,12 @@
                 <div v-for="i in 1" :key="i" class="project-card">
                    <div class="card-preview">
                      <div class="preview-placeholder">
-                        <n-icon :component="DocumentText" size="40" color="#8b5cf6" />
+                        <n-icon :component="DocumentText" size="40" color="#6b7280" />
                      </div>
                    </div>
                    <div class="card-info">
                       <div class="card-title-row">
-                        <n-icon :component="DocumentText" color="#8b5cf6" />
+                        <n-icon :component="DocumentText" color="#6b7280" />
                         <span class="card-title">项目一</span>
                       </div>
                       <div class="card-meta">
@@ -326,12 +326,12 @@
                  <div v-for="i in 3" :key="'file'+i" class="project-card">
                    <div class="card-preview">
                      <div class="preview-placeholder">
-                        <n-icon :component="DocumentText" size="40" color="#8b5cf6" />
+                        <n-icon :component="DocumentText" size="40" color="#6b7280" />
                      </div>
                    </div>
                    <div class="card-info">
                       <div class="card-title-row">
-                        <n-icon :component="DocumentText" color="#8b5cf6" />
+                        <n-icon :component="DocumentText" color="#6b7280" />
                         <span class="card-title">设计文件</span>
                       </div>
                       <div class="card-meta">
@@ -377,7 +377,7 @@
         <template #footer>
           <n-space justify="end">
             <n-button @click="showCreateModal = false">取消</n-button>
-            <n-button type="primary" @click="handleCreateProject">确认创建</n-button>
+            <n-button type="primary" color="#000" @click="handleCreateProject">确认创建</n-button>
           </n-space>
         </template>
       </n-card>
@@ -740,14 +740,14 @@ function formatUpdateTime(updatedAt: number): string {
   margin-bottom: 32px; /* 增加底部间距 */
   
   .create-btn {
-    background-color: #10b981;
-    border-color: #10b981;
+    background-color: #000;
+    border-color: #000;
     padding: 0 20px;
     font-weight: 500;
     
     &:hover {
-      background-color: #059669;
-      border-color: #059669;
+      background-color: #111827;
+      border-color: #111827;
     }
   }
 
@@ -783,7 +783,7 @@ function formatUpdateTime(updatedAt: number): string {
       transition: color 0.2s;
       
       &:hover {
-        color: #10b981;
+        color: #111827;
       }
 
       .edit-icon {
@@ -859,7 +859,7 @@ function formatUpdateTime(updatedAt: number): string {
 }
 
 .recent-project-card {
-  border-left: 4px solid #10b981; /* Highlight recent */
+  border-left: 4px solid #000; /* Highlight recent */
 }
 
 .create-new-card {
@@ -867,8 +867,8 @@ function formatUpdateTime(updatedAt: number): string {
   background: transparent;
   
   &:hover {
-    border-color: #10b981;
-    background: #f0fdf4;
+    border-color: #000;
+    background: #f9fafb;
   }
   
   .text-gray {
@@ -944,7 +944,7 @@ function formatUpdateTime(updatedAt: number): string {
 
   &:hover {
     background-color: #fff;
-    border-color: #10b981;
+    border-color: #d1d5db;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     transform: translateY(-2px);
   }
@@ -1138,7 +1138,7 @@ function formatUpdateTime(updatedAt: number): string {
         color: #4b5563;
         
         &:hover {
-          color: #10b981;
+          color: #111827;
         }
       }
     }
@@ -1166,15 +1166,15 @@ function formatUpdateTime(updatedAt: number): string {
         box-shadow: 0 1px 2px rgba(0,0,0,0.05);
       }
       .root { 
-        border-color: #10b981; 
-        color: #10b981; 
+        border-color: #000; 
+        color: #000; 
         font-weight: 600;
         font-size: 13px;
       }
     }
 
     &.preview-2 {
-      background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+      background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
     }
   }
 
@@ -1393,7 +1393,7 @@ function formatUpdateTime(updatedAt: number): string {
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: #f0fdf4;
+  background: #f3f4f6;
   flex: 0 0 auto;
 }
 
@@ -1452,11 +1452,11 @@ function formatUpdateTime(updatedAt: number): string {
   border-bottom: 1px solid #e5e7eb;
 }
 :deep(.n-tabs-tab-wrapper .n-tabs-tab.n-tabs-tab--active) {
-    color: #10b981;
+    color: #000;
     font-weight: 600;
 }
 :deep(.n-tabs-bar) {
-    background-color: #10b981;
+    background-color: #000;
 }
 :deep(.n-tabs-tab) {
   padding-bottom: 12px;

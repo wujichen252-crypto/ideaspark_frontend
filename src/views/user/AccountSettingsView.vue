@@ -135,7 +135,7 @@ import { ArrowBackOutline as ArrowBack, LockClosedOutline, MailOutline, PhonePor
 }
 
 .setting-desc {
-  color: #666;
+  color: #6b7280;
   font-size: 14px;
 }
 </style>

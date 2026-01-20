@@ -33,7 +33,7 @@
             ></div>
           </div>
           <div v-if="post.tags && post.tags.length" class="tags">
-            <n-tag v-for="tag in post.tags" :key="tag" size="small" round type="primary" secondary>
+            <n-tag v-for="tag in post.tags" :key="tag" size="small" round :bordered="false">
               # {{ tag }}
             </n-tag>
           </div>
@@ -67,7 +67,7 @@
                 :autosize="{ minRows: 2, maxRows: 4 }"
               />
               <div class="input-actions">
-                <n-button type="primary" size="small" :disabled="!newCommentContent.trim()" @click="submitComment">
+                <n-button type="primary" size="small" color="#000" :disabled="!newCommentContent.trim()" @click="submitComment">
                   发布
                 </n-button>
               </div>
@@ -85,7 +85,7 @@
                 </div>
                 <p class="text">{{ comment.content }}</p>
                 <div class="comment-actions">
-                  <n-button text size="tiny" :type="comment.isLiked ? 'error' : 'default'" @click="toggleCommentLike(comment)">
+                  <n-button text size="tiny" :color="comment.isLiked ? '#000' : undefined" @click="toggleCommentLike(comment)">
                     <template #icon>
                       <n-icon :component="comment.isLiked ? Heart : HeartOutline" />
                     </template>
@@ -101,7 +101,7 @@
 
       <n-card v-else :bordered="false" class="detail-card">
         <p>这条动态不存在或已被删除。</p>
-        <n-button type="primary" size="small" @click="goBack">
+        <n-button type="primary" size="small" color="#000" @click="goBack">
           返回社区
         </n-button>
       </n-card>
