@@ -327,7 +327,7 @@ function initAnimation() {
   /* 滚动状态 / 内部页面状态 (暗灰色主题) */
   &.is-scrolled {
     height: 56px; /* 保持高度，与页面 padding-top 对齐 */
-    background: rgba(24, 24, 28, 0.98); /* 略微增加不透明度 */
+    background: linear-gradient(180deg, rgba(31, 31, 35, 0.98) 0%, rgba(18, 18, 22, 0.98) 100%);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: none; /* 移除阴影，避免与下方内容头部重叠产生视觉脏感 */
@@ -480,7 +480,7 @@ function initAnimation() {
   .art-pattern {
     width: 100%;
     height: 100%;
-    filter: drop-shadow(0 0 5px rgba(74, 222, 128, 0.5));
+    filter: none;
   }
 }
 
@@ -526,24 +526,10 @@ function initAnimation() {
 .logo-spark {
   width: 12px;
   height: 12px;
-  background: linear-gradient(135deg, #fff 0%, #4ADE80 100%);
+  background: #4ADE80;
   transform: rotate(45deg);
   border-radius: 1px;
   position: relative;
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 100%;
-    height: 100%;
-    background: inherit;
-    filter: blur(4px);
-    opacity: 0.7;
-    transform: translate(-50%, -50%);
-    z-index: -1;
-  }
 }
 
 .logo-content {
@@ -581,11 +567,11 @@ function initAnimation() {
 
 /* ... Menu Styles ... */
 :deep(.custom-menu) {
-  --n-item-text-color-active: #ffffff !important;
+  --n-item-text-color-active: #4ADE80 !important;
   --n-item-text-color-active-hover: #4ADE80 !important;
   --n-item-icon-color: #ffffff !important;
   --n-item-icon-color-hover: #4ADE80 !important;
-  --n-item-icon-color-active: #ffffff !important;
+  --n-item-icon-color-active: #4ADE80 !important;
   --n-item-icon-color-active-hover: #4ADE80 !important;
 
   background-color: transparent !important;
@@ -593,6 +579,7 @@ function initAnimation() {
   align-items: center;
 
   .n-menu-item-content {
+    position: relative;
     padding: 0 20px !important;
     height: 40px;
     display: flex;
@@ -610,6 +597,29 @@ function initAnimation() {
       right: 4px;
       transition: background-color 0.3s ease;
     }
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 6px;
+      height: 2px;
+      background-color: #4ADE80;
+      border-radius: 2px;
+      transform: scaleX(0);
+      transform-origin: center;
+      transition: transform 0.2s ease;
+      opacity: 0.9;
+    }
+
+    &:hover::after {
+      transform: scaleX(1);
+    }
+
+    &.n-menu-item-content--selected::after {
+      transform: scaleX(1);
+    }
   }
 
   .n-menu-item-content-header {
@@ -621,7 +631,7 @@ function initAnimation() {
   }
 
   .n-menu-item-content--selected .n-menu-item-content-header {
-    color: #ffffff !important;
+    color: #4ADE80 !important;
     font-weight: 600;
   }
 
