@@ -409,10 +409,11 @@ const menuOptions = computed<MenuOption[]>(() => {
 
 .workbench-layout {
   flex: 1;
+  height: calc(100vh - 56px);
 }
 
 .workbench-sider {
-  background-color: #f9fafb; /* 浅灰背景，区分内容区 */
+  background-color: #fff;
   display: flex;
   flex-direction: column;
   border-right: 1px solid #f3f4f6;
@@ -443,11 +444,7 @@ const menuOptions = computed<MenuOption[]>(() => {
   }
   
   :deep(.n-menu-item-content--selected) {
-    background-color: #e5e7eb !important; /* 灰色选中背景，更低调 */
-    
-    &::before {
-      display: none; /* 移除右侧绿色条，更简洁 */
-    }
+    background-color: #f9fafb !important;
   }
 
   :deep(.n-menu-item-content__icon) {
@@ -455,7 +452,7 @@ const menuOptions = computed<MenuOption[]>(() => {
   }
 
   :deep(.n-menu-item-content--selected .n-menu-item-content__icon) {
-    color: #111827 !important; /* 选中深色图标 */
+    color: #111827 !important;
   }
 
   :deep(.n-menu-item-content-header) {
@@ -464,14 +461,14 @@ const menuOptions = computed<MenuOption[]>(() => {
   }
 
   :deep(.n-menu-item-content--selected .n-menu-item-content-header) {
-    color: #111827 !important; /* 选中深色文字 */
+    color: #111827 !important;
     font-weight: 600;
   }
 }
 
 .workbench-content {
-  background-color: #fff; // 整体背景改为白色
-  padding: 0; // 由内部组件控制 padding
+  background-color: #F9FAFB;
+  padding: 0;
 }
 
 .content-placeholder {

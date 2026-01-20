@@ -6,7 +6,7 @@
         <span class="view-subtitle">快速访问您最近工作的项目</span>
       </div>
       <div class="header-right">
-        <n-button type="primary" style="margin-right: 12px" @click="handleCreateClick">
+        <n-button type="primary" color="#000" style="margin-right: 12px" @click="handleCreateClick">
           <template #icon>
             <n-icon :component="AddOutline" />
           </template>
@@ -60,7 +60,7 @@
                   <n-icon v-else :component="BulbOutline" color="#10b981" size="32" />
                 </div>
                 <div class="card-overlay">
-                  <n-button type="primary" size="tiny" @click.stop="handleOpenProject(project.id)">
+                  <n-button ghost size="tiny" color="#fff" @click.stop="handleOpenProject(project.id)">
                     进入
                   </n-button>
                 </div>

@@ -32,7 +32,7 @@
                   <n-icon :component="SearchOutline" />
                 </template>
               </n-input>
-              <n-button type="primary" size="large" @click="handleSearch">
+              <n-button type="primary" color="#000" size="large" @click="handleSearch">
                 搜索
               </n-button>
             </n-input-group>
@@ -53,7 +53,7 @@
             <h1>发现无限创意<br/><span class="highlight">探索 AI 的可能性</span></h1>
             <p class="subtitle">汇聚全球开发者的智慧结晶，为您提供最前沿的 AI 应用与设计资源。在这里，每一个想法都值得被看见。</p>
             <div class="hero-actions">
-              <n-button type="primary" size="large" round class="explore-btn" @click="$router.push('/ai/workshop')">
+              <n-button type="primary" color="#000" size="large" round class="explore-btn" @click="$router.push('/ai/workshop')">
                 立即创作
                 <template #icon><n-icon :component="ArrowForwardOutline" /></template>
               </n-button>
@@ -72,7 +72,7 @@
             </div>
             <div class="glass-card card-2">
               <div class="glass-content">
-                <div class="card-icon"><n-icon :component="Heart" color="#f43f5e" /></div>
+                <div class="card-icon"><n-icon :component="Heart" color="#6b7280" /></div>
                 <div class="card-stat"><span>98%</span> Match</div>
               </div>
             </div>
@@ -160,7 +160,7 @@
                   {{ item.author }}
                 </span>
                 <span class="likes">
-                  <n-icon :component="Heart" color="#ff416c" /> {{ item.likes }}
+                  <n-icon :component="Heart" color="#6b7280" /> {{ item.likes }}
                 </span>
               </div>
               <div class="card-tags">
@@ -364,9 +364,9 @@ function scrollCreators(direction: 'left' | 'right') {
 <style scoped lang="scss">
 @use "sass:color";
 
-/* Global Variables - Light Theme Consistent with CreateView */
-$primary-color: #4ade80;
-$bg-color: #f6f5f7;
+/* Global Variables - IdeaSpark Minimalist */
+$primary-color: #000000;
+$bg-color: #ffffff;
 $card-bg: #ffffff;
 $text-primary: #1f2937;
 $text-secondary: #6b7280;
@@ -404,13 +404,8 @@ $border-color: #e5e7eb;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background-color: #f8fafc;
-      /* Advanced mesh gradient background */
-      background-image: 
-        radial-gradient(at 0% 0%, rgba(74, 222, 128, 0.15) 0px, transparent 50%),
-        radial-gradient(at 100% 0%, rgba(56, 189, 248, 0.15) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0px, transparent 50%),
-        radial-gradient(at 0% 100%, rgba(251, 146, 60, 0.15) 0px, transparent 50%);
+      background-color: #ffffff;
+      background-image: none;
       padding: 40px 60px;
       border-radius: 24px;
       margin: 0 auto;
@@ -423,6 +418,7 @@ $border-color: #e5e7eb;
       
       /* Background Animation Blobs */
       .hero-bg-animation {
+        display: none;
         position: absolute;
         inset: 0;
         z-index: 0;
@@ -482,17 +478,17 @@ $border-color: #e5e7eb;
           background: rgba(255, 255, 255, 0.8);
           backdrop-filter: blur(4px);
           border-radius: 20px;
-          border: 1px solid rgba(74, 222, 128, 0.3);
+          border: 1px solid #e5e7eb;
           font-size: 12px;
           font-weight: 600;
-          color: #059669;
+          color: #6b7280;
           margin-bottom: 16px;
           box-shadow: 0 2px 6px rgba(0,0,0,0.04);
           
           .pulse-dot {
             width: 6px;
             height: 6px;
-            background-color: #10b981;
+            background-color: #9ca3af;
             border-radius: 50%;
             position: relative;
             
@@ -501,7 +497,7 @@ $border-color: #e5e7eb;
               position: absolute;
               inset: -3px;
               border-radius: 50%;
-              border: 2px solid #10b981;
+              border: 2px solid #9ca3af;
               opacity: 0.4;
               animation: pulse 2s infinite;
             }
@@ -516,9 +512,10 @@ $border-color: #e5e7eb;
           line-height: 1.2;
           
           .highlight {
-            background: linear-gradient(120deg, #2563eb, #06b6d4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            background: none;
+            -webkit-background-clip: initial;
+            -webkit-text-fill-color: initial;
+            color: #111827;
             user-select: none;
           }
         }
@@ -540,12 +537,12 @@ $border-color: #e5e7eb;
             height: 40px;
             font-size: 14px;
             font-weight: 600;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+            box-shadow: none;
             transition: transform 0.2s;
             
             &:hover {
               transform: translateY(-2px);
-              box-shadow: 0 8px 16px rgba(37, 99, 235, 0.3);
+              box-shadow: none;
             }
           }
           
@@ -611,8 +608,8 @@ $border-color: #e5e7eb;
               
               .card-icon {
                 font-size: 32px;
-                color: #3b82f6;
-                background: #eff6ff;
+                color: #111827;
+                background: #f3f4f6;
                 padding: 12px;
                 border-radius: 12px;
               }
@@ -655,12 +652,12 @@ $border-color: #e5e7eb;
               
               .card-icon {
                 font-size: 40px;
-                filter: drop-shadow(0 4px 6px rgba(244, 63, 94, 0.2));
+                filter: none;
               }
               
               .card-stat {
                 font-size: 14px;
-                color: #64748b;
+                color: #6b7280;
                 font-weight: 500;
                 
                 span {
@@ -937,7 +934,7 @@ $border-color: #e5e7eb;
   &:hover {
     transform: translateY(-8px);
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    border-color: rgba($primary-color, 0.2);
+    border-color: #d1d5db;
     
     .card-thumb {
       transform: scale(1.02);
@@ -963,7 +960,7 @@ $border-color: #e5e7eb;
       position: absolute;
       top: 12px;
       left: 12px;
-      background: rgba(225, 29, 72, 0.9);
+      background: #000000;
       color: white;
       padding: 4px 10px;
       border-radius: 20px;
@@ -1034,10 +1031,10 @@ $border-color: #e5e7eb;
         display: flex;
         align-items: center;
         gap: 6px;
-        background: #fff1f2;
+        background: #f3f4f6;
         padding: 4px 10px;
         border-radius: 20px;
-        color: #e11d48;
+        color: #374151;
         font-weight: 600;
         font-size: 12px;
       }
@@ -1056,5 +1053,15 @@ $border-color: #e5e7eb;
   margin-top: 40px;
   display: flex;
   justify-content: center;
+}
+
+/* Tabs Active and Bar color unify to black */
+.market-header .header-tabs {
+  :deep(.n-tabs-tab-wrapper .n-tabs-tab.n-tabs-tab--active) {
+    color: #000;
+  }
+  :deep(.n-tabs-bar) {
+    background-color: #000;
+  }
 }
 </style>
