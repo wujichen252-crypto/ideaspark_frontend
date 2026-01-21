@@ -65,16 +65,12 @@
           <div class="header-actions">
             <n-tooltip trigger="hover">
               <template #trigger>
-                <n-button circle quaternary size="small">
+                <n-button circle quaternary size="small" @click="$router.push('/notifications')">
                   <template #icon><n-icon :component="NotificationsOutline" /></template>
                 </n-button>
               </template>
               消息通知
             </n-tooltip>
-            <n-button type="primary" color="#000" size="small" @click="$router.push('/create')">
-              <template #icon><n-icon :component="AddOutline" /></template>
-              新建项目
-            </n-button>
           </div>
         </div>
 
