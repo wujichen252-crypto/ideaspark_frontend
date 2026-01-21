@@ -115,7 +115,7 @@
             </div>
           </div>
 
-          <a href="#" class="forgot-password">忘记密码?</a>
+          <a class="forgot-password" @click.prevent="$router.push('/forgot-password')">忘记密码?</a>
 
           <button class="action-btn" :disabled="loading" @click="handleLogin">
             <span v-if="!loading">登录</span>
