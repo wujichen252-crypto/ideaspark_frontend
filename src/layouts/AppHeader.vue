@@ -30,13 +30,17 @@ const menuOptions = computed<MenuOption[]>(() => {
 })
 
 // 监听路由变化更新 activeKey
-watch(() => route.path, (path) => {
-  if (path === '/dashboard') activeKey.value = 'dashboard'
-  else if (path === '/workbench') activeKey.value = 'workbench'
-  else if (path === '/market') activeKey.value = 'market'
-  else if (path === '/community') activeKey.value = 'community'
-  else activeKey.value = null
-}, { immediate: true })
+watch(
+  () => route.path,
+  (path) => {
+    if (path === '/dashboard') activeKey.value = 'dashboard'
+    else if (path === '/workbench') activeKey.value = 'workbench'
+    else if (path === '/market') activeKey.value = 'market'
+    else if (path === '/community') activeKey.value = 'community'
+    else activeKey.value = null
+  },
+  { immediate: true }
+)
 
 // GSAP Timeline
 let tl: gsap.core.Timeline | null = null
@@ -83,16 +87,16 @@ function handleScroll() {
 }
 
 // 监听路由变化，及时更新 Header 状态
-  watch(
-    () => route.path,
-    async () => {
-      // 路由切换时，重新评估 Header 状态
-      await nextTick()
-      handleScroll()
-      // 重新初始化动画，防止元素丢失
-      initAnimation()
-    }
-  )
+watch(
+  () => route.path,
+  async () => {
+    // 路由切换时，重新评估 Header 状态
+    await nextTick()
+    handleScroll()
+    // 重新初始化动画，防止元素丢失
+    initAnimation()
+  }
+)
 
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
@@ -133,9 +137,11 @@ function initAnimation() {
     // 再次尝试获取，可能是 v-if 或 DOM 更新导致
     const headerEl = document.querySelector('.app-header')
     if (headerEl) {
-      if (!scrolledLogo) scrolledLogo = headerEl.querySelector('.scrolled-logo-container') as HTMLElement
+      if (!scrolledLogo)
+        scrolledLogo = headerEl.querySelector('.scrolled-logo-container') as HTMLElement
       if (!solidSquare) solidSquare = headerEl.querySelector('.solid-square') as HTMLElement
-      if (!initialLogo) initialLogo = headerEl.querySelector('.initial-logo-container') as HTMLElement
+      if (!initialLogo)
+        initialLogo = headerEl.querySelector('.initial-logo-container') as HTMLElement
     }
   }
 
@@ -149,15 +155,20 @@ function initAnimation() {
   tl = gsap.timeline({ paused: true })
 
   // 1. 初始 Logo 整体淡出
-  tl.to(initialLogo, {
-    duration: 0.4,
-    autoAlpha: 0,
-    y: -10,
-    ease: 'power2.in'
-  }, 0)
+  tl.to(
+    initialLogo,
+    {
+      duration: 0.4,
+      autoAlpha: 0,
+      y: -10,
+      ease: 'power2.in'
+    },
+    0
+  )
 
   // 2. 形态重组 (Reassembly)
-  tl.fromTo(scrolledLogo,
+  tl.fromTo(
+    scrolledLogo,
     {
       autoAlpha: 0,
       scale: 0.5,
@@ -174,7 +185,8 @@ function initAnimation() {
   )
 
   // 方块的变形效果强化
-  tl.fromTo(solidSquare,
+  tl.fromTo(
+    solidSquare,
     { rx: 40 }, // 圆形
     { duration: 0.6, rx: 8, ease: 'power2.out' },
     0.5
@@ -212,12 +224,18 @@ function initAnimation() {
 
           <!-- 滚动后 Logo -->
           <div ref="scrolledLogoRef" class="scrolled-logo-container">
-             <svg class="art-pattern" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg
+              class="art-pattern"
+              viewBox="0 0 80 80"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
               <defs>
                 <mask id="hollow-mask">
                   <rect x="0" y="0" width="80" height="80" fill="white" />
                   <text
-                    x="40" y="53"
+                    x="40"
+                    y="53"
                     text-anchor="middle"
                     font-family="'Orbitron', sans-serif"
                     font-weight="900"
@@ -225,11 +243,17 @@ function initAnimation() {
                     fill="black"
                     letter-spacing="1"
                     class="is-text"
-                  >IS</text>
+                  >
+                    IS
+                  </text>
                 </mask>
               </defs>
               <rect
-                ref="solidSquareRef" x="15" y="15" width="50" height="50"
+                ref="solidSquareRef"
+                x="15"
+                y="15"
+                width="50"
+                height="50"
                 rx="8"
                 fill="#4ADE80"
                 mask="url(#hollow-mask)"
@@ -280,20 +304,22 @@ function initAnimation() {
               { label: '个人中心', key: 'profile' },
               { label: '退出登录', key: 'logout' }
             ]"
-            @select="(key) => {
-              if (key === 'profile') router.push('/profile')
-              if (key === 'logout') {
-                userStore.logout()
-                router.push('/')
+            @select="
+              (key) => {
+                if (key === 'profile') router.push('/profile')
+                if (key === 'logout') {
+                  userStore.logout()
+                  router.push('/')
+                }
               }
-            }"
+            "
           >
             <div class="user-avatar-wrapper">
               <n-avatar
                 round
                 size="small"
                 :src="userStore.userInfo?.avatar"
-                style="cursor: pointer;"
+                style="cursor: pointer"
               />
               <span class="username ml-2">{{ userStore.userInfo?.username }}</span>
             </div>
@@ -301,8 +327,10 @@ function initAnimation() {
 
           <!-- 未登录状态 -->
           <n-button v-else quaternary class="login-btn" @click="router.push('/login')">
-             <template #icon><n-icon><PersonOutline /></n-icon></template>
-             登录 / 注册
+            <template #icon
+              ><n-icon><PersonOutline /></n-icon
+            ></template>
+            登录 / 注册
           </n-button>
         </n-space>
       </div>
@@ -320,16 +348,16 @@ function initAnimation() {
   height: 56px;
   display: flex;
   align-items: center;
-  background: transparent;
+  background: #9b9ef0;
   border-bottom: none;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* 滚动状态 / 内部页面状态 (暗灰色主题) */
+  /* 滚动状态 / 内部页面状态 */
   &.is-scrolled {
     height: 56px; /* 保持高度，与页面 padding-top 对齐 */
-    background: linear-gradient(180deg, rgba(31, 31, 35, 0.98) 0%, rgba(18, 18, 22, 0.98) 100%);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: #9b9ef0;
+    backdrop-filter: none;
+    border-bottom: none;
     box-shadow: none; /* 移除阴影，避免与下方内容头部重叠产生视觉脏感 */
 
     /* CSS 状态控制作为 GSAP 的兜底 */
@@ -355,50 +383,64 @@ function initAnimation() {
 
     /* Logo 适配 */
     .logo-title {
-      color: #f0f0f0; /* 浅色文字 */
+      color: #111; /* 深色文字 */
     }
-    
+
     /* 菜单适配 */
     :deep(.custom-menu) {
+      --n-item-text-color: #ffffff !important;
+      --n-item-text-color-hover: #ffffff !important;
+      --n-item-text-color-active: #ffffff !important;
+      --n-item-text-color-child-active: #ffffff !important;
+      --n-item-text-color-child-active-hover: #ffffff !important;
+
       .n-menu-item-content-header {
-        color: rgba(255, 255, 255, 0.85) !important;
+        color: #ffffff !important;
+        font-weight: 800 !important;
+        font-size: 18px !important;
       }
       .n-menu-item-content:hover .n-menu-item-content-header,
       .n-menu-item-content--selected .n-menu-item-content-header {
-        color: #4ADE80 !important;
+        color: #ffffff !important; /* 保持白色 */
+        opacity: 0.9;
       }
-      
+
       /* Hover 背景调整 */
       .n-menu-item-content:hover::before {
-        background-color: rgba(255, 255, 255, 0.08) !important;
+        background-color: rgba(255, 255, 255, 0.1) !important;
       }
     }
 
     /* 右侧图标/文字适配 */
     .icon-btn {
-      color: #fff;
-      &:hover { background-color: rgba(255,255,255,0.1) !important; }
+      color: #ffffff !important;
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+      }
     }
-    
+
     .login-btn {
-      color: #fff !important;
-      &:hover { color: #4ADE80 !important; }
+      color: #ffffff !important;
+      &:hover {
+        color: #ffffff !important;
+        opacity: 0.8;
+      }
     }
 
     .user-avatar-wrapper {
       background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255,255,255,0.05);
-      
+      border: 1px solid rgba(255, 255, 255, 0.1);
+
       &:hover {
         background: rgba(255, 255, 255, 0.2);
       }
-      
+
       .n-avatar {
-        border: 1px solid rgba(255,255,255,0.2) !important;
+        border: 1px solid #fff !important;
       }
 
       .username {
-        color: #fff;
+        color: #ffffff !important;
       }
     }
   }
@@ -425,10 +467,13 @@ function initAnimation() {
 }
 
 .header-center {
-  flex: 1;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 100%;
   display: flex;
   justify-content: center;
-  height: 100%;
+  align-items: center;
 }
 
 .header-right {
@@ -500,7 +545,7 @@ function initAnimation() {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background-color: #4ADE80;
+  background-color: #4ade80;
   opacity: 0;
 }
 
@@ -526,7 +571,7 @@ function initAnimation() {
 .logo-spark {
   width: 12px;
   height: 12px;
-  background: #4ADE80;
+  background: #4ade80;
   transform: rotate(45deg);
   border-radius: 1px;
   position: relative;
@@ -556,7 +601,7 @@ function initAnimation() {
 
 .logo-subtitle {
   font-size: 9px;
-  color: #4ADE80;
+  color: #4ade80;
   text-transform: uppercase;
   letter-spacing: 3px;
   margin-top: 3px;
@@ -567,16 +612,17 @@ function initAnimation() {
 
 /* ... Menu Styles ... */
 :deep(.custom-menu) {
-  --n-item-text-color-active: #4ADE80 !important;
-  --n-item-text-color-active-hover: #4ADE80 !important;
+  --n-item-text-color-active: #4ade80 !important;
+  --n-item-text-color-active-hover: #4ade80 !important;
   --n-item-icon-color: #ffffff !important;
-  --n-item-icon-color-hover: #4ADE80 !important;
-  --n-item-icon-color-active: #4ADE80 !important;
-  --n-item-icon-color-active-hover: #4ADE80 !important;
+  --n-item-icon-color-hover: #4ade80 !important;
+  --n-item-icon-color-active: #4ade80 !important;
+  --n-item-icon-color-active-hover: #4ade80 !important;
 
   background-color: transparent !important;
   display: flex;
   align-items: center;
+  gap: 120px !important;
 
   .n-menu-item-content {
     position: relative;
@@ -605,7 +651,7 @@ function initAnimation() {
       right: 16px;
       bottom: 6px;
       height: 2px;
-      background-color: #4ADE80;
+      background-color: #ffffff;
       border-radius: 2px;
       transform: scaleX(0);
       transform-origin: center;
@@ -623,21 +669,25 @@ function initAnimation() {
   }
 
   .n-menu-item-content-header {
-    font-weight: 500;
+    font-weight: 800 !important; /* 加粗 */
     letter-spacing: 0.5px;
-    font-size: 15px;
+    font-size: 18px !important; /* 调大 */
     transition: all 0.3s ease;
-    color: rgba(255, 255, 255, 0.85) !important;
+    color: #ffffff !important; /* 白色 */
+    font-family:
+      'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial,
+      sans-serif !important; /* 商务字体 */
   }
 
   .n-menu-item-content--selected .n-menu-item-content-header {
-    color: #4ADE80 !important;
-    font-weight: 600;
+    color: #ffffff !important; /* 保持白色 */
+    font-weight: 700 !important;
   }
 
   .n-menu-item-content:hover .n-menu-item-content-header,
   .n-menu-item-content--selected:hover .n-menu-item-content-header {
-    color: #4ADE80 !important;
+    color: #ffffff !important;
+    opacity: 0.9;
   }
 }
 
@@ -670,9 +720,9 @@ function initAnimation() {
   color: #fff !important;
   font-weight: 500;
   transition: color 0.3s;
-  
+
   &:hover {
-    color: #4ADE80 !important;
+    color: #4ade80 !important;
   }
 }
 
@@ -680,10 +730,11 @@ function initAnimation() {
   color: #fff; /* Default color */
   transition: color 0.3s;
   &:hover {
-    background-color: rgba(255,255,255,0.1) !important;
+    background-color: rgba(255, 255, 255, 0.1) !important;
   }
 }
 
-.ml-2 { margin-left: 8px; }
-
+.ml-2 {
+  margin-left: 8px;
+}
 </style>

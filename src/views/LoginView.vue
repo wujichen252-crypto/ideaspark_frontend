@@ -254,7 +254,7 @@ $border-color: #e5e7eb;
   flex-direction: column;
   height: 100vh;
   padding-top: 0; /* Removed padding to allow full screen centering */
-  background: #e6f4fe;
+  background: #f8f8ff;
   font-family:
     'Inter',
     'HarmonyOS Sans SC',
@@ -292,7 +292,7 @@ $border-color: #e5e7eb;
   inset: 0;
   overflow: hidden;
   z-index: 0;
-  background: #e6f4fe;
+  background: #f8f8ff;
 }
 
 .aurora-blob {
@@ -434,7 +434,7 @@ $border-color: #e5e7eb;
 }
 
 .overlay {
-  background: #1d3e56 !important;
+  background: #3b306dfd !important;
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 0 0;

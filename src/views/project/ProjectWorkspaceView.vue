@@ -1564,16 +1564,23 @@ function downloadBlob(filename: string, blob: Blob) {
   height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative; /* 为绝对定位的 header 提供锚点 */
 }
 
 .content-header {
+  position: absolute; /* 悬浮定位 */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
   height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  border-bottom: 1px solid #e5e7eb;
-  background-color: #fff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background-color: rgba(155, 158, 240, 0.9); /* #9B9EF0 半透明 */
+  backdrop-filter: blur(20px);                /* 毛玻璃效果 */
   flex-shrink: 0;
 }
 
@@ -1601,7 +1608,9 @@ function downloadBlob(filename: string, blob: Blob) {
   flex-direction: column;
   min-height: 0;
   padding: 16px 0;
+  padding-top: 72px; /* 56px header + 16px padding */
   box-sizing: border-box;
+  overflow-y: auto; /* 统一由 body 滚动，以便内容穿过 header 下方 */
 }
 
 .content-body-inner {
@@ -1635,7 +1644,7 @@ function downloadBlob(filename: string, blob: Blob) {
 }
 
 .home-panel {
-  overflow: auto;
+  /* overflow: auto; 移除内部滚动，改用 body 滚动 */
 }
 
 .home-hero {

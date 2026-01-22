@@ -488,6 +488,7 @@ const handleExport = () => {
   display: flex;
   flex-direction: column;
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative; /* 为绝对定位的 header 提供锚点 */
   
   &.collapsed {
     width: 64px;
@@ -498,11 +499,18 @@ const handleExport = () => {
   }
 
   .sidebar-header {
+    position: absolute; /* 悬浮定位 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
     height: 60px;
     display: flex;
     align-items: center;
     padding: 0 12px;
-    border-bottom: 1px solid #f5f7fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    background: rgba(155, 158, 240, 0.9); /* #9B9EF0 半透明 */
+    backdrop-filter: blur(20px);          /* 毛玻璃效果 */
     gap: 8px;
     
     .project-title {
@@ -524,6 +532,7 @@ const handleExport = () => {
   .nav-menu {
     flex: 1;
     overflow-y: auto;
+    padding-top: 60px; /* 为悬浮 header 留出空间 */
   }
 
   .sidebar-footer {
@@ -552,15 +561,22 @@ const handleExport = () => {
   flex-direction: column;
   background: #fff;
   min-width: 300px;
+  position: relative; /* 为绝对定位的 header 提供锚点 */
   
   .panel-header {
+    position: absolute; /* 悬浮定位 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
     height: 60px;
     padding: 0 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid #eef0f5;
-    background: #fff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    background: rgba(155, 158, 240, 0.9); /* #9B9EF0 半透明 */
+    backdrop-filter: blur(20px);          /* 毛玻璃效果 */
     
     .module-info {
       h3 {
@@ -571,7 +587,7 @@ const handleExport = () => {
       }
       .desc {
         font-size: 12px;
-        color: #999;
+        color: #666;
       }
     }
   }
@@ -580,6 +596,7 @@ const handleExport = () => {
     flex: 1;
     overflow-y: auto;
     padding: 24px;
+    padding-top: 84px; /* 60px header + 24px padding */
     
     &.workspace-content {
       background-color: #f5f7fa;
@@ -642,19 +659,29 @@ const handleExport = () => {
   flex-direction: column;
   border-left: 1px solid #eef0f5;
   min-width: 300px;
+  position: relative; /* 为绝对定位的 header 提供锚点 */
   
   .panel-header {
+    position: absolute; /* 悬浮定位 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
     height: 60px;
     padding: 0 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid #f5f7fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    background: rgba(230, 244, 254, 0.9); /* #E6F4FE 半透明 */
+    backdrop-filter: blur(20px);          /* 毛玻璃效果 */
   }
   
   .chat-container {
     flex: 1;
-    overflow: hidden;
+    overflow-y: auto;
+    padding: 16px;
+    padding-top: 76px; /* 60px header + 16px padding */
   }
 }
 
