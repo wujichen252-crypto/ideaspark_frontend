@@ -20,7 +20,7 @@
             </template>
             一键已读
           </n-button>
-          <n-button secondary size="small" @click="clearRead" class="ml-2">
+          <n-button secondary size="small" class="ml-2" @click="clearRead">
             <template #icon>
               <n-icon :component="TrashOutline" />
             </template>

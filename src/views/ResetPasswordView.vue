@@ -15,12 +15,7 @@
 
         <div class="input-group">
           <div class="custom-input-wrapper">
-            <input
-              v-model="password"
-              type="password"
-              placeholder="新密码"
-              class="custom-input"
-            />
+            <input v-model="password" type="password" placeholder="新密码" class="custom-input" />
             <span class="input-border"></span>
           </div>
           <div class="custom-input-wrapper">
@@ -90,12 +85,18 @@ function handleConfirmReset() {
 @use 'sass:color';
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;600;700;800&display=swap');
 
-/* 全局变量 - 黑白主题 */
-$primary-color: #0a0a0a;
-$secondary-color: #111111;
-$text-color: #111111;
-$text-secondary: rgba(17, 17, 17, 0.72);
-$bg-color: #e9e5dc;
+/* 全局变量 - 白色 + 浅蓝 + 黑色引导 */
+$text-color: #0f172a;
+$text-secondary: #475569;
+$bg-root: #ffffff;
+$bg-surface: #ffffff;
+$bg-soft-blue: #f2f6ff;
+$bg-soft-blue-2: #eef3ff;
+$bg-soft-blue-3: #eaf0ff;
+$action-primary: #3e5be6;
+$action-hover: #4a6cf7;
+$action-active: #3248c2;
+$border-color: #e5e7eb;
 
 /* 全局样式 */
 * {
@@ -110,9 +111,9 @@ $bg-color: #e9e5dc;
   height: 100vh;
   padding-top: 0;
   background:
-    radial-gradient(1200px circle at 20% -10%, rgba(0, 0, 0, 0.035), transparent 60%),
-    radial-gradient(800px circle at 80% 110%, rgba(0, 0, 0, 0.045), transparent 60%),
-    linear-gradient(180deg, #ece7de 0%, #e9e5dc 60%, #e6e1d8 100%);
+    radial-gradient(1200px circle at 20% -10%, rgba(62, 91, 230, 0.08), transparent 60%),
+    radial-gradient(800px circle at 80% 110%, rgba(62, 91, 230, 0.06), transparent 60%),
+    linear-gradient(180deg, #ffffff 0%, #f3f7ff 60%, #e4edff 100%);
   font-family:
     'Inter',
     'HarmonyOS Sans SC',
@@ -150,7 +151,7 @@ $bg-color: #e9e5dc;
   inset: 0;
   overflow: hidden;
   z-index: 0;
-  background: #e9e5dc;
+  background: #ffffff;
 }
 
 .aurora-blob {
@@ -166,7 +167,7 @@ $bg-color: #e9e5dc;
   left: -10%;
   width: 50vw;
   height: 50vw;
-  background: #ddd7cd;
+  background: #e5ecff;
   animation-delay: 0s;
 }
 
@@ -175,7 +176,7 @@ $bg-color: #e9e5dc;
   right: -10%;
   width: 60vw;
   height: 60vw;
-  background: #e6e1d8;
+  background: #dde7ff;
   animation-delay: -2s;
 }
 
@@ -184,7 +185,7 @@ $bg-color: #e9e5dc;
   left: 40%;
   width: 40vw;
   height: 40vw;
-  background: radial-gradient(circle, #e3ded4 0%, #e9e5dc 100%);
+  background: radial-gradient(circle, #e7eeff 0%, #f3f7ff 100%);
   transform: translate(-50%, -50%);
   animation-delay: -4s;
 }
@@ -204,9 +205,9 @@ $bg-color: #e9e5dc;
 
 /* --- 主容器 --- */
 .container {
-  background: #ffffff;
+  background: $bg-surface;
   border-radius: 20px;
-  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.08);
   position: relative;
   overflow: hidden;
   width: 400px;
@@ -255,84 +256,81 @@ h1 {
 .custom-input-wrapper {
   position: relative;
   width: 100%;
-}
+  margin-bottom: 5px;
 
-.custom-input {
-  background-color: #f5f5f5;
-  border: none;
-  padding: 14px 16px;
-  margin: 0;
-  width: 100%;
-  border-radius: 12px;
-  font-size: 14px;
-  color: $text-color;
-  transition: all 0.3s ease;
-  outline: none;
-  font-weight: 500;
-}
+  .custom-input {
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid $border-color;
+    padding: 12px 5px;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 0;
+    color: $text-color;
+    outline: none;
+    transition: all 0.3s;
 
-.custom-input::placeholder {
-  color: rgba(17, 17, 17, 0.4);
-  font-weight: 400;
-}
+    &::placeholder {
+      color: rgba(71, 85, 105, 0.6);
+    }
 
-.custom-input:focus {
-  background-color: #ffffff;
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08);
-}
+    &:focus {
+      background-color: transparent;
+      border-bottom-color: transparent;
+      box-shadow: none;
+    }
+  }
 
-.input-border {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  width: 0;
-  height: 2px;
-  background-color: $primary-color;
-  transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
-  transform: translateX(-50%);
-  pointer-events: none;
-}
+  .input-border {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #000000;
+    transition: width 0.4s ease;
+    display: block;
+  }
 
-.custom-input:focus ~ .input-border {
-  width: 100%;
+  .custom-input:focus + .input-border {
+    width: 100%;
+  }
 }
 
 .action-btn {
-  border-radius: 12px;
-  border: 1px solid #111;
-  background-color: #111;
+  border-radius: 16px;
+  border: 1px solid #000000;
+  background-color: #000000;
   color: #fff;
   font-size: 13px;
   font-weight: 600;
-  padding: 14px 45px;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  padding: 12px 45px;
+  letter-spacing: 1px;
+  text-transform: none;
+  transition:
+    transform 80ms ease-in,
+    background 0.3s;
+  margin-top: 10px;
   cursor: pointer;
   width: 100%;
-  position: relative;
-  overflow: hidden;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
-.action-btn:hover:not(:disabled) {
-  background-color: #000;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-}
+  &:active {
+    transform: scale(0.95);
+  }
 
-.action-btn:active:not(:disabled) {
-  transform: translateY(1px);
-}
+  &:focus {
+    outline: none;
+  }
 
-.action-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-  background-color: #333;
-  border-color: #333;
+  &:hover {
+    background-color: #333333;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.25);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
 }
 
 /* Loading Spinner */
@@ -366,7 +364,7 @@ h1 {
 }
 
 .back-link:hover {
-  color: $primary-color;
+  color: $text-color;
   text-decoration: underline;
 }
 
@@ -377,7 +375,7 @@ h1 {
     border-radius: 0;
     box-shadow: none;
   }
-  
+
   .form-content {
     padding: 0 24px;
   }
