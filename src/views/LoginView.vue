@@ -254,10 +254,7 @@ $border-color: #e5e7eb;
   flex-direction: column;
   height: 100vh;
   padding-top: 0; /* Removed padding to allow full screen centering */
-  background:
-    radial-gradient(1200px circle at 20% -10%, rgba(62, 91, 230, 0.08), transparent 60%),
-    radial-gradient(800px circle at 80% 110%, rgba(62, 91, 230, 0.06), transparent 60%),
-    linear-gradient(180deg, #ffffff 0%, #f3f7ff 60%, #e4edff 100%);
+  background: #e6f4fe;
   font-family:
     'Inter',
     'HarmonyOS Sans SC',
@@ -295,7 +292,7 @@ $border-color: #e5e7eb;
   inset: 0;
   overflow: hidden;
   z-index: 0;
-  background: #ffffff;
+  background: #e6f4fe;
 }
 
 .aurora-blob {

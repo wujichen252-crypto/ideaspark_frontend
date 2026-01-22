@@ -881,7 +881,7 @@ const projectColumns: DataTableColumns<ProjectRow> = [
 }
 
 .welcome-card {
-  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  background: #1D3E56;
   border-radius: 12px;
   padding: 40px;
   position: relative;
