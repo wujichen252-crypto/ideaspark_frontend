@@ -3,7 +3,6 @@ import { ref, onMounted, onUnmounted, nextTick, watch, computed } from 'vue'
 import type { MenuOption } from 'naive-ui'
 import { useRouter, useRoute } from 'vue-router'
 import { PersonOutline } from '@vicons/ionicons5'
-import gsap from 'gsap'
 
 import { useUserStore } from '@/store'
 
@@ -42,12 +41,7 @@ watch(
   { immediate: true }
 )
 
-// GSAP Timeline
-let tl: gsap.core.Timeline | null = null
-
-// 粒子数量
-const particleCount = 20
-const particles = ref(Array.from({ length: particleCount }, (_, i) => i))
+// 移除动画与粒子效果，简化为静态 Logo 显示
 
 /**
  * 处理菜单切换
@@ -74,16 +68,6 @@ function handleScroll() {
   if (isScrolled.value !== shouldBeScrolled) {
     isScrolled.value = shouldBeScrolled
   }
-
-  // 同步 GSAP 动画状态
-  // 即使状态没有改变，也需要确保 timeline 处于正确位置（例如刚初始化时）
-  if (tl) {
-    if (shouldBeScrolled) {
-      tl.play()
-    } else {
-      tl.reverse()
-    }
-  }
 }
 
 // 监听路由变化，及时更新 Header 状态
@@ -93,108 +77,18 @@ watch(
     // 路由切换时，重新评估 Header 状态
     await nextTick()
     handleScroll()
-    // 重新初始化动画，防止元素丢失
-    initAnimation()
   }
 )
 
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
-
-  // 初始化 GSAP 动画
-  nextTick(() => {
-    initAnimation()
-  })
 })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
-  tl?.kill()
 })
 
-const solidSquareRef = ref<HTMLElement | null>(null)
-const logoTitleRef = ref<HTMLElement | null>(null)
-const subtitleRef = ref<HTMLElement | null>(null)
-const logoIconRef = ref<HTMLElement | null>(null)
-const scrolledLogoRef = ref<HTMLElement | null>(null)
-const initialLogoRef = ref<HTMLElement | null>(null)
-
-function initAnimation() {
-  // 清理旧的时间轴，防止冲突
-  if (tl) {
-    tl.kill()
-    tl = null
-  }
-
-  // 使用 Refs 获取元素
-  // 注意：只严格检查动画实际需要的元素，避免因无关元素缺失导致动画失效
-  let scrolledLogo = scrolledLogoRef.value
-  let solidSquare = solidSquareRef.value
-  let initialLogo = initialLogoRef.value
-
-  // Fallback: 如果 Refs 为空，尝试直接查询 DOM (防止 Refs 尚未绑定)
-  if (!scrolledLogo || !solidSquare || !initialLogo) {
-    // 再次尝试获取，可能是 v-if 或 DOM 更新导致
-    const headerEl = document.querySelector('.app-header')
-    if (headerEl) {
-      if (!scrolledLogo)
-        scrolledLogo = headerEl.querySelector('.scrolled-logo-container') as HTMLElement
-      if (!solidSquare) solidSquare = headerEl.querySelector('.solid-square') as HTMLElement
-      if (!initialLogo)
-        initialLogo = headerEl.querySelector('.initial-logo-container') as HTMLElement
-    }
-  }
-
-  // 必须确保关键动画元素存在
-  if (!scrolledLogo || !solidSquare || !initialLogo) {
-    // 如果仍然获取不到，可能是路由切换导致组件重新挂载，等待 DOM 稳定
-    return
-  }
-
-  // 创建时间轴 (默认为暂停状态)
-  tl = gsap.timeline({ paused: true })
-
-  // 1. 初始 Logo 整体淡出
-  tl.to(
-    initialLogo,
-    {
-      duration: 0.4,
-      autoAlpha: 0,
-      y: -10,
-      ease: 'power2.in'
-    },
-    0
-  )
-
-  // 2. 形态重组 (Reassembly)
-  tl.fromTo(
-    scrolledLogo,
-    {
-      autoAlpha: 0,
-      scale: 0.5,
-      rotation: -90
-    },
-    {
-      duration: 0.6,
-      autoAlpha: 1,
-      scale: 1,
-      rotation: 0,
-      ease: 'back.out(1.7)'
-    },
-    0.2 // 稍微提前，衔接更紧凑
-  )
-
-  // 方块的变形效果强化
-  tl.fromTo(
-    solidSquare,
-    { rx: 40 }, // 圆形
-    { duration: 0.6, rx: 8, ease: 'power2.out' },
-    0.5
-  )
-
-  // 动画初始化完成后，立即检查一次状态
-  handleScroll()
-}
+// 删除动画相关的 DOM refs 与初始化逻辑
 </script>
 
 <template>
@@ -208,77 +102,7 @@ function initAnimation() {
       <!-- 1. Left: Logo -->
       <div class="header-left">
         <div class="brand-logo" @click="onUpdateMenu('home')">
-          <!-- 粒子层 -->
-          <div class="particles-container">
-            <div
-              v-for="i in particles"
-              :key="i"
-              class="energy-particle"
-              :style="{
-                top: `${Math.random() * 40}px`,
-                left: `${Math.random() * 150 + 50}px`,
-                backgroundColor: Math.random() > 0.5 ? '#4ADE80' : '#FFFFFF'
-              }"
-            ></div>
-          </div>
-
-          <!-- 滚动后 Logo -->
-          <div ref="scrolledLogoRef" class="scrolled-logo-container">
-            <svg
-              class="art-pattern"
-              viewBox="0 0 80 80"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <defs>
-                <mask id="hollow-mask">
-                  <rect x="0" y="0" width="80" height="80" fill="white" />
-                  <text
-                    x="40"
-                    y="53"
-                    text-anchor="middle"
-                    font-family="'Orbitron', sans-serif"
-                    font-weight="900"
-                    font-size="30"
-                    fill="black"
-                    letter-spacing="1"
-                    class="is-text"
-                  >
-                    IS
-                  </text>
-                </mask>
-              </defs>
-              <rect
-                ref="solidSquareRef"
-                x="15"
-                y="15"
-                width="50"
-                height="50"
-                rx="8"
-                fill="#4ADE80"
-                mask="url(#hollow-mask)"
-                class="solid-square"
-              />
-            </svg>
-          </div>
-
-          <!-- 初始 Logo -->
-          <div ref="initialLogoRef" class="initial-logo-container">
-            <div ref="logoIconRef" class="logo-icon-wrapper">
-              <div class="logo-icon">
-                <div class="logo-spark"></div>
-              </div>
-            </div>
-            <div class="logo-content">
-              <div ref="logoTitleRef" class="logo-title">
-                <span class="logo-title-char">意</span>
-                <span class="logo-title-char">念</span>
-                <span class="logo-title-char">方</span>
-                <span class="logo-title-char">舟</span>
-              </div>
-              <div ref="subtitleRef" class="logo-subtitle">IDEASPARK</div>
-            </div>
-          </div>
+          <img src="@/assets/logo-ideaspark.svg" class="brand-logo-image" alt="IdeaSpark Logo" />
         </div>
       </div>
 
@@ -348,14 +172,14 @@ function initAnimation() {
   height: 56px;
   display: flex;
   align-items: center;
-  background: #9b9ef0;
+  background: transparent;
   border-bottom: none;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   /* 滚动状态 / 内部页面状态 */
   &.is-scrolled {
     height: 56px; /* 保持高度，与页面 padding-top 对齐 */
-    background: #9b9ef0;
+    background: transparent;
     backdrop-filter: none;
     border-bottom: none;
     box-shadow: none; /* 移除阴影，避免与下方内容头部重叠产生视觉脏感 */
@@ -388,51 +212,51 @@ function initAnimation() {
 
     /* 菜单适配 */
     :deep(.custom-menu) {
-      --n-item-text-color: #ffffff !important;
-      --n-item-text-color-hover: #ffffff !important;
-      --n-item-text-color-active: #ffffff !important;
-      --n-item-text-color-child-active: #ffffff !important;
-      --n-item-text-color-child-active-hover: #ffffff !important;
+      --n-item-text-color: #111111 !important;
+      --n-item-text-color-hover: #111111 !important;
+      --n-item-text-color-active: #111111 !important;
+      --n-item-text-color-child-active: #111111 !important;
+      --n-item-text-color-child-active-hover: #111111 !important;
 
       .n-menu-item-content-header {
-        color: #ffffff !important;
+        color: #111111 !important;
         font-weight: 800 !important;
         font-size: 18px !important;
       }
       .n-menu-item-content:hover .n-menu-item-content-header,
       .n-menu-item-content--selected .n-menu-item-content-header {
-        color: #ffffff !important; /* 保持白色 */
+        color: #111111 !important;
         opacity: 0.9;
       }
 
       /* Hover 背景调整 */
       .n-menu-item-content:hover::before {
-        background-color: rgba(255, 255, 255, 0.1) !important;
+        background-color: rgba(0, 0, 0, 0.06) !important;
       }
     }
 
     /* 右侧图标/文字适配 */
     .icon-btn {
-      color: #ffffff !important;
+      color: #111111 !important;
       &:hover {
-        background-color: rgba(255, 255, 255, 0.1) !important;
+        background-color: rgba(0, 0, 0, 0.06) !important;
       }
     }
 
     .login-btn {
-      color: #ffffff !important;
+      color: #111111 !important;
       &:hover {
-        color: #ffffff !important;
+        color: #111111 !important;
         opacity: 0.8;
       }
     }
 
     .user-avatar-wrapper {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(0, 0, 0, 0.05);
 
       &:hover {
-        background: rgba(255, 255, 255, 0.2);
+        background: rgba(0, 0, 0, 0.08);
       }
 
       .n-avatar {
@@ -440,7 +264,7 @@ function initAnimation() {
       }
 
       .username {
-        color: #ffffff !important;
+        color: #111111 !important;
       }
     }
   }
@@ -491,6 +315,11 @@ function initAnimation() {
   position: relative;
   height: 40px;
   width: 200px;
+}
+
+.brand-logo-image {
+  height: 36px;
+  display: block;
 }
 
 /* ... Container Management ... */
