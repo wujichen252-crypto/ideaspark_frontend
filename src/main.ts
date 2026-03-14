@@ -11,7 +11,10 @@ import store from './store'
  */
 const updateScrollbarWidthVar = () => {
   const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
-  document.documentElement.style.setProperty('--scrollbar-width', `${Math.max(0, scrollbarWidth)}px`)
+  document.documentElement.style.setProperty(
+    '--scrollbar-width',
+    `${Math.max(0, scrollbarWidth)}px`
+  )
   const isDesktopPointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches
   const overlayGap = scrollbarWidth === 0 && isDesktopPointer ? 16 : 0
   document.documentElement.style.setProperty('--scrollbar-overlay-gap', `${overlayGap}px`)

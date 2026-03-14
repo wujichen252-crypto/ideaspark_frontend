@@ -183,22 +183,24 @@ async function handleLogin() {
   loading.value = true
   try {
     const res = await apiLogin({ email: signInModel.email, password: signInModel.password })
-    const { token, user } = res.data.data
+    const { token: authToken, userInfo } = res.data.data
+
     userStore.login(
       {
-        id: String(user.id),
-        username: user.username,
-        email: user.email,
-        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`,
-        role: '用户',
+        id: String(userInfo.id),
+        username: userInfo.username,
+        email: userInfo.email,
+        avatar:
+          userInfo.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userInfo.username}`,
+        role: userInfo.role || '用户',
         stats: { likes: 0, followers: 0, following: 0 }
       },
-      token
+      authToken
     )
     message.success('登录成功')
-    router.push('/dashboard')
-  } catch {
-    // 错误已由 request 拦截器统一提示
+    await router.replace('/dashboard')
+  } catch (error) {
+    console.error('登录失败:', error)
   } finally {
     loading.value = false
   }
