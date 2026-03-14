@@ -5,9 +5,9 @@ import { createDiscreteApi } from 'naive-ui'
 import router from '@/router'
 import store, { useUserStore } from '@/store'
 
-// Define response structure
+// Define response structure (matches backend: { status, message, data })
 export interface Result<T = unknown> {
-  code: number
+  status: number
   message: string
   data: T
 }
@@ -65,8 +65,8 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   (response: AxiosResponse) => {
     const res = response.data as Result<unknown>
-    // You can adjust this check based on your actual API response structure
-    if (res.code !== 0) {
+    // Backend returns status=200 for success, other values indicate errors
+    if (res.status !== 200 && res.status !== 201) {
       const msg = res.message || '请求失败'
       message.error(msg)
       return Promise.reject(new Error(msg))

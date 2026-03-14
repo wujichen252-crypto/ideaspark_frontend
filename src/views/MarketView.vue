@@ -119,7 +119,7 @@
       <div class="list-header">
         <div class="left-section">
           <h2 class="section-title">精选项目</h2>
-          <span class="project-count">共 {{ filteredProjectList.length }} 个项目</span>
+          <span class="project-count">共 {{ totalCount }} 个项目</span>
         </div>
         <div class="right-section">
           <n-space>
@@ -139,59 +139,71 @@
         </div>
       </div>
 
-      <n-grid :x-gap="24" :y-gap="24" cols="1 s:2 m:3 l:4 xl:4" responsive="screen">
-        <n-grid-item v-for="item in filteredProjectList" :key="item.id">
-          <div class="project-card" @click="goToProject(item.id)">
-            <div class="card-thumb" :style="{ backgroundImage: `url(${item.cover})` }">
-              <div v-if="item.likes > 500" class="hot-badge">
-                <n-icon :component="Heart" /> 热门
+      <n-spin :show="loading">
+        <n-grid :x-gap="24" :y-gap="24" cols="1 s:2 m:3 l:4 xl:4" responsive="screen">
+          <n-grid-item v-for="item in sortedProjectList" :key="item.id">
+            <div class="project-card" @click="goToProject(item.id)">
+              <div class="card-thumb" :style="{ backgroundImage: `url(${item.cover})` }">
+                <div v-if="item.likes > 500" class="hot-badge">
+                  <n-icon :component="Heart" /> 热门
+                </div>
+                <div class="card-overlay">
+                  <n-button quaternary circle color="#fff" @click.stop>
+                    <template #icon><n-icon :component="HeartOutline" /></template>
+                  </n-button>
+                </div>
               </div>
-              <div class="card-overlay">
-                <n-button quaternary circle color="#fff" @click.stop>
-                  <template #icon><n-icon :component="HeartOutline" /></template>
-                </n-button>
+              <div class="card-body">
+                <h3 class="card-title">{{ item.title }}</h3>
+                <div class="card-meta">
+                  <span class="author" style="cursor: pointer" @click.stop="router.push(`/user/${item.authorId}`)">
+                    <n-avatar round size="small" :src="item.avatar" />
+                    {{ item.author }}
+                  </span>
+                  <span class="likes">
+                    <n-icon :component="Heart" color="#6b7280" /> {{ item.likes }}
+                  </span>
+                </div>
+                <div class="card-tags">
+                  <n-tag v-for="tag in item.tags" :key="tag" size="small" :bordered="false">
+                    {{ tag }}
+                  </n-tag>
+                </div>
               </div>
             </div>
-            <div class="card-body">
-              <h3 class="card-title">{{ item.title }}</h3>
-              <div class="card-meta">
-                <span class="author" style="cursor: pointer" @click.stop="router.push(`/user/${item.authorId}`)">
-                  <n-avatar round size="small" :src="item.avatar" />
-                  {{ item.author }}
-                </span>
-                <span class="likes">
-                  <n-icon :component="Heart" color="#6b7280" /> {{ item.likes }}
-                </span>
-              </div>
-              <div class="card-tags">
-                <n-tag v-for="tag in item.tags" :key="tag" size="small" :bordered="false">
-                  {{ tag }}
-                </n-tag>
-              </div>
-            </div>
-          </div>
-        </n-grid-item>
-      </n-grid>
-      
+          </n-grid-item>
+        </n-grid>
+
+        <div v-if="!loading && sortedProjectList.length === 0" class="empty-tip">
+          <n-empty description="暂无项目数据" />
+        </div>
+      </n-spin>
+
       <div class="pagination-wrapper">
-        <n-pagination v-model:page="page" :page-count="10" />
+        <n-pagination v-model:page="page" :page-count="totalPages" @update:page="onPageChange" />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { SearchOutline, HeartOutline, Heart, ChevronForwardOutline, ChevronBackOutline, ArrowForwardOutline, CubeOutline } from '@vicons/ionicons5'
+import { getProjectList } from '@/api/market'
+import type { MarketProject } from '@/api/market'
 
 const router = useRouter()
 const searchQuery = ref('')
 const page = ref(1)
+const pageSize = 12
+const totalCount = ref(0)
 const sortValue = ref('default')
 const categoryValue = ref('all')
 const creatorsScrollRef = ref<HTMLElement | null>(null)
 const headerTabValue = ref<'all' | 'popular' | 'newest' | 'web' | 'mobile' | 'design'>('all')
+const loading = ref(false)
+const apiProjects = ref<MarketProject[]>([])
 
 /**
  * 跳转到项目详情页
@@ -275,6 +287,12 @@ watch([categoryValue, sortValue], ([category, sort]) => {
   headerTabValue.value = 'all'
 })
 
+// 分类变化时重新拉取（页码重置）
+watch(categoryValue, () => {
+  page.value = 1
+  fetchProjects()
+})
+
 const categoryOptions = [
   { label: '全部分类', value: 'all' },
   { label: '前端开发', value: 'frontend' },
@@ -290,54 +308,57 @@ const sortOptions = [
   { label: '最多浏览', value: 'views' }
 ]
 
-// 模拟创作者数据
+// 精选创作者（暂用确定性占位数据，后端无对应接口）
+const getSeedNumber = (seed: number | string) => {
+  const str = String(seed)
+  let hash = 0
+  for (let i = 0; i < str.length; i += 1) {
+    hash = (hash * 31 + str.charCodeAt(i)) >>> 0
+  }
+  return hash
+}
+
+const getRealAvatarUrl = (seed: number | string) => {
+  const hash = getSeedNumber(seed)
+  const index = hash % 100
+  const gender = hash % 2 === 0 ? 'men' : 'women'
+  return `https://randomuser.me/api/portraits/${gender}/${index}.jpg`
+}
+
 const creatorsList = ref(Array.from({ length: 10 }).map((_, i) => ({
   id: i,
   name: `Creator_${i}`,
-  avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=creator_${i}`,
+  avatar: getRealAvatarUrl(`creator_${i}`),
   bg: `https://picsum.photos/seed/${i + 200}/300/200`
 })))
 
-// 模拟数据源
-const allProjects = Array.from({ length: 12 }).map((_, i) => {
-  const categories = ['frontend', 'backend', 'ai', 'design']
-  const category = categories[i % categories.length]
-  const titles = ['AI 助手', '电商后台', '个人博客', '设计系统', '数据可视化', '聊天室']
-  
+/**
+ * 将后端 MarketProject 映射为 UI 展示格式
+ * 封面/头像/作者名等列表接口未提供，使用确定性占位数据填充
+ */
+function mapToUIProject(p: MarketProject) {
+  const hash = getSeedNumber(p.id)
   return {
-    id: i,
-    title: `${titles[i % titles.length]} V${i + 1}`,
-    author: `Creator_${i}`,
-    authorId: i,
-    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${i}`,
-    cover: `https://picsum.photos/seed/${i + 100}/600/400`,
-    likes: Math.floor(Math.random() * 1000),
-    views: Math.floor(Math.random() * 5000),
-    createTime: Date.now() - Math.floor(Math.random() * 10000000000),
-    category,
-    tags: [category === 'ai' ? 'AI' : category === 'design' ? 'Design' : 'Dev', 'Vue3', 'Ts']
+    id: p.id,
+    title: p.name,
+    author: `用户_${String(p.id).slice(0, 6)}`,
+    authorId: p.id,
+    avatar: getRealAvatarUrl(p.id),
+    cover: `https://picsum.photos/seed/${hash % 900}/600/400`,
+    likes: p.likeCount,
+    views: p.viewCount,
+    createTime: 0,
+    category: p.category.toLowerCase(),
+    tags: [p.category]
   }
-})
+}
 
-// 计算过滤后的项目列表
-const filteredProjectList = computed(() => {
-  let result = [...allProjects]
+// 映射后的展示数据
+const displayProjects = computed(() => apiProjects.value.map(mapToUIProject))
 
-  // 分类筛选
-  if (categoryValue.value !== 'all') {
-    result = result.filter(p => p.category === categoryValue.value)
-  }
-
-  // 搜索筛选
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    result = result.filter(p => 
-      p.title.toLowerCase().includes(query) || 
-      p.author.toLowerCase().includes(query)
-    )
-  }
-
-  // 排序
+// 客户端排序（后端暂不支持排序参数）
+const sortedProjectList = computed(() => {
+  const result = [...displayProjects.value]
   if (sortValue.value === 'newest') {
     result.sort((a, b) => b.createTime - a.createTime)
   } else if (sortValue.value === 'likes') {
@@ -345,12 +366,39 @@ const filteredProjectList = computed(() => {
   } else if (sortValue.value === 'views') {
     result.sort((a, b) => b.views - a.views)
   }
-
   return result
 })
 
+const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / pageSize)))
+
+/**
+ * 从后端拉取项目列表
+ */
+async function fetchProjects() {
+  loading.value = true
+  try {
+    const params: Record<string, unknown> = { page: page.value, size: pageSize }
+    if (searchQuery.value.trim()) params.keyword = searchQuery.value.trim()
+    if (categoryValue.value !== 'all') params.category = categoryValue.value
+    const res = await getProjectList(params)
+    const data = res.data.data
+    apiProjects.value = data.projects ?? []
+    totalCount.value = data.total ?? 0
+  } catch {
+    // 错误由 request 拦截器统一处理
+  } finally {
+    loading.value = false
+  }
+}
+
 function handleSearch() {
   page.value = 1
+  fetchProjects()
+}
+
+function onPageChange(newPage: number) {
+  page.value = newPage
+  fetchProjects()
 }
 
 function scrollCreators(direction: 'left' | 'right') {
@@ -359,6 +407,10 @@ function scrollCreators(direction: 'left' | 'right') {
     creatorsScrollRef.value.scrollBy({ left: scrollAmount, behavior: 'smooth' })
   }
 }
+
+onMounted(() => {
+  fetchProjects()
+})
 </script>
 
 <style scoped lang="scss">

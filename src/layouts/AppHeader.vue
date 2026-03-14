@@ -94,13 +94,13 @@ onUnmounted(() => {
 <template>
   <header
     class="app-header"
-    :class="{ 'is-scrolled': isScrolled }"
+    :class="{ 'is-scrolled': isScrolled, 'is-home': route.path === '/' }"
     role="banner"
     aria-label="顶部导航栏"
   >
     <div class="app-header__content">
       <!-- 1. Left: Logo -->
-      <div class="header-left">
+      <div v-if="route.path !== '/'" class="header-left">
         <div class="brand-logo" @click="onUpdateMenu('home')">
           <img src="@/assets/logo-ideaspark.svg" class="brand-logo-image" alt="IdeaSpark Logo" />
         </div>
@@ -184,6 +184,12 @@ onUnmounted(() => {
     border-bottom: none;
     box-shadow: none; /* 移除阴影，避免与下方内容头部重叠产生视觉脏感 */
 
+    &:not(.is-home) {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
     /* CSS 状态控制作为 GSAP 的兜底 */
     .initial-logo-container {
       opacity: 0;
@@ -217,6 +223,10 @@ onUnmounted(() => {
       --n-item-text-color-active: #111111 !important;
       --n-item-text-color-child-active: #111111 !important;
       --n-item-text-color-child-active-hover: #111111 !important;
+
+      .n-menu-item:not(:last-child)::after {
+        color: rgba(17, 17, 17, 0.35);
+      }
 
       .n-menu-item-content-header {
         color: #111111 !important;
@@ -447,11 +457,28 @@ onUnmounted(() => {
   --n-item-icon-color-hover: #4ade80 !important;
   --n-item-icon-color-active: #4ade80 !important;
   --n-item-icon-color-active-hover: #4ade80 !important;
+  --menu-gap: 220px;
 
   background-color: transparent !important;
   display: flex;
   align-items: center;
-  gap: 120px !important;
+  gap: var(--menu-gap) !important;
+
+  .n-menu-item {
+    position: relative;
+  }
+
+  .n-menu-item:not(:last-child)::after {
+    content: '|';
+    position: absolute;
+    right: calc(var(--menu-gap) * -0.5);
+    top: 50%;
+    transform: translate(50%, -50%);
+    pointer-events: none;
+    color: rgba(255, 255, 255, 0.55);
+    font-weight: 300;
+    font-size: 14px;
+  }
 
   .n-menu-item-content {
     position: relative;

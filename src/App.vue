@@ -57,6 +57,8 @@ const isHeaderHidden = computed(() => {
   return hiddenRouteNames.includes(route.name as string)
 })
 
+const shouldPadMain = computed(() => !isHeaderHidden.value && route.path !== '/')
+
 onMounted(() => {
   userStore.init()
 })
@@ -68,7 +70,7 @@ onMounted(() => {
       <n-notification-provider>
         <n-dialog-provider>
           <AppHeader v-if="!isHeaderHidden" />
-          <main>
+          <main :class="['app-main', { 'app-main--with-header': shouldPadMain }]">
             <router-view />
           </main>
         </n-dialog-provider>
@@ -78,4 +80,11 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.app-main {
+  min-height: 100vh;
+}
+
+.app-main--with-header {
+  padding-top: 56px;
+}
 </style>

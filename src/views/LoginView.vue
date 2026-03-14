@@ -151,6 +151,7 @@ import { useRouter } from 'vue-router'
 import { useMessage } from 'naive-ui'
 import { useUserStore } from '@/store'
 import { LogoGoogle, LogoGithub, LogoLinkedin } from '@vicons/ionicons5'
+import { login as apiLogin, register as apiRegister } from '@/api/user'
 
 const router = useRouter()
 const message = useMessage()
@@ -172,56 +173,66 @@ const signUpModel = reactive({
 
 /**
  * 执行登录流程
- * @description 校验输入并写入模拟登录态，成功后进入控制台
  */
-function handleLogin() {
+async function handleLogin() {
   if (!signInModel.email || !signInModel.password) {
     message.warning('请填写完整信息')
     return
   }
 
   loading.value = true
-  setTimeout(() => {
-    loading.value = false
-    const mockUser = {
-      id: 'u123',
-      username: 'DemoUser',
-      email: signInModel.email,
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Demo',
-      role: '用户',
-      stats: { likes: 0, followers: 0, following: 0 }
-    }
-    userStore.login(mockUser, 'mock-token')
+  try {
+    const res = await apiLogin({ email: signInModel.email, password: signInModel.password })
+    const { token, user } = res.data.data
+    userStore.login(
+      {
+        id: String(user.id),
+        username: user.username,
+        email: user.email,
+        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`,
+        role: '用户',
+        stats: { likes: 0, followers: 0, following: 0 }
+      },
+      token
+    )
     message.success('登录成功')
     router.push('/dashboard')
-  }, 1500)
+  } catch {
+    // 错误已由 request 拦截器统一提示
+  } finally {
+    loading.value = false
+  }
 }
 
 /**
  * 执行注册流程
- * @description 校验输入并写入模拟登录态，成功后进入控制台
  */
-function handleRegister() {
+async function handleRegister() {
   if (!signUpModel.username || !signUpModel.email || !signUpModel.password) {
     message.warning('请填写完整信息')
     return
   }
 
   loading.value = true
-  setTimeout(() => {
-    loading.value = false
-    const mockUser = {
-      id: 'uNew',
+  try {
+    const res = await apiRegister({
       username: signUpModel.username,
       email: signUpModel.email,
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + signUpModel.username,
-      role: '新用户',
-      stats: { likes: 0, followers: 0, following: 0 }
-    }
-    userStore.login(mockUser, 'mock-token')
-    message.success('注册成功')
-    router.push('/dashboard')
-  }, 1500)
+      password: signUpModel.password
+    })
+    const user = res.data.data
+    message.success('注册成功，请登录')
+    // 注册成功后自动填充邮箱并切换到登录面板
+    signInModel.email = signUpModel.email
+    signInModel.password = signUpModel.password
+    isSignUp.value = false
+    // 注册成功后也可以直接给 user 登录，但后端注册接口不返回 token，故切换到登录
+    void user
+  } catch {
+    // 错误已由 request 拦截器统一提示
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 

@@ -29,35 +29,32 @@ export const useUserStore = defineStore('user', () => {
     user.value = userData
     token.value = authToken
     localStorage.setItem('token', authToken)
+    localStorage.setItem('user', JSON.stringify(userData))
   }
 
   function logout() {
     user.value = null
     token.value = null
     localStorage.removeItem('token')
+    localStorage.removeItem('user')
   }
 
   function updateProfile(data: Partial<UserInfo>) {
     if (user.value) {
       user.value = { ...user.value, ...data }
+      localStorage.setItem('user', JSON.stringify(user.value))
     }
   }
 
-  // 初始化时尝试恢复用户信息（这里仅为模拟，实际应调用 API）
+  // 初始化时从 localStorage 恢复用户信息
   function init() {
     if (token.value && !user.value) {
-      // 模拟从 Token 恢复用户数据
-      user.value = {
-        id: 'u123',
-        username: 'DemoUser',
-        email: 'demo@ideaspark.com',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Demo',
-        role: '全栈开发者',
-        bio: '热爱代码，热衷于用 AI 改变世界。正在寻找志同道合的伙伴。',
-        stats: {
-          likes: 128,
-          followers: 45,
-          following: 12
+      const stored = localStorage.getItem('user')
+      if (stored) {
+        try {
+          user.value = JSON.parse(stored) as UserInfo
+        } catch {
+          localStorage.removeItem('user')
         }
       }
     }
