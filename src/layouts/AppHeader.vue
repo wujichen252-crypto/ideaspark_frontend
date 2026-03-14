@@ -224,6 +224,10 @@ onUnmounted(() => {
       --n-item-text-color-child-active: #111111 !important;
       --n-item-text-color-child-active-hover: #111111 !important;
 
+      .n-menu-item {
+        margin: 0 8px;
+      }
+
       .n-menu-item:not(:last-child)::after {
         color: rgba(17, 17, 17, 0.35);
       }
@@ -231,7 +235,7 @@ onUnmounted(() => {
       .n-menu-item-content-header {
         color: #111111 !important;
         font-weight: 800 !important;
-        font-size: 18px !important;
+        font-size: 16px !important;
       }
       .n-menu-item-content:hover .n-menu-item-content-header,
       .n-menu-item-content--selected .n-menu-item-content-header {
@@ -295,7 +299,7 @@ onUnmounted(() => {
 
 /* ... 保持原有样式不变 ... */
 .header-left {
-  flex: 0 0 240px;
+  flex: 0 0 280px;
   display: flex;
   align-items: center;
 }
@@ -311,7 +315,7 @@ onUnmounted(() => {
 }
 
 .header-right {
-  flex: 0 0 240px;
+  flex: 0 0 280px;
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -324,11 +328,11 @@ onUnmounted(() => {
   user-select: none;
   position: relative;
   height: 40px;
-  width: 200px;
+  width: 180px;
 }
 
 .brand-logo-image {
-  height: 36px;
+  height: 32px;
   display: block;
 }
 
