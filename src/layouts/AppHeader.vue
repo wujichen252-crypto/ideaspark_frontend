@@ -288,7 +288,7 @@ onUnmounted(() => {
   width: 100%;
   max-width: 1440px;
   margin: 0 auto;
-  padding: 0 32px;
+  padding: 0 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -297,9 +297,10 @@ onUnmounted(() => {
   transition: all 0.3s ease;
 }
 
-/* ... 保持原有样式不变 ... */
+/* 使用百分比布局，确保各区域有足够空间 */
 .header-left {
-  flex: 0 0 280px;
+  flex: 0 0 20%;
+  min-width: 180px;
   display: flex;
   align-items: center;
 }
@@ -315,7 +316,8 @@ onUnmounted(() => {
 }
 
 .header-right {
-  flex: 0 0 280px;
+  flex: 0 0 20%;
+  min-width: 180px;
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -328,7 +330,8 @@ onUnmounted(() => {
   user-select: none;
   position: relative;
   height: 40px;
-  width: 180px;
+  width: 100%;
+  max-width: 200px;
 }
 
 .brand-logo-image {
@@ -461,7 +464,7 @@ onUnmounted(() => {
   --n-item-icon-color-hover: #4ade80 !important;
   --n-item-icon-color-active: #4ade80 !important;
   --n-item-icon-color-active-hover: #4ade80 !important;
-  --menu-gap: 220px;
+  --menu-gap: 160px;
 
   background-color: transparent !important;
   display: flex;
@@ -481,20 +484,20 @@ onUnmounted(() => {
     pointer-events: none;
     color: rgba(255, 255, 255, 0.55);
     font-weight: 300;
-    font-size: 14px;
+    font-size: 12px;
   }
 
   .n-menu-item-content {
     position: relative;
-    padding: 0 20px !important;
-    height: 40px;
+    padding: 0 16px !important;
+    height: 36px;
     display: flex;
     align-items: center;
     transition: all 0.3s ease;
 
     &:hover::before {
       background-color: rgba(255, 255, 255, 0.08) !important;
-      border-radius: 20px;
+      border-radius: 18px;
     }
 
     &::before {
@@ -507,9 +510,9 @@ onUnmounted(() => {
     &::after {
       content: '';
       position: absolute;
-      left: 16px;
-      right: 16px;
-      bottom: 6px;
+      left: 12px;
+      right: 12px;
+      bottom: 4px;
       height: 2px;
       background-color: #ffffff;
       border-radius: 2px;
@@ -529,19 +532,19 @@ onUnmounted(() => {
   }
 
   .n-menu-item-content-header {
-    font-weight: 800 !important; /* 加粗 */
-    letter-spacing: 0.5px;
-    font-size: 18px !important; /* 调大 */
+    font-weight: 600 !important;
+    letter-spacing: 0.3px;
+    font-size: 15px !important;
     transition: all 0.3s ease;
-    color: #ffffff !important; /* 白色 */
+    color: #ffffff !important;
     font-family:
       'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial,
-      sans-serif !important; /* 商务字体 */
+      sans-serif !important;
   }
 
   .n-menu-item-content--selected .n-menu-item-content-header {
-    color: #ffffff !important; /* 保持白色 */
-    font-weight: 700 !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
   }
 
   .n-menu-item-content:hover .n-menu-item-content-header,
@@ -559,6 +562,7 @@ onUnmounted(() => {
   border-radius: 30px;
   transition: all 0.3s;
   cursor: pointer;
+  max-width: 180px;
 
   &:hover {
     background: rgba(255, 255, 255, 0.2);
@@ -566,13 +570,117 @@ onUnmounted(() => {
 
   .username {
     color: #fff;
-    font-size: 14px;
+    font-size: 13px;
     margin-right: 8px;
-    max-width: 100px;
+    max-width: 80px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     transition: color 0.3s;
+  }
+}
+
+/* 响应式适配 */
+@media screen and (max-width: 1200px) {
+  .app-header__content {
+    padding: 0 16px;
+  }
+
+  .header-left,
+  .header-right {
+    flex: 0 0 18%;
+    min-width: 150px;
+  }
+
+  :deep(.custom-menu) {
+    --menu-gap: 120px;
+
+    .n-menu-item-content-header {
+      font-size: 14px !important;
+    }
+
+    .n-menu-item-content {
+      padding: 0 12px !important;
+      height: 34px;
+    }
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .header-left,
+  .header-right {
+    flex: 0 0 16%;
+    min-width: 120px;
+  }
+
+  .brand-logo {
+    max-width: 160px;
+  }
+
+  :deep(.custom-menu) {
+    --menu-gap: 80px;
+
+    .n-menu-item-content-header {
+      font-size: 13px !important;
+      font-weight: 500 !important;
+    }
+
+    .n-menu-item-content {
+      padding: 0 10px !important;
+      height: 32px;
+    }
+
+    .n-menu-item:not(:last-child)::after {
+      font-size: 10px;
+    }
+  }
+
+  .user-avatar-wrapper {
+    max-width: 140px;
+
+    .username {
+      font-size: 12px;
+      max-width: 70px;
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .app-header__content {
+    padding: 0 12px;
+  }
+
+  .header-left,
+  .header-right {
+    flex: 0 0 14%;
+    min-width: 100px;
+  }
+
+  .brand-logo {
+    max-width: 140px;
+  }
+
+  :deep(.custom-menu) {
+    --menu-gap: 50px;
+
+    .n-menu-item-content-header {
+      font-size: 12px !important;
+    }
+
+    .n-menu-item-content {
+      padding: 0 8px !important;
+      height: 30px;
+    }
+
+    .n-menu-item-content-header {
+      letter-spacing: 0;
+    }
+  }
+
+  .user-avatar-wrapper {
+    .username {
+      display: none;
+    }
   }
 }
 

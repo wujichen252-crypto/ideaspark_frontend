@@ -78,6 +78,7 @@
               type="primary"
               size="large"
               :disabled="!createTeamName"
+              :loading="loading"
               @click="handleCreateTeam"
             >
               创建团队
@@ -122,6 +123,7 @@
               size="large"
               class="confirm-btn"
               :disabled="!dissolveTeamNameInput"
+              :loading="loading"
               @click="handleDissolveTeam"
             >
               确认解散
@@ -147,7 +149,13 @@
         <template #footer>
           <div class="modal-footer">
             <n-button size="large" @click="showRenameModal = false">取消</n-button>
-            <n-button type="primary" size="large" class="confirm-btn" @click="handleRenameTeam">
+            <n-button
+              type="primary"
+              size="large"
+              class="confirm-btn"
+              :loading="loading"
+              @click="handleRenameTeam"
+            >
               确认修改
             </n-button>
           </div>
@@ -158,7 +166,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, h, computed, nextTick } from 'vue'
+import { ref, h, computed, nextTick, onMounted } from 'vue'
 import type { Component } from 'vue'
 import { NIcon, NAvatar, NModal, NCard, NInput, NButton, NDropdown, useMessage } from 'naive-ui'
 import type { MenuOption } from 'naive-ui'
@@ -172,6 +180,7 @@ import {
   FolderOutline
 } from '@vicons/ionicons5'
 import { useUserStore } from '@/store'
+import { createCollaborationTeam, updateTeam, dissolveTeam, getMyTeams } from '@/api/team'
 import WorkbenchTeamView from './workbench/WorkbenchTeamView.vue'
 import WorkbenchCommunityView from './workbench/WorkbenchCommunityView.vue'
 import WorkbenchRecentView from './workbench/WorkbenchRecentView.vue'
@@ -198,6 +207,9 @@ interface Team {
   id: string
   name: string
   isPersonal: boolean
+  uuid?: string
+  memberCount?: number
+  role?: string
 }
 
 // 表单数据
@@ -206,11 +218,39 @@ const dissolveTeamNameInput = ref('')
 const renameTeamName = ref('')
 const dissolveError = ref(false)
 const currentOperatingTeam = ref<Team | null>(null)
+const loading = ref(false)
 
-// 模拟团队数据 (实际应从 Store 获取)
+// 团队列表
 const teams = ref<Team[]>([
   { id: 'personal-space', name: userStore.userInfo?.username || '无迹尘', isPersonal: true }
 ])
+
+// 加载团队列表
+async function loadTeams() {
+  try {
+    const res = await getMyTeams({ page: 1, size: 50 })
+    if (res.data.data?.teams) {
+      const teamList = res.data.data.teams.map((team) => ({
+        id: team.uuid,
+        name: team.name,
+        isPersonal: false,
+        uuid: team.uuid,
+        memberCount: team.memberCount,
+        role: team.role
+      }))
+      teams.value = [
+        { id: 'personal-space', name: userStore.userInfo?.username || '无迹尘', isPersonal: true },
+        ...teamList
+      ]
+    }
+  } catch (error) {
+    console.error('加载团队列表失败:', error)
+  }
+}
+
+onMounted(() => {
+  loadTeams()
+})
 
 // 图标渲染辅助函数
 function renderIcon(icon: Component) {
@@ -275,24 +315,39 @@ function handleDropdownSelect(key: string) {
 }
 
 // 创建团队
-function handleCreateTeam() {
+async function handleCreateTeam() {
   if (!createTeamName.value) return
 
-  // 模拟创建
-  const newTeamId = `team-${Date.now()}`
-  teams.value.push({
-    id: newTeamId,
-    name: createTeamName.value,
-    isPersonal: false
-  })
+  loading.value = true
+  try {
+    // 调用创建团队 API
+    const res = await createCollaborationTeam({
+      name: createTeamName.value,
+      description: '' // 可以后续添加描述输入框
+    })
 
-  message.success('创建团队成功')
-  showCreateModal.value = false
-  activeKey.value = newTeamId // 切换到新团队
+    const newTeam = res.data.data
+    message.success('创建团队成功')
+    showCreateModal.value = false
+    createTeamName.value = ''
+
+    // 重新加载团队列表
+    await loadTeams()
+
+    // 切换到新团队
+    if (newTeam?.uuid) {
+      activeKey.value = newTeam.uuid
+    }
+  } catch (error) {
+    console.error('创建团队失败:', error)
+    message.error('创建团队失败，请重试')
+  } finally {
+    loading.value = false
+  }
 }
 
 // 解散团队
-function handleDissolveTeam() {
+async function handleDissolveTeam() {
   if (dissolveTeamNameInput.value !== currentOperatingTeam.value?.name) {
     message.error('团队名称输入不一致')
     dissolveError.value = true
@@ -300,33 +355,54 @@ function handleDissolveTeam() {
   }
 
   const team = currentOperatingTeam.value
-  if (!team) return
+  if (!team || !team.uuid) return
 
-  // 模拟删除
-  const index = teams.value.findIndex((t) => t.id === team.id)
-  if (index > -1) {
-    teams.value.splice(index, 1)
+  loading.value = true
+  try {
+    // 调用解散团队 API
+    await dissolveTeam(team.uuid)
+
     message.success('团队已解散')
-    activeKey.value = 'personal-space' // 回到个人空间
-  }
+    showDissolveModal.value = false
 
-  showDissolveModal.value = false
+    // 重新加载团队列表
+    await loadTeams()
+
+    // 回到个人空间
+    activeKey.value = 'personal-space'
+  } catch (error) {
+    console.error('解散团队失败:', error)
+    message.error('解散团队失败，请重试')
+  } finally {
+    loading.value = false
+  }
 }
 
 // 重命名团队
-function handleRenameTeam() {
+async function handleRenameTeam() {
   if (!renameTeamName.value) return
 
   const operatingTeam = currentOperatingTeam.value
-  if (!operatingTeam) return
+  if (!operatingTeam || !operatingTeam.uuid) return
 
-  const team = teams.value.find((t) => t.id === operatingTeam.id)
-  if (team) {
-    team.name = renameTeamName.value
+  loading.value = true
+  try {
+    // 调用更新团队 API
+    await updateTeam(operatingTeam.uuid, {
+      name: renameTeamName.value
+    })
+
     message.success('重命名成功')
-  }
+    showRenameModal.value = false
 
-  showRenameModal.value = false
+    // 重新加载团队列表
+    await loadTeams()
+  } catch (error) {
+    console.error('重命名团队失败:', error)
+    message.error('重命名团队失败，请重试')
+  } finally {
+    loading.value = false
+  }
 }
 
 // 菜单配置

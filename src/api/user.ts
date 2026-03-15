@@ -16,17 +16,37 @@ export interface UpdateUserParams {
   username?: string
   email?: string
   password?: string
+  avatar?: string | null
+  role?: string
+  bio?: string | null
+  position?: string | null
+  address?: string | null
+  perWebsite?: string | null
+  phone?: string | null
 }
 
 export interface BackendUser {
   id: number
   username: string
   email: string
+  avatar?: string | null
+  role?: string
+  createdAt?: string
+  updatedAt?: string
+  isHide?: boolean
+  isNotifSys?: boolean
+  isNotifTrends?: boolean
+  isNotifPost?: boolean
+  bio?: string | null
+  position?: string | null
+  address?: string | null
+  perWebsite?: string | null
+  phone?: string | null
 }
 
 export interface LoginResult {
   token: string
-  user: BackendUser
+  userInfo: BackendUser
 }
 
 export interface GetUsersParams {

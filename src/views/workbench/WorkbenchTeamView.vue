@@ -1,6 +1,5 @@
 <template>
   <div class="workbench-team-view">
-
     <!-- 用户/团队信息头部 -->
     <div class="team-profile-header">
       <div class="profile-main">
@@ -8,11 +7,15 @@
           <n-avatar
             round
             :size="48"
-            :src="userStore.userInfo?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Guest'"
+            :src="
+              userStore.userInfo?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Guest'
+            "
             class="profile-avatar"
           />
           <div class="profile-info">
-            <h1 class="profile-name">{{ props.teamName || userStore.userInfo?.username || '未登录用户' }}</h1>
+            <h1 class="profile-name">
+              {{ props.teamName || userStore.userInfo?.username || '未登录用户' }}
+            </h1>
             <div class="profile-desc">
               <n-icon :component="CreateOutline" class="edit-icon" />
               <span>{{ props.isPersonal ? '添加个人描述' : '添加团队描述' }}</span>
@@ -31,9 +34,8 @@
       <div class="profile-tabs">
         <n-tabs v-model:value="currentTab" type="line" animated>
           <n-tab-pane name="projects" tab="项目">
-             <!-- 项目列表内容 -->
+            <!-- 项目列表内容 -->
             <div class="project-list-container custom-scrollbar">
-
               <!-- 所有项目 -->
               <div class="team-group">
                 <div class="group-header">
@@ -48,34 +50,40 @@
                     </n-button>
                   </div>
                 </div>
-                
-                <div class="project-row-list">
-                  <div 
-                    v-for="project in allProjects" 
-                    :key="project.id" 
+
+                <!-- 加载状态 -->
+                <div v-if="loadingProjects" class="loading-state">
+                  <n-spin size="medium" />
+                </div>
+
+                <div v-else class="project-row-list">
+                  <div
+                    v-for="project in allProjects"
+                    :key="project.id"
                     class="project-row-card simple-file-row"
                     @click="handleOpenProject(project.id)"
+                    style="cursor: pointer"
                   >
                     <div class="file-icon">
-                       <n-icon :component="DocumentText" color="#6b7280" size="24" />
+                      <n-icon :component="DocumentText" color="#6b7280" size="24" />
                     </div>
                     <div class="card-info">
                       <div class="card-title-row">
                         <span class="card-title">{{ project.name }}</span>
                       </div>
                       <div class="card-meta-row">
-                         <n-tag size="small" :bordered="false">{{ project.category }}</n-tag>
+                        <n-tag size="small" :bordered="false">{{ project.category }}</n-tag>
                       </div>
                     </div>
-                     <div class="card-actions">
-                        <n-button circle quaternary size="small">
-                          <template #icon><n-icon :component="ShareSocialOutline" /></template>
-                        </n-button>
+                    <div class="card-actions">
+                      <n-button circle quaternary size="small">
+                        <template #icon><n-icon :component="ShareSocialOutline" /></template>
+                      </n-button>
                     </div>
                   </div>
 
                   <!-- 创建新项目卡片 -->
-                    <!-- <div class="project-row-card create-new-card" @click="router.push('/ai/workshop/start')">
+                  <!-- <div class="project-row-card create-new-card" @click="router.push('/ai/workshop/start')">
                        <div class="file-icon">
                           <n-icon :component="AddOutline" color="#9ca3af" size="32" />
                        </div>
@@ -92,7 +100,7 @@
               </div>
             </div>
           </n-tab-pane>
-          
+
           <n-tab-pane name="members" tab="成员">
             <div class="members-container">
               <div class="members-toolbar">
@@ -100,7 +108,7 @@
                   v-model:value="membersSubTab"
                   type="segment"
                   size="small"
-                  style="width: 240px;"
+                  style="width: 240px"
                 >
                   <n-tab-pane name="members" :tab="`成员 (${memberCount})`" />
                   <n-tab-pane name="visitors" :tab="`访客 (${visitorCount})`" />
@@ -110,20 +118,20 @@
                     v-model:value="memberRoleFilter"
                     size="small"
                     :options="memberRoleOptions"
-                    style="width: 140px;"
+                    style="width: 140px"
                   />
                   <n-input
                     v-model:value="memberKeyword"
                     clearable
                     size="small"
                     placeholder="搜索成员"
-                    style="width: 220px;"
+                    style="width: 220px"
                   >
                     <template #prefix><n-icon :component="SearchOutline" /></template>
                   </n-input>
                 </div>
               </div>
-              
+
               <div class="members-table-header">
                 <div class="col-name">名称</div>
                 <div class="col-role">团队权限</div>
@@ -136,7 +144,14 @@
                     <div class="member-meta">
                       <div class="member-name-row">
                         <span class="member-name">{{ m.name }}</span>
-                        <n-tag v-if="m.isMe" size="small" type="info" :bordered="false" class="me-tag">我</n-tag>
+                        <n-tag
+                          v-if="m.isMe"
+                          size="small"
+                          type="info"
+                          :bordered="false"
+                          class="me-tag"
+                          >我</n-tag
+                        >
                       </div>
                       <span class="member-sub">{{ formatJoinTime(m.joinedAt) }}</span>
                     </div>
@@ -169,113 +184,126 @@
               </div>
             </div>
           </n-tab-pane>
-          
+
           <n-tab-pane name="resources" tab="资源">
-             <div class="resources-container">
-               <div class="resources-toolbar">
-                 <n-radio-group v-model:value="resourceKind" size="medium">
-                   <n-radio-button value="repo" label="资源库" />
-                   <n-radio-button value="fonts" label="字体库" />
-                 </n-radio-group>
-                 <div class="resources-tools">
-                   <n-button type="primary" color="#000" size="small" @click="openCreateResourceModal">
-                     新建{{ resourceKindLabel }}
-                   </n-button>
-                   <n-input
-                     v-model:value="resourceKeyword"
-                     clearable
-                     size="small"
-                     :placeholder="`搜索${resourceKindLabel}名称`"
-                     style="width: 240px;"
-                   >
-                     <template #prefix><n-icon :component="SearchOutline" /></template>
-                   </n-input>
-                 </div>
-               </div>
+            <div class="resources-container">
+              <div class="resources-toolbar">
+                <n-radio-group v-model:value="resourceKind" size="medium">
+                  <n-radio-button value="repo" label="资源库" />
+                  <n-radio-button value="fonts" label="字体库" />
+                </n-radio-group>
+                <div class="resources-tools">
+                  <n-button
+                    type="primary"
+                    color="#000"
+                    size="small"
+                    @click="openCreateResourceModal"
+                  >
+                    新建{{ resourceKindLabel }}
+                  </n-button>
+                  <n-input
+                    v-model:value="resourceKeyword"
+                    clearable
+                    size="small"
+                    :placeholder="`搜索${resourceKindLabel}名称`"
+                    style="width: 240px"
+                  >
+                    <template #prefix><n-icon :component="SearchOutline" /></template>
+                  </n-input>
+                </div>
+              </div>
 
-               <div v-if="filteredResources.length" class="resources-list">
-                 <div v-for="r in filteredResources" :key="r.id" class="resource-row">
-                   <div class="resource-main">
-                     <div class="resource-icon">
-                      <n-icon :component="r.kind === 'repo' ? FolderOpenOutline : TextOutline" size="22" color="#3f3f46" />
-                     </div>
-                     <div class="resource-info">
-                       <div class="resource-title">{{ r.name }}</div>
-                       <div class="resource-meta">
-                         <span>{{ r.itemCount }} 项</span>
-                         <span class="meta-dot">·</span>
-                         <span>{{ formatUpdateTime(r.updatedAt) }}</span>
-                       </div>
-                     </div>
-                   </div>
-                   <div class="resource-actions">
-                     <n-button text size="small" @click="handleOpenResource(r.id)">打开</n-button>
-                   </div>
-                 </div>
-               </div>
-               <div v-else class="resources-empty">
-                 <n-empty :description="`暂无${resourceKindLabel}`">
-                   <template #extra>
-                     <n-space>
-                       <n-button type="primary" color="#000" @click="openCreateResourceModal">新建{{ resourceKindLabel }}</n-button>
-                       <n-button quaternary @click="resetResourceFilters">清除搜索</n-button>
-                     </n-space>
-                   </template>
-                 </n-empty>
-               </div>
-             </div>
+              <div v-if="filteredResources.length" class="resources-list">
+                <div v-for="r in filteredResources" :key="r.id" class="resource-row">
+                  <div class="resource-main">
+                    <div class="resource-icon">
+                      <n-icon
+                        :component="r.kind === 'repo' ? FolderOpenOutline : TextOutline"
+                        size="22"
+                        color="#3f3f46"
+                      />
+                    </div>
+                    <div class="resource-info">
+                      <div class="resource-title">{{ r.name }}</div>
+                      <div class="resource-meta">
+                        <span>{{ r.itemCount }} 项</span>
+                        <span class="meta-dot">·</span>
+                        <span>{{ formatUpdateTime(r.updatedAt) }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="resource-actions">
+                    <n-button text size="small" @click="handleOpenResource(r.id)">打开</n-button>
+                  </div>
+                </div>
+              </div>
+              <div v-else class="resources-empty">
+                <n-empty :description="`暂无${resourceKindLabel}`">
+                  <template #extra>
+                    <n-space>
+                      <n-button type="primary" color="#000" @click="openCreateResourceModal"
+                        >新建{{ resourceKindLabel }}</n-button
+                      >
+                      <n-button quaternary @click="resetResourceFilters">清除搜索</n-button>
+                    </n-space>
+                  </template>
+                </n-empty>
+              </div>
+            </div>
 
-             <n-modal v-model:show="showCreateResourceModal">
-               <n-card
-                 style="width: 560px"
-                 title="新建资源"
-                 :bordered="false"
-                 size="huge"
-                 role="dialog"
-                 aria-modal="true"
-               >
-                 <n-form
-                   ref="resourceFormRef"
-                   :model="createResourceForm"
-                   :rules="createResourceRules"
-                   label-placement="left"
-                   label-width="auto"
-                   require-mark-placement="right-hanging"
-                 >
-                   <n-form-item label="类型" path="kind">
-                     <n-radio-group v-model:value="createResourceForm.kind">
-                       <n-radio-button value="repo" label="资源库" />
-                       <n-radio-button value="fonts" label="字体库" />
-                     </n-radio-group>
-                   </n-form-item>
-                   <n-form-item label="名称" path="name">
-                     <n-input v-model:value="createResourceForm.name" placeholder="请输入名称" />
-                   </n-form-item>
-                 </n-form>
-                 <template #footer>
-                   <n-space justify="end">
-                     <n-button @click="showCreateResourceModal = false">取消</n-button>
-                   <n-button type="primary" color="#000" @click="handleCreateResource">确认创建</n-button>
-                   </n-space>
-                 </template>
-               </n-card>
-             </n-modal>
+            <n-modal v-model:show="showCreateResourceModal">
+              <n-card
+                style="width: 560px"
+                title="新建资源"
+                :bordered="false"
+                size="huge"
+                role="dialog"
+                aria-modal="true"
+              >
+                <n-form
+                  ref="resourceFormRef"
+                  :model="createResourceForm"
+                  :rules="createResourceRules"
+                  label-placement="left"
+                  label-width="auto"
+                  require-mark-placement="right-hanging"
+                >
+                  <n-form-item label="类型" path="kind">
+                    <n-radio-group v-model:value="createResourceForm.kind">
+                      <n-radio-button value="repo" label="资源库" />
+                      <n-radio-button value="fonts" label="字体库" />
+                    </n-radio-group>
+                  </n-form-item>
+                  <n-form-item label="名称" path="name">
+                    <n-input v-model:value="createResourceForm.name" placeholder="请输入名称" />
+                  </n-form-item>
+                </n-form>
+                <template #footer>
+                  <n-space justify="end">
+                    <n-button @click="showCreateResourceModal = false">取消</n-button>
+                    <n-button type="primary" color="#000" @click="handleCreateResource"
+                      >确认创建</n-button
+                    >
+                  </n-space>
+                </template>
+              </n-card>
+            </n-modal>
           </n-tab-pane>
-          
+
           <n-tab-pane name="settings" tab="设置">
             <div class="settings-container">
               <div class="setting-item">
                 <div class="setting-label">团队人数</div>
                 <div class="setting-content">1</div>
               </div>
-               <n-divider />
+              <n-divider />
               <div class="setting-item">
                 <div class="setting-label">团队头像</div>
                 <div class="setting-content">
                   <div class="setting-desc">支持 2M 以内的JPG、JPEG、PNG</div>
                 </div>
                 <div class="setting-action">
-                   <n-button>上传</n-button>
+                  <n-button>上传</n-button>
                 </div>
               </div>
               <n-divider />
@@ -283,61 +311,67 @@
                 <div class="setting-label">团队 ID</div>
                 <div class="setting-content">3401350</div>
                 <div class="setting-action">
-                   <n-button>复制</n-button>
+                  <n-button>复制</n-button>
                 </div>
               </div>
               <n-divider />
               <div class="setting-item">
                 <div class="setting-label">解散团队</div>
                 <div class="setting-content">
-                   <div class="setting-desc">删除团队后，团队所有成员将无法访问团队的任何项目、文件、资源库。</div>
+                  <div class="setting-desc">
+                    删除团队后，团队所有成员将无法访问团队的任何项目、文件、资源库。
+                  </div>
                 </div>
                 <div class="setting-action">
-                   <n-button type="error" ghost>解散团队</n-button>
+                  <n-button type="error" ghost>解散团队</n-button>
                 </div>
               </div>
             </div>
           </n-tab-pane>
-          
+
           <n-tab-pane name="trash" tab="回收站">
             <div class="trash-container">
               <div class="trash-filter">
-                 <n-button text class="filter-trigger">所有类型 <n-icon :component="ChevronDownOutline" /></n-button>
-                 <n-button text class="filter-trigger">删除时间 <n-icon :component="ChevronDownOutline" /></n-button>
+                <n-button text class="filter-trigger"
+                  >所有类型 <n-icon :component="ChevronDownOutline"
+                /></n-button>
+                <n-button text class="filter-trigger"
+                  >删除时间 <n-icon :component="ChevronDownOutline"
+                /></n-button>
               </div>
               <div class="project-grid">
                 <!-- 示例回收站项目 -->
                 <div v-for="i in 1" :key="i" class="project-card">
-                   <div class="card-preview">
-                     <div class="preview-placeholder">
-                        <n-icon :component="DocumentText" size="40" color="#6b7280" />
-                     </div>
-                   </div>
-                   <div class="card-info">
-                      <div class="card-title-row">
-                        <n-icon :component="DocumentText" color="#6b7280" />
-                        <span class="card-title">项目一</span>
-                      </div>
-                      <div class="card-meta">
-                        <span>1个月前删除</span>
-                      </div>
-                   </div>
+                  <div class="card-preview">
+                    <div class="preview-placeholder">
+                      <n-icon :component="DocumentText" size="40" color="#6b7280" />
+                    </div>
+                  </div>
+                  <div class="card-info">
+                    <div class="card-title-row">
+                      <n-icon :component="DocumentText" color="#6b7280" />
+                      <span class="card-title">项目一</span>
+                    </div>
+                    <div class="card-meta">
+                      <span>1个月前删除</span>
+                    </div>
+                  </div>
                 </div>
-                 <div v-for="i in 3" :key="'file'+i" class="project-card">
-                   <div class="card-preview">
-                     <div class="preview-placeholder">
-                        <n-icon :component="DocumentText" size="40" color="#6b7280" />
-                     </div>
-                   </div>
-                   <div class="card-info">
-                      <div class="card-title-row">
-                        <n-icon :component="DocumentText" color="#6b7280" />
-                        <span class="card-title">设计文件</span>
-                      </div>
-                      <div class="card-meta">
-                        <span>19 天前删除</span>
-                      </div>
-                   </div>
+                <div v-for="i in 3" :key="'file' + i" class="project-card">
+                  <div class="card-preview">
+                    <div class="preview-placeholder">
+                      <n-icon :component="DocumentText" size="40" color="#6b7280" />
+                    </div>
+                  </div>
+                  <div class="card-info">
+                    <div class="card-title-row">
+                      <n-icon :component="DocumentText" color="#6b7280" />
+                      <span class="card-title">设计文件</span>
+                    </div>
+                    <div class="card-meta">
+                      <span>19 天前删除</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -369,7 +403,7 @@
           </n-form-item>
           <n-form-item label="公开项目" path="isPublic">
             <n-switch v-model:value="createForm.isPublic" />
-            <span style="margin-left: 12px; font-size: 12px; color: #666;">
+            <span style="margin-left: 12px; font-size: 12px; color: #666">
               {{ createForm.isPublic ? '所有人都可见' : '仅团队成员可见' }}
             </span>
           </n-form-item>
@@ -386,10 +420,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive } from 'vue'
+import { ref, computed, reactive, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { 
-  SearchOutline, 
+import {
+  SearchOutline,
   PersonAddOutline,
   AddOutline,
   CreateOutline,
@@ -397,28 +431,29 @@ import {
   DocumentText,
   ShareSocialOutline,
   FolderOpenOutline,
-  TextOutline,
+  TextOutline
 } from '@vicons/ionicons5'
 import { useUserStore, useAiWorkshopStore } from '@/store'
-import { 
-  NEmpty, 
-  NModal, 
-  NCard, 
-  NForm, 
-  NFormItem, 
-  NInput, 
+import { getTeamProjects } from '@/api/team'
+import {
+  NEmpty,
+  NModal,
+  NCard,
+  NForm,
+  NFormItem,
+  NInput,
   NSelect,
-  NSwitch, 
-  NSpace, 
-  NButton, 
-  NIcon, 
-  NTabs, 
-  NTabPane, 
-  NAvatar, 
-  NBadge, 
-  NTag, 
-  NDivider, 
-  NRadioGroup, 
+  NSwitch,
+  NSpace,
+  NButton,
+  NIcon,
+  NTabs,
+  NTabPane,
+  NAvatar,
+  NBadge,
+  NTag,
+  NDivider,
+  NRadioGroup,
   NRadioButton,
   useMessage
 } from 'naive-ui'
@@ -435,6 +470,53 @@ const userStore = useUserStore()
 const aiStore = useAiWorkshopStore()
 const message = useMessage()
 const currentTab = ref('projects')
+const loadingProjects = ref(false)
+
+// 团队项目列表
+const teamProjects = ref<any[]>([])
+
+/**
+ * 加载团队项目列表
+ */
+async function loadTeamProjects() {
+  // 如果是个人空间，不加载团队项目
+  if (props.isPersonal || !props.teamId) {
+    teamProjects.value = []
+    return
+  }
+
+  loadingProjects.value = true
+  try {
+    const res = await getTeamProjects(props.teamId!, { page: 1, size: 50 })
+    if (res.data.data?.projects) {
+      teamProjects.value = res.data.data.projects.map((project) => ({
+        id: project.id,
+        name: project.name,
+        description: project.description,
+        category: project.category,
+        cover: project.cover,
+        createdAt: project.createdAt,
+        updatedAt: project.updatedAt
+      }))
+    } else {
+      teamProjects.value = []
+    }
+  } catch (error) {
+    console.error('加载团队项目失败:', error)
+    teamProjects.value = []
+  } finally {
+    loadingProjects.value = false
+  }
+}
+
+// 监听 props 变化，重新加载项目
+watch(
+  () => [props.teamId, props.isPersonal],
+  () => {
+    loadTeamProjects()
+  },
+  { immediate: true }
+)
 
 // 创建项目相关
 const showCreateModal = ref(false)
@@ -477,17 +559,22 @@ const handleCreateProject = () => {
       })
       // 保存
       aiStore.saveProject()
-      
+
       message.success('创建成功')
       showCreateModal.value = false
-      // 跳转到项目详情页
-      router.push(`/ai/workshop/project/${id}`)
+      // 跳转到项目工作区
+      router.push(`/project/workspace/${id}`)
     }
   })
 }
 
-// 计算所有项目（目前就是全部，后续可加过滤）
+// 计算所有项目（优先使用团队项目列表，否则使用本地 store）
 const allProjects = computed(() => {
+  // 如果是团队空间，使用团队项目列表
+  if (!props.isPersonal && props.teamId) {
+    return teamProjects.value
+  }
+  // 如果是个人空间，使用本地 store
   return aiStore.projectList
 })
 
@@ -495,11 +582,18 @@ const allProjects = computed(() => {
  * 打开项目（按项目类型路由跳转）。
  */
 const handleOpenProject = (id: string) => {
+  console.log('Opening project:', id)
   const project = aiStore.getProjectById(id)
-  if (project && project.type === 'document') {
+  console.log('Project data:', project)
+
+  if (!project) {
+    message.error('项目不存在或已被删除')
+    return
+  }
+
+  if (project.type === 'document') {
     router.push(`/project/doc/${id}`)
   } else {
-    // router.push(`/project/${id}`)
     router.push(`/project/workspace/${id}`)
   }
 }
@@ -551,8 +645,12 @@ const visitorCount = computed(() => members.value.filter((m) => m.role === 'visi
 
 const displayedMembers = computed(() => {
   const keyword = memberKeyword.value.trim().toLowerCase()
-  const inSubTab = members.value.filter((m) => (membersSubTab.value === 'visitors' ? m.role === 'visitor' : m.role !== 'visitor'))
-  const inRole = inSubTab.filter((m) => (memberRoleFilter.value === 'all' ? true : m.role === memberRoleFilter.value))
+  const inSubTab = members.value.filter((m) =>
+    membersSubTab.value === 'visitors' ? m.role === 'visitor' : m.role !== 'visitor'
+  )
+  const inRole = inSubTab.filter((m) =>
+    memberRoleFilter.value === 'all' ? true : m.role === memberRoleFilter.value
+  )
   if (!keyword) return inRole
   return inRole.filter((m) => m.name.toLowerCase().includes(keyword))
 })
@@ -738,13 +836,13 @@ function formatUpdateTime(updatedAt: number): string {
 
 .team-profile-header {
   margin-bottom: 32px; /* 增加底部间距 */
-  
+
   .create-btn {
     background-color: #000;
     border-color: #000;
     padding: 0 20px;
     font-weight: 500;
-    
+
     &:hover {
       background-color: #111827;
       border-color: #111827;
@@ -781,7 +879,7 @@ function formatUpdateTime(updatedAt: number): string {
       font-size: 14px;
       cursor: pointer;
       transition: color 0.2s;
-      
+
       &:hover {
         color: #111827;
       }
@@ -836,6 +934,13 @@ function formatUpdateTime(updatedAt: number): string {
   gap: 24px;
 }
 
+.loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 48px 0;
+}
+
 .project-row-card {
   /* Common card styles */
   display: flex;
@@ -853,7 +958,9 @@ function formatUpdateTime(updatedAt: number): string {
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
     border-color: #d1d5db;
   }
 }
@@ -865,12 +972,12 @@ function formatUpdateTime(updatedAt: number): string {
 .create-new-card {
   border: 2px dashed #e5e7eb;
   background: transparent;
-  
+
   &:hover {
     border-color: #000;
     background: #f9fafb;
   }
-  
+
   .text-gray {
     color: #9ca3af;
   }
@@ -890,7 +997,7 @@ function formatUpdateTime(updatedAt: number): string {
 .card-info {
   text-align: center;
   width: 100%;
-  
+
   .card-title {
     font-weight: 600;
     color: #1f2937;
@@ -901,7 +1008,7 @@ function formatUpdateTime(updatedAt: number): string {
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  
+
   .card-desc-row {
     font-size: 12px;
     color: #6b7280;
@@ -969,8 +1076,10 @@ function formatUpdateTime(updatedAt: number): string {
       justify-content: center;
 
       &.preview-1 {
-         background-color: #ecfdf5;
-         .mindmap-node { display: none; } 
+        background-color: #ecfdf5;
+        .mindmap-node {
+          display: none;
+        }
       }
     }
   }
@@ -1004,21 +1113,21 @@ function formatUpdateTime(updatedAt: number): string {
     right: 8px;
     display: flex;
     gap: 4px;
-    opacity: 0; 
+    opacity: 0;
     transition: opacity 0.2s;
-    background: rgba(255,255,255,0.9);
+    background: rgba(255, 255, 255, 0.9);
     border-radius: 4px;
     padding: 2px;
   }
 
   &:hover .card-actions {
-    opacity: 1; 
+    opacity: 1;
   }
 
   &.simple-file-row {
     padding: 24px 16px;
     height: auto;
-    
+
     .file-icon {
       margin-right: 0;
       margin-bottom: 16px;
@@ -1029,12 +1138,12 @@ function formatUpdateTime(updatedAt: number): string {
       height: 64px;
       background-color: #f3f4f6; /* Light gray background for icon area */
       border-radius: 12px;
-      
+
       .n-icon {
         font-size: 32px !important; /* Larger icon */
       }
     }
-    
+
     .card-info {
       padding-right: 0;
       .card-title-row {
@@ -1068,13 +1177,13 @@ function formatUpdateTime(updatedAt: number): string {
     align-items: center;
     justify-content: space-between;
     margin-bottom: 16px;
-    
+
     .header-left {
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    
+
     .group-title {
       font-size: 16px;
       font-weight: 600;
@@ -1101,7 +1210,9 @@ function formatUpdateTime(updatedAt: number): string {
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
     border-color: #d1d5db;
 
     .card-preview .card-overlay {
@@ -1116,7 +1227,7 @@ function formatUpdateTime(updatedAt: number): string {
     background-color: #f3f4f6;
     overflow: hidden;
     border-bottom: 1px solid #f3f4f6;
-    
+
     .card-overlay {
       position: absolute;
       top: 0;
@@ -1131,12 +1242,12 @@ function formatUpdateTime(updatedAt: number): string {
       gap: 4px;
       opacity: 0;
       transition: opacity 0.2s;
-      
+
       .overlay-btn {
         background: #fff;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         color: #4b5563;
-        
+
         &:hover {
           color: #111827;
         }
@@ -1150,12 +1261,12 @@ function formatUpdateTime(updatedAt: number): string {
     display: flex;
     align-items: center;
     justify-content: center;
-    
+
     &.preview-1 {
       flex-direction: column;
       gap: 8px;
       background-color: #f9fafb;
-      
+
       .mindmap-node {
         background: #fff;
         border: 1px solid #e5e7eb;
@@ -1163,11 +1274,11 @@ function formatUpdateTime(updatedAt: number): string {
         padding: 4px 12px;
         font-size: 12px;
         color: #6b7280;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
       }
-      .root { 
-        border-color: #000; 
-        color: #000; 
+      .root {
+        border-color: #000;
+        color: #000;
         font-weight: 600;
         font-size: 13px;
       }
@@ -1187,7 +1298,7 @@ function formatUpdateTime(updatedAt: number): string {
       align-items: center;
       gap: 8px;
       margin-bottom: 4px;
-      
+
       .card-title {
         font-weight: 600;
         font-size: 15px;
@@ -1197,7 +1308,7 @@ function formatUpdateTime(updatedAt: number): string {
         text-overflow: ellipsis;
       }
     }
-    
+
     .card-meta {
       font-size: 12px;
       color: #9ca3af;
@@ -1210,11 +1321,11 @@ function formatUpdateTime(updatedAt: number): string {
     display: flex;
     justify-content: flex-end;
     border-top: 1px solid transparent;
-    
+
     .card-actions {
       display: flex;
       gap: 4px;
-      
+
       .n-button {
         color: #9ca3af;
         &:hover {
@@ -1452,11 +1563,11 @@ function formatUpdateTime(updatedAt: number): string {
   border-bottom: 1px solid #e5e7eb;
 }
 :deep(.n-tabs-tab-wrapper .n-tabs-tab.n-tabs-tab--active) {
-    color: #000;
-    font-weight: 600;
+  color: #000;
+  font-weight: 600;
 }
 :deep(.n-tabs-bar) {
-    background-color: #000;
+  background-color: #000;
 }
 :deep(.n-tabs-tab) {
   padding-bottom: 12px;

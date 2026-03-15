@@ -51,6 +51,25 @@ export interface InviteParams {
   role: string
 }
 
+export interface TeamProject {
+  id: string
+  name: string
+  description?: string
+  category?: string
+  cover?: string
+  createdAt?: string
+  updatedAt?: string
+  ownerId?: number
+  teamId?: string
+}
+
+export interface TeamProjectsResult {
+  projects: TeamProject[]
+  total: number
+  page: number
+  size: number
+}
+
 export function getMyTeams(params?: { page?: number; size?: number }) {
   return service.get<Result<TeamListResult>>('/teams/my', { params })
 }
@@ -76,7 +95,10 @@ export function getTeamMembers(uuid: string, params?: { page?: number; size?: nu
 }
 
 export function updateMemberRole(uuid: string, memberId: string | number, role: string) {
-  return service.put<Result<{ memberId: string; role: string }>>(`/teams/${uuid}/members/${memberId}/role`, { role })
+  return service.put<Result<{ memberId: string; role: string }>>(
+    `/teams/${uuid}/members/${memberId}/role`,
+    { role }
+  )
 }
 
 export function removeMember(uuid: string, memberId: string | number) {
@@ -88,9 +110,24 @@ export function leaveTeam(uuid: string) {
 }
 
 export function transferOwnership(uuid: string, newOwnerId: number) {
-  return service.post<Result<{ uuid: string; newOwnerId: number }>>(`/teams/${uuid}/transfer-ownership`, { newOwnerId })
+  return service.post<Result<{ uuid: string; newOwnerId: number }>>(
+    `/teams/${uuid}/transfer-ownership`,
+    { newOwnerId }
+  )
 }
 
 export function sendInvitation(uuid: string, params: InviteParams) {
-  return service.post<Result<{ uuid: string; invitedCount: number }>>(`/teams/${uuid}/invitations`, params)
+  return service.post<Result<{ uuid: string; invitedCount: number }>>(
+    `/teams/${uuid}/invitations`,
+    params
+  )
+}
+
+/**
+ * 获取团队项目列表
+ * @param uuid - 团队 UUID
+ * @param params - 分页参数
+ */
+export function getTeamProjects(uuid: string, params?: { page?: number; size?: number }) {
+  return service.get<Result<TeamProjectsResult>>(`/teams/${uuid}/projects`, { params })
 }
