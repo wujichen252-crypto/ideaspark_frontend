@@ -1,56 +1,25 @@
+/**
+ * 团队管理接口
+ * @description 封装团队模块的所有 HTTP 请求方法
+ */
 import service from './request'
-import type { Result } from './request'
+import type { ApiResponse } from './types'
+import type {
+  Team,
+  TeamDetail,
+  TeamMember,
+  TeamListResult,
+  TeamMembersResult,
+  CreateTeamParams,
+  UpdateTeamParams,
+  InviteParams,
+  UpdateMemberRoleParams,
+  TransferOwnershipParams
+} from './types'
 
-export interface Team {
-  uuid: string
-  name: string
-  description: string
-  memberCount: number
-  role: string
-}
-
-export interface TeamDetail extends Team {
-  ownerId: number
-  createdAt: string
-}
-
-export interface TeamMember {
-  id: number
-  username: string
-  email: string
-  role: string
-  joinedAt: string
-}
-
-export interface TeamListResult {
-  teams: Team[]
-  total: number
-  page: number
-  size: number
-}
-
-export interface MembersListResult {
-  members: TeamMember[]
-  total: number
-  page: number
-  size: number
-}
-
-export interface CreateTeamParams {
-  name: string
-  description?: string
-}
-
-export interface UpdateTeamParams {
-  name?: string
-  description?: string
-}
-
-export interface InviteParams {
-  emails: string[]
-  role: string
-}
-
+/**
+ * 团队项目信息
+ */
 export interface TeamProject {
   id: string
   name: string
@@ -63,6 +32,9 @@ export interface TeamProject {
   teamId?: string
 }
 
+/**
+ * 团队项目列表响应
+ */
 export interface TeamProjectsResult {
   projects: TeamProject[]
   total: number
@@ -70,54 +42,105 @@ export interface TeamProjectsResult {
   size: number
 }
 
+/**
+ * 获取我的团队列表
+ * @param params - 分页参数
+ */
 export function getMyTeams(params?: { page?: number; size?: number }) {
-  return service.get<Result<TeamListResult>>('/teams/my', { params })
+  return service.get<ApiResponse<TeamListResult>>('/teams/my', { params })
 }
 
+/**
+ * 获取团队详情
+ * @param uuid - 团队 UUID
+ */
 export function getTeamDetail(uuid: string) {
-  return service.get<Result<TeamDetail>>(`/teams/${uuid}`)
+  return service.get<ApiResponse<TeamDetail>>(`/teams/${uuid}`)
 }
 
+/**
+ * 更新团队信息
+ * @param uuid - 团队 UUID
+ * @param params - 更新参数
+ */
 export function updateTeam(uuid: string, params: UpdateTeamParams) {
-  return service.put<Result<Team>>(`/teams/${uuid}`, params)
+  return service.put<ApiResponse<Team>>(`/teams/${uuid}`, params)
 }
 
+/**
+ * 创建协作团队
+ * @param params - 创建参数
+ */
 export function createCollaborationTeam(params: CreateTeamParams) {
-  return service.post<Result<TeamDetail>>('/teams/collaboration', params)
+  return service.post<ApiResponse<TeamDetail>>('/teams/collaboration', params)
 }
 
+/**
+ * 解散团队
+ * @param uuid - 团队 UUID
+ */
 export function dissolveTeam(uuid: string) {
-  return service.delete<Result<{ uuid: string }>>(`/teams/${uuid}`)
+  return service.delete<ApiResponse<{ uuid: string }>>(`/teams/${uuid}`)
 }
 
+/**
+ * 获取团队成员列表
+ * @param uuid - 团队 UUID
+ * @param params - 分页参数
+ */
 export function getTeamMembers(uuid: string, params?: { page?: number; size?: number }) {
-  return service.get<Result<MembersListResult>>(`/teams/${uuid}/members`, { params })
+  return service.get<ApiResponse<TeamMembersResult>>(`/teams/${uuid}/members`, { params })
 }
 
-export function updateMemberRole(uuid: string, memberId: string | number, role: string) {
-  return service.put<Result<{ memberId: string; role: string }>>(
+/**
+ * 更新成员角色
+ * @param uuid - 团队 UUID
+ * @param memberId - 成员 ID
+ * @param params - 角色参数
+ */
+export function updateMemberRole(uuid: string, memberId: string | number, params: UpdateMemberRoleParams) {
+  return service.put<ApiResponse<{ memberId: string; role: string }>>(
     `/teams/${uuid}/members/${memberId}/role`,
-    { role }
+    params
   )
 }
 
+/**
+ * 移除成员
+ * @param uuid - 团队 UUID
+ * @param memberId - 成员 ID
+ */
 export function removeMember(uuid: string, memberId: string | number) {
-  return service.delete<Result<{ memberId: string }>>(`/teams/${uuid}/members/${memberId}`)
+  return service.delete<ApiResponse<{ memberId: string }>>(`/teams/${uuid}/members/${memberId}`)
 }
 
+/**
+ * 退出团队
+ * @param uuid - 团队 UUID
+ */
 export function leaveTeam(uuid: string) {
-  return service.delete<Result<{ uuid: string }>>(`/teams/${uuid}/members/self`)
+  return service.delete<ApiResponse<{ uuid: string }>>(`/teams/${uuid}/members/self`)
 }
 
-export function transferOwnership(uuid: string, newOwnerId: number) {
-  return service.post<Result<{ uuid: string; newOwnerId: number }>>(
+/**
+ * 转让团队所有权
+ * @param uuid - 团队 UUID
+ * @param params - 转让参数
+ */
+export function transferOwnership(uuid: string, params: TransferOwnershipParams) {
+  return service.post<ApiResponse<{ uuid: string; newOwnerId: number }>>(
     `/teams/${uuid}/transfer-ownership`,
-    { newOwnerId }
+    params
   )
 }
 
+/**
+ * 发送团队邀请
+ * @param uuid - 团队 UUID
+ * @param params - 邀请参数
+ */
 export function sendInvitation(uuid: string, params: InviteParams) {
-  return service.post<Result<{ uuid: string; invitedCount: number }>>(
+  return service.post<ApiResponse<{ uuid: string; invitedCount: number }>>(
     `/teams/${uuid}/invitations`,
     params
   )
@@ -129,5 +152,5 @@ export function sendInvitation(uuid: string, params: InviteParams) {
  * @param params - 分页参数
  */
 export function getTeamProjects(uuid: string, params?: { page?: number; size?: number }) {
-  return service.get<Result<TeamProjectsResult>>(`/teams/${uuid}/projects`, { params })
+  return service.get<ApiResponse<TeamProjectsResult>>(`/teams/${uuid}/projects`, { params })
 }

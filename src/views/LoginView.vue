@@ -183,22 +183,36 @@ async function handleLogin() {
   loading.value = true
   try {
     const res = await apiLogin({ email: signInModel.email, password: signInModel.password })
-    const { token: authToken, userInfo } = res.data.data
+    console.log('登录响应:', res)
+    console.log('响应数据:', res.data)
+    const responseData = res.data.data
+    console.log('data字段:', responseData)
+    
+    const authToken = responseData.token
+    const user = responseData.user || responseData.userInfo
+    
+    if (!authToken || !user) {
+      message.error('登录响应数据格式错误')
+      console.error('响应数据缺少token或user字段:', responseData)
+      return
+    }
 
     userStore.login(
       {
-        id: String(userInfo.id),
-        username: userInfo.username,
-        email: userInfo.email,
+        id: String(user.id),
+        username: user.username,
+        email: user.email,
         avatar:
-          userInfo.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userInfo.username}`,
-        role: userInfo.role || '用户',
+          user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`,
+        role: user.role || '用户',
         stats: { likes: 0, followers: 0, following: 0 }
       },
       authToken
     )
     message.success('登录成功')
+    console.log('准备跳转到 /dashboard')
     await router.replace('/dashboard')
+    console.log('跳转完成')
   } catch (error) {
     console.error('登录失败:', error)
   } finally {

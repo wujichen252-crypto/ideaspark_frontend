@@ -534,7 +534,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, h, reactive, computed } from 'vue'
+import { ref, h, reactive, computed, onMounted } from 'vue'
 import type { Component } from 'vue'
 import { useRouter } from 'vue-router'
 import { NIcon, useMessage, type UploadFileInfo } from 'naive-ui'
@@ -557,6 +557,21 @@ import {
   CloseOutline
 } from '@vicons/ionicons5'
 import { useUserStore } from '@/store'
+import {
+  getPostList,
+  createPost,
+  deletePost,
+  updatePostLikes
+} from '@/api/community/post'
+import { getGroupList, joinGroup, quitGroup } from '@/api/community/group'
+import { likePost, unlikePost, checkPostLiked } from '@/api/community/like'
+import {
+  followUser,
+  unfollowUser,
+  getMyFollowing,
+  checkFollowing
+} from '@/api/follow'
+import type { Post, Group, FollowRelation } from '@/api/types'
 
 const userStore = useUserStore()
 const loading = ref(false)
@@ -565,39 +580,12 @@ const message = useMessage()
 
 type FeedKey = 'recommend' | 'hot' | 'following' | 'qa'
 
-interface CommunityAuthor {
-  id: string
-  name: string
-  avatar: string
-}
-
-interface CommunityPostStats {
-  likes: number
-  comments: number
-}
-
-interface CommunityPost {
-  id: number
-  author: CommunityAuthor
-  publishTime: string
-  content: string
-  images: string[]
-  tags: string[]
-  stats: CommunityPostStats
+interface CommunityPost extends Post {
   isLiked: boolean
   channel: Exclude<FeedKey, 'hot'>
 }
 
-interface CommunityGroup {
-  id: number
-  name: string
-  icon: string
-  keyword: string
-  description: string
-  cover: string
-  memberCount: number
-  activeCount: number
-  postCount: number
+interface CommunityGroup extends Group {
   activeUsers: CommunityActiveUser[]
 }
 
@@ -654,6 +642,87 @@ const topicOptions = COMMUNITY_TOPIC_OPTIONS
 const handleUploadFinish = ({ file }: { file: UploadFileInfo; event?: ProgressEvent }) => {
   message.success('上传成功 (Mock)')
   return file
+}
+
+/**
+ * 加载帖子列表
+ */
+async function loadPosts() {
+  try {
+    const res = await getPostList()
+    if (res.data.status === 0 && res.data.data) {
+      posts.value = (res.data.data as Post[]).map((post) => ({
+        ...post,
+        isLiked: false,
+        channel: post.tags?.includes('问答') ? 'qa' : 'recommend'
+      }))
+    }
+  } catch (error) {
+    console.error('加载帖子列表失败:', error)
+    message.error('加载帖子列表失败')
+  }
+}
+
+/**
+ * 加载圈子列表
+ */
+async function loadGroups() {
+  try {
+    const res = await getGroupList()
+    if (res.data.status === 0 && res.data.data) {
+      const groups = res.data.data as Group[]
+      // 前 3 个作为我的圈子，其余作为发现圈子
+      myGroups.value = groups.slice(0, 3).map((group) => ({
+        ...group,
+        activeUsers: []
+      }))
+      discoverGroups.value = groups.slice(3).map((group) => ({
+        ...group,
+        activeUsers: []
+      }))
+    }
+  } catch (error) {
+    console.error('加载圈子列表失败:', error)
+    message.error('加载圈子列表失败')
+  }
+}
+
+/**
+ * 加载关注的用户列表
+ */
+async function loadFollowing() {
+  try {
+    const res = await getMyFollowing()
+    if (res.data.status === 0 && res.data.data) {
+      const relations = res.data.data as FollowRelation[]
+      followedUserIds.value = new Set(relations.map((r) => r.followingId))
+    }
+  } catch (error) {
+    console.error('加载关注列表失败:', error)
+    message.error('加载关注列表失败')
+  }
+}
+
+/**
+ * 加载推荐用户（使用关注列表作为推荐）
+ */
+async function loadRecommendedUsers() {
+  // 推荐用户功能暂时保留为空，后续可从后端获取推荐算法结果
+  recommendedUsers.value = []
+}
+
+/**
+ * 初始化数据加载
+ */
+async function loadData() {
+  loading.value = true
+  try {
+    await Promise.all([loadPosts(), loadGroups(), loadFollowing(), loadRecommendedUsers()])
+  } catch (error) {
+    console.error('数据加载失败:', error)
+  } finally {
+    loading.value = false
+  }
 }
 
 /**
@@ -755,43 +824,43 @@ function handleFeedChange(key: string): void {
   activeGroupId.value = null
 }
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
   if (!formValue.content) {
     message.warning('请输入正文内容')
     return
   }
 
   submitting.value = true
-  // Simulate API call
-  setTimeout(() => {
-    submitting.value = false
-    message.success('发布成功！')
-    showCreateModal.value = false
-
-    // Mock adding post (Optimistic update)
-    posts.value.unshift({
-      id: Date.now(),
-      author: {
-        id: String(userStore.userInfo?.id || 'me'),
-        name: userStore.userInfo?.username || '我',
-        avatar: userStore.userInfo?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Me'
-      },
-      publishTime: '刚刚',
+  try {
+    // 调用创建帖子 API
+    const res = await createPost({
+      title: formValue.title || '',
       content: formValue.content,
-      images: fileList.value.map(() => `https://picsum.photos/seed/${Math.random()}/400/300`), // Mock random images
       tags: formValue.topics as string[],
-      stats: { likes: 0, comments: 0 },
-      isLiked: false,
-      channel: activeFeedKey.value === 'qa' ? 'qa' : 'recommend'
+      images: fileList.value.map((f) => f.url || '').filter(Boolean),
+      visibility: formValue.visibility as 'public' | 'followers' | 'private'
     })
 
-    // Reset form
-    quickContent.value = ''
-    formValue.title = ''
-    formValue.content = ''
-    formValue.topics = []
-    fileList.value = []
-  }, 1000)
+    if (res.data.status === 0 && res.data.data) {
+      message.success('发布成功！')
+      showCreateModal.value = false
+
+      // 刷新帖子列表
+      await loadPosts()
+
+      // Reset form
+      quickContent.value = ''
+      formValue.title = ''
+      formValue.content = ''
+      formValue.topics = []
+      fileList.value = []
+    }
+  } catch (error) {
+    console.error('发布失败:', error)
+    message.error('发布失败，请重试')
+  } finally {
+    submitting.value = false
+  }
 }
 
 /**
@@ -826,235 +895,11 @@ function getGroupById(groupId: number): CommunityGroup | undefined {
   return myGroups.find((g) => g.id === groupId) || discoverGroups.find((g) => g.id === groupId)
 }
 
-const myGroups: CommunityGroup[] = [
-  {
-    id: 1,
-    name: 'Vue.js 爱好者',
-    icon: 'https://api.dicebear.com/7.x/identicon/svg?seed=Vue',
-    keyword: 'Vue3',
-    description: '一起聊 Vue3、工程化与组件化实践，分享优雅写法与踩坑经验。',
-    cover: 'https://picsum.photos/seed/group-vue/1200/360',
-    memberCount: 18234,
-    activeCount: 468,
-    postCount: 3269,
-    activeUsers: [
-      {
-        id: 11,
-        name: '小满',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=VueUser1',
-        activity: '正在讨论 defineModel'
-      },
-      {
-        id: 12,
-        name: '阿七',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=VueUser2',
-        activity: '发布了组件封装'
-      },
-      {
-        id: 13,
-        name: 'Nina',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=VueUser3',
-        activity: '解答了表单联动'
-      },
-      {
-        id: 14,
-        name: 'Ray',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=VueUser4',
-        activity: '分享了性能优化'
-      }
-    ]
-  },
-  {
-    id: 2,
-    name: 'AI 绘画交流',
-    icon: 'https://api.dicebear.com/7.x/identicon/svg?seed=AI',
-    keyword: 'AI',
-    description: '模型、提示词、风格与工作流分享：把想法变成图像，让创作更高效。',
-    cover: 'https://picsum.photos/seed/group-ai/1200/360',
-    memberCount: 9632,
-    activeCount: 312,
-    postCount: 2145,
-    activeUsers: [
-      {
-        id: 21,
-        name: 'Kite',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=AIUser1',
-        activity: '分享了提示词模板'
-      },
-      {
-        id: 22,
-        name: '花生',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=AIUser2',
-        activity: '更新了 LoRA 推荐'
-      },
-      {
-        id: 23,
-        name: 'Sora',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=AIUser3',
-        activity: '发布了作品集'
-      },
-      {
-        id: 24,
-        name: 'Bobo',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=AIUser4',
-        activity: '在做风格对比'
-      }
-    ]
-  },
-  {
-    id: 3,
-    name: '前端面试题',
-    icon: 'https://api.dicebear.com/7.x/identicon/svg?seed=Job',
-    keyword: '前端',
-    description: '高频面试题、手写题与项目亮点拆解，系统提升你的前端面试战斗力。',
-    cover: 'https://picsum.photos/seed/group-fe/1200/360',
-    memberCount: 23110,
-    activeCount: 790,
-    postCount: 5412,
-    activeUsers: [
-      {
-        id: 31,
-        name: 'Mia',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=FEUser1',
-        activity: '整理了闭包题'
-      },
-      {
-        id: 32,
-        name: 'Zero',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=FEUser2',
-        activity: '复盘了性能面试'
-      },
-      {
-        id: 33,
-        name: '小白',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=FEUser3',
-        activity: '分享了项目亮点'
-      },
-      {
-        id: 34,
-        name: 'Lynn',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=FEUser4',
-        activity: '答疑了事件循环'
-      }
-    ]
-  }
-]
-
-const discoverGroups: CommunityGroup[] = [
-  {
-    id: 11,
-    name: '设计灵感站',
-    icon: 'https://api.dicebear.com/7.x/identicon/svg?seed=DesignGroup',
-    keyword: 'UI',
-    description: '收集 UI/UX 灵感、组件布局与配色方案，适合做产品与后台的同学。',
-    cover: 'https://picsum.photos/seed/group-design/1200/360',
-    memberCount: 14280,
-    activeCount: 521,
-    postCount: 4870,
-    activeUsers: [
-      {
-        id: 111,
-        name: 'Cora',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=DesignActive1',
-        activity: '分享了配色方案'
-      },
-      {
-        id: 112,
-        name: 'Luca',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=DesignActive2',
-        activity: '在讨论信息架构'
-      },
-      {
-        id: 113,
-        name: 'Yuki',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=DesignActive3',
-        activity: '发布了组件规范'
-      },
-      {
-        id: 114,
-        name: '阿布',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=DesignActive4',
-        activity: '做了动效拆解'
-      }
-    ]
-  },
-  {
-    id: 12,
-    name: '效率工具箱',
-    icon: 'https://api.dicebear.com/7.x/identicon/svg?seed=ToolGroup',
-    keyword: '效率工具',
-    description: '分享效率工具、插件与工作流，少加班多产出。',
-    cover: 'https://picsum.photos/seed/group-tools/1200/360',
-    memberCount: 8830,
-    activeCount: 240,
-    postCount: 1698,
-    activeUsers: [
-      {
-        id: 121,
-        name: 'Tom',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ToolActive1',
-        activity: '更新了插件清单'
-      },
-      {
-        id: 122,
-        name: '小鱼',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ToolActive2',
-        activity: '分享了工作流'
-      },
-      {
-        id: 123,
-        name: 'Noah',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ToolActive3',
-        activity: '在做效率对比'
-      },
-      {
-        id: 124,
-        name: 'Momo',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ToolActive4',
-        activity: '提问了工具选型'
-      }
-    ]
-  },
-  {
-    id: 13,
-    name: 'TypeScript 进阶',
-    icon: 'https://api.dicebear.com/7.x/identicon/svg?seed=TSGroup',
-    keyword: 'TypeScript',
-    description: '类型体操、工程实践与最佳实践分享，让类型真正成为生产力。',
-    cover: 'https://picsum.photos/seed/group-ts/1200/360',
-    memberCount: 12650,
-    activeCount: 358,
-    postCount: 2796,
-    activeUsers: [
-      {
-        id: 131,
-        name: 'Vera',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=TSActive1',
-        activity: '整理了泛型套路'
-      },
-      {
-        id: 132,
-        name: 'Ken',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=TSActive2',
-        activity: '在做类型体操'
-      },
-      {
-        id: 133,
-        name: 'Eli',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=TSActive3',
-        activity: '分享了工程模板'
-      },
-      {
-        id: 134,
-        name: '阿南',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=TSActive4',
-        activity: '答疑了联合类型'
-      }
-    ]
-  }
-]
-
-const followedUserIds = ref<Set<number>>(new Set([101]))
+// 数据状态
+const posts = ref<CommunityPost[]>([])
+const myGroups = ref<CommunityGroup[]>([])
+const discoverGroups = ref<CommunityGroup[]>([])
+const followedUserIds = ref<Set<number>>(new Set())
 
 const activeGroup = computed<CommunityGroup | null>(() => {
   if (!activeGroupId.value) return null
@@ -1111,96 +956,31 @@ function handleExitGroup(): void {
 }
 
 /**
- * 加入/退出当前圈子（本地演示）。
+ * 加入/退出当前圈子
  */
-function handleToggleJoinActiveGroup(): void {
+async function handleToggleJoinActiveGroup(): Promise<void> {
   const groupId = activeGroupId.value
   if (!groupId) return
-  const next = new Set(joinedGroupIds.value)
-  if (next.has(groupId)) {
-    next.delete(groupId)
-    message.info('已退出圈子成员')
-  } else {
-    next.add(groupId)
-    message.success('加入圈子成功')
+
+  try {
+    if (joinedGroupIds.value.has(groupId)) {
+      // 退出圈子
+      await quitGroup(String(groupId))
+      joinedGroupIds.value.delete(groupId)
+      message.success('已退出圈子')
+    } else {
+      // 加入圈子
+      await joinGroup(String(groupId))
+      joinedGroupIds.value.add(groupId)
+      message.success('加入圈子成功')
+    }
+  } catch (error) {
+    console.error('圈子操作失败:', error)
+    message.error('操作失败，请重试')
   }
-  joinedGroupIds.value = next
 }
 
-const posts = ref<CommunityPost[]>([
-  {
-    id: 1,
-    author: {
-      id: '101',
-      name: 'TechHunter',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=TechHunter'
-    },
-    publishTime: '2小时前',
-    content:
-      '刚才试用了一下 IdeaSpark 的 AI Logo 生成器，效果出乎意料的好！直接生成了矢量图，省了我找设计师的钱 😂 强烈推荐给大家尝试一下！',
-    images: [
-      'https://picsum.photos/seed/logo1/400/300',
-      'https://picsum.photos/seed/logo2/400/300'
-    ],
-    tags: ['AI', '设计', '效率工具'],
-    stats: { likes: 124, comments: 45 },
-    isLiked: true,
-    channel: 'recommend'
-  },
-  {
-    id: 2,
-    author: {
-      id: '102',
-      name: 'FrontendMaster',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Frontend'
-    },
-    publishTime: '5小时前',
-    content:
-      'Vue 3.4 发布的 defineModel 宏真的太好用了，双向绑定代码量减少了至少 30%。分享一段我封装的通用 Input 组件代码，大家看看有没有改进空间。',
-    images: [], // 纯文本/代码
-    tags: ['Vue3', '前端', '经验分享'],
-    stats: { likes: 89, comments: 12 },
-    isLiked: false,
-    channel: 'recommend'
-  },
-  {
-    id: 3,
-    author: {
-      id: '103',
-      name: 'DesignDaily',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Design'
-    },
-    publishTime: '昨天',
-    content:
-      '分享一组极简主义风格的 UI 配色方案，适合用在后台管理系统或者 SaaS 产品中。#UI设计 #配色',
-    images: [
-      'https://picsum.photos/seed/color1/400/300',
-      'https://picsum.photos/seed/color2/400/300',
-      'https://picsum.photos/seed/color3/400/300'
-    ],
-    tags: ['UI', '素材'],
-    stats: { likes: 256, comments: 33 },
-    isLiked: false,
-    channel: 'recommend'
-  },
-  {
-    id: 4,
-    author: {
-      id: '104',
-      name: 'QAHacker',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=QA'
-    },
-    publishTime: '3天前',
-    content: '问答：Vue3 项目里如何优雅处理表单联动校验？大家有推荐的最佳实践或封装方式吗？',
-    images: [],
-    tags: ['Vue3', '表单', '问答'],
-    stats: { likes: 18, comments: 6 },
-    isLiked: false,
-    channel: 'qa'
-  }
-])
-
-// 模拟数据：热门话题
+// 热门话题（保留为常量，因为文档中未定义话题接口）
 const hotTopics: HotTopicItem[] = [
   { name: 'Vue3', heat: 234 },
   { name: 'AI', heat: 189 },
@@ -1209,40 +989,38 @@ const hotTopics: HotTopicItem[] = [
   { name: '问答', heat: 98 }
 ]
 
-// 模拟数据：推荐关注
-const recommendedUsers = ref<RecommendedUser[]>([
-  {
-    id: 101,
-    name: '尤雨溪',
-    desc: 'Vue.js 作者',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Evan',
-    isFollowed: true
-  },
-  {
-    id: 102,
-    name: 'AI前沿',
-    desc: '分享最新 AI 资讯',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=AIPro',
-    isFollowed: false
-  },
-  {
-    id: 103,
-    name: 'CSS魔法',
-    desc: 'CSS 动效专家',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=CSS',
-    isFollowed: false
-  }
-])
+// 推荐关注（从 API 加载）
+const recommendedUsers = ref<RecommendedUser[]>([])
 
 /**
- * 点赞/取消点赞动态（本地演示）。
- * @param postId - 动态ID
+ * 点赞/取消点赞动态
+ * @param postId - 动态 ID
  */
-function handleToggleLike(postId: number): void {
+async function handleToggleLike(postId: number): Promise<void> {
   const target = posts.value.find((p) => p.id === postId)
   if (!target) return
-  target.isLiked = !target.isLiked
-  target.stats.likes += target.isLiked ? 1 : -1
+
+  try {
+    if (target.isLiked) {
+      // 取消点赞
+      await unlikePost(postId)
+      target.isLiked = false
+      target.stats.likes = Math.max(0, target.stats.likes - 1)
+      message.success('已取消点赞')
+    } else {
+      // 点赞
+      await likePost(postId)
+      target.isLiked = true
+      target.stats.likes += 1
+      message.success('点赞成功')
+    }
+  } catch (error) {
+    console.error('点赞操作失败:', error)
+    message.error('操作失败，请重试')
+    // 恢复状态
+    target.isLiked = !target.isLiked
+    target.stats.likes += target.isLiked ? 1 : -1
+  }
 }
 
 /**
@@ -1358,27 +1136,58 @@ function handlePostActionSelect(key: string | number, postId: number): void {
     return
   }
   if (key === 'delete') {
-    posts.value = posts.value.filter((p) => p.id !== postId)
-    message.success('已删除')
+    void (async () => {
+      try {
+        await deletePost(String(postId))
+        posts.value = posts.value.filter((p) => p.id !== postId)
+        message.success('已删除')
+      } catch (error) {
+        console.error('删除失败:', error)
+        message.error('删除失败，请重试')
+      }
+    })()
   }
 }
 
 /**
- * 关注/取消关注推荐用户，并同步“关注动态”筛选集合。
- * @param userId - 用户ID
+ * 关注/取消关注推荐用户，并同步"关注动态"筛选集合。
+ * @param userId - 用户 ID
  */
-function handleToggleFollowUser(userId: number): void {
+async function handleToggleFollowUser(userId: number): Promise<void> {
   const target = recommendedUsers.value.find((u) => u.id === userId)
   if (!target) return
-  target.isFollowed = !target.isFollowed
-  if (target.isFollowed) {
-    followedUserIds.value.add(userId)
-    message.success('已关注')
-  } else {
-    followedUserIds.value.delete(userId)
-    message.info('已取消关注')
+
+  try {
+    if (target.isFollowed) {
+      // 取消关注
+      await unfollowUser(userId)
+      target.isFollowed = false
+      followedUserIds.value.delete(userId)
+      message.info('已取消关注')
+    } else {
+      // 关注
+      await followUser(userId)
+      target.isFollowed = true
+      followedUserIds.value.add(userId)
+      message.success('关注成功')
+    }
+  } catch (error) {
+    console.error('关注操作失败:', error)
+    message.error('操作失败，请重试')
+    // 恢复状态
+    target.isFollowed = !target.isFollowed
+    if (target.isFollowed) {
+      followedUserIds.value.add(userId)
+    } else {
+      followedUserIds.value.delete(userId)
+    }
   }
 }
+
+// 页面加载时初始化数据
+onMounted(() => {
+  loadData()
+})
 </script>
 
 <style scoped lang="scss">

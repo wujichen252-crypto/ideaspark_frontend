@@ -1,15 +1,15 @@
+/**
+ * 邀请管理接口
+ * @description 封装邀请管理模块的 HTTP 请求方法
+ */
 import service from './request'
-import type { Result } from './request'
+import type { ApiResponse } from './types'
+import type { InvitationValidateResult } from './types'
 
-export interface InvitationValidateResult {
-  valid: boolean
-  team: {
-    uuid: string
-    name: string
-  }
-  role: string
-}
-
+/**
+ * 验证团队邀请链接
+ * @param token - 邀请令牌
+ */
 export function validateInvitation(token: string) {
-  return service.get<Result<InvitationValidateResult>>('/invitations/validate', { params: { token } })
+  return service.get<ApiResponse<InvitationValidateResult>>('/invitations/validate', { params: { token } })
 }
