@@ -534,6 +534,35 @@ export interface UpdateGroupMemberRoleParams {
   role: GroupMemberRole
 }
 
+/**
+ * 我加入的圈子列表项
+ */
+export interface MyGroupItem {
+  id: string
+  group: {
+    id: string
+    name: string
+    keyword: string
+    description: string
+  }
+  role: GroupMemberRole
+  joinedAt: string
+}
+
+/**
+ * 圈子成员数响应
+ */
+export interface GroupMemberCountResult {
+  count: number
+}
+
+/**
+ * 圈子成员状态响应
+ */
+export interface GroupMembershipResult {
+  member: boolean
+}
+
 // ==================== 社区点赞模块类型 ====================
 
 /**

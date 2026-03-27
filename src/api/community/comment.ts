@@ -59,3 +59,12 @@ export function updateComment(commentId: string, params: UpdateCommentParams) {
 export function deleteComment(commentId: string) {
   return service.delete<ApiResponse<null>>(`/community/comments/${commentId}`)
 }
+
+/**
+ * 更新评论点赞数
+ * @param commentId - 评论 ID
+ * @param params - 点赞数参数
+ */
+export function updateCommentLikes(commentId: string, params: { count: number }) {
+  return service.put<ApiResponse<Comment>>(`/community/comments/${commentId}/likes`, params)
+}

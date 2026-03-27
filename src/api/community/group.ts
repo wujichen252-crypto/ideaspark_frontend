@@ -10,7 +10,10 @@ import type {
   GroupMember,
   CreateGroupParams,
   UpdateGroupParams,
-  UpdateGroupMemberRoleParams
+  UpdateGroupMemberRoleParams,
+  MyGroupItem,
+  GroupMemberCountResult,
+  GroupMembershipResult
 } from '../types'
 
 /**
@@ -66,7 +69,32 @@ export function joinGroup(groupId: string) {
  * @param groupId - 圈子 ID
  */
 export function quitGroup(groupId: string) {
-  return service.delete<ApiResponse<null>>(`/community/groups/${groupId}/quit`)
+  return service.delete<ApiResponse<null>>(`/community/groups/${groupId}/join`)
+}
+
+/**
+ * 获取我加入的圈子列表
+ */
+export function getMyGroups() {
+  return service.get<ApiResponse<MyGroupItem[]>>('/community/groups/my')
+}
+
+/**
+ * 获取圈子成员数
+ * @param groupId - 圈子 ID
+ */
+export function getGroupMemberCount(groupId: string) {
+  return service.get<ApiResponse<GroupMemberCountResult>>(
+    `/community/groups/${groupId}/members/count`
+  )
+}
+
+/**
+ * 检查当前用户是否在圈子中
+ * @param groupId - 圈子 ID
+ */
+export function checkGroupMembership(groupId: string) {
+  return service.get<ApiResponse<GroupMembershipResult>>(`/community/groups/${groupId}/check`)
 }
 
 /**

@@ -4,7 +4,15 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import service from '../../request'
-import { createComment, getPostComments, getAllPostComments, getCommentReplies, updateComment, deleteComment } from '../comment'
+import {
+  createComment,
+  getPostComments,
+  getAllPostComments,
+  getCommentReplies,
+  updateComment,
+  deleteComment,
+  updateCommentLikes
+} from '../comment'
 import type { AxiosResponse } from 'axios'
 
 vi.mock('../../request', () => ({
@@ -43,7 +51,10 @@ describe('社区评论接口', () => {
 
       const result = await createComment({ postId: 'post-123', content: '测试评论' })
 
-      expect(mockService.post).toHaveBeenCalledWith('/community/comments', { postId: 'post-123', content: '测试评论' })
+      expect(mockService.post).toHaveBeenCalledWith('/community/comments', {
+        postId: 'post-123',
+        content: '测试评论'
+      })
       expect(result.data.data.id).toBe('comment-123')
     })
 
@@ -64,7 +75,11 @@ describe('社区评论接口', () => {
       } as AxiosResponse
       mockService.post.mockResolvedValue(mockResponse)
 
-      const result = await createComment({ postId: 'post-123', content: '回复内容', parentId: 'comment-123' })
+      const result = await createComment({
+        postId: 'post-123',
+        content: '回复内容',
+        parentId: 'comment-123'
+      })
 
       expect(mockService.post).toHaveBeenCalledWith('/community/comments', {
         postId: 'post-123',
@@ -81,7 +96,16 @@ describe('社区评论接口', () => {
         data: {
           status: 200,
           message: '获取成功',
-          data: [{ id: 'comment-123', content: '测试评论', user: { id: 1, username: '张三' }, likesCount: 5, createdAt: '2024-01-01', replies: [] }]
+          data: [
+            {
+              id: 'comment-123',
+              content: '测试评论',
+              user: { id: 1, username: '张三' },
+              likesCount: 5,
+              createdAt: '2024-01-01',
+              replies: []
+            }
+          ]
         }
       } as AxiosResponse
       mockService.get.mockResolvedValue(mockResponse)
@@ -100,8 +124,22 @@ describe('社区评论接口', () => {
           status: 200,
           message: '获取成功',
           data: [
-            { id: 'comment-123', content: '测试评论', user: { id: 1, username: '张三' }, parentId: null, likesCount: 5, createdAt: '2024-01-01' },
-            { id: 'comment-456', content: '回复', user: { id: 2, username: '李四' }, parentId: 'comment-123', likesCount: 2, createdAt: '2024-01-01' }
+            {
+              id: 'comment-123',
+              content: '测试评论',
+              user: { id: 1, username: '张三' },
+              parentId: null,
+              likesCount: 5,
+              createdAt: '2024-01-01'
+            },
+            {
+              id: 'comment-456',
+              content: '回复',
+              user: { id: 2, username: '李四' },
+              parentId: 'comment-123',
+              likesCount: 2,
+              createdAt: '2024-01-01'
+            }
           ]
         }
       } as AxiosResponse
@@ -120,7 +158,15 @@ describe('社区评论接口', () => {
         data: {
           status: 200,
           message: '获取成功',
-          data: [{ id: 'comment-456', content: '回复', user: { id: 2, username: '李四' }, likesCount: 2, createdAt: '2024-01-01' }]
+          data: [
+            {
+              id: 'comment-456',
+              content: '回复',
+              user: { id: 2, username: '李四' },
+              likesCount: 2,
+              createdAt: '2024-01-01'
+            }
+          ]
         }
       } as AxiosResponse
       mockService.get.mockResolvedValue(mockResponse)
@@ -138,14 +184,22 @@ describe('社区评论接口', () => {
         data: {
           status: 200,
           message: '更新成功',
-          data: { id: 'comment-123', content: '更新后的评论', user: { id: 1, username: '张三' }, likesCount: 5, createdAt: '2024-01-01' }
+          data: {
+            id: 'comment-123',
+            content: '更新后的评论',
+            user: { id: 1, username: '张三' },
+            likesCount: 5,
+            createdAt: '2024-01-01'
+          }
         }
       } as AxiosResponse
       mockService.put.mockResolvedValue(mockResponse)
 
       const result = await updateComment('comment-123', { content: '更新后的评论' })
 
-      expect(mockService.put).toHaveBeenCalledWith('/community/comments/comment-123', { content: '更新后的评论' })
+      expect(mockService.put).toHaveBeenCalledWith('/community/comments/comment-123', {
+        content: '更新后的评论'
+      })
       expect(result.data.data.content).toBe('更新后的评论')
     })
   })
@@ -160,6 +214,32 @@ describe('社区评论接口', () => {
       await deleteComment('comment-123')
 
       expect(mockService.delete).toHaveBeenCalledWith('/community/comments/comment-123')
+    })
+  })
+
+  describe('updateCommentLikes', () => {
+    it('应该正确调用更新评论点赞数接口', async () => {
+      const mockResponse = {
+        data: {
+          status: 200,
+          message: '更新成功',
+          data: {
+            id: 'comment-123',
+            content: '测试评论',
+            user: { id: 1, username: '张三' },
+            likesCount: 10,
+            createdAt: '2024-01-01'
+          }
+        }
+      } as AxiosResponse
+      mockService.put.mockResolvedValue(mockResponse)
+
+      const result = await updateCommentLikes('comment-123', { count: 10 })
+
+      expect(mockService.put).toHaveBeenCalledWith('/community/comments/comment-123/likes', {
+        count: 10
+      })
+      expect(result.data.data.likesCount).toBe(10)
     })
   })
 })

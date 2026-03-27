@@ -14,7 +14,10 @@ import {
   quitGroup,
   getGroupMembers,
   removeGroupMember,
-  updateGroupMemberRole
+  updateGroupMemberRole,
+  getMyGroups,
+  getGroupMemberCount,
+  checkGroupMembership
 } from '../group'
 import type { AxiosResponse } from 'axios'
 
@@ -55,9 +58,17 @@ describe('社区圈子接口', () => {
       } as AxiosResponse
       mockService.post.mockResolvedValue(mockResponse)
 
-      const result = await createGroup({ name: '测试圈子', keyword: '测试', description: '测试描述' })
+      const result = await createGroup({
+        name: '测试圈子',
+        keyword: '测试',
+        description: '测试描述'
+      })
 
-      expect(mockService.post).toHaveBeenCalledWith('/community/groups', { name: '测试圈子', keyword: '测试', description: '测试描述' })
+      expect(mockService.post).toHaveBeenCalledWith('/community/groups', {
+        name: '测试圈子',
+        keyword: '测试',
+        description: '测试描述'
+      })
       expect(result.data.data.id).toBe('group-123')
     })
   })
@@ -68,7 +79,16 @@ describe('社区圈子接口', () => {
         data: {
           status: 200,
           message: '获取成功',
-          data: [{ id: 'group-123', name: '测试圈子', keyword: '测试', description: '', memberCount: 10, createdAt: '2024-01-01' }]
+          data: [
+            {
+              id: 'group-123',
+              name: '测试圈子',
+              keyword: '测试',
+              description: '',
+              memberCount: 10,
+              createdAt: '2024-01-01'
+            }
+          ]
         }
       } as AxiosResponse
       mockService.get.mockResolvedValue(mockResponse)
@@ -114,14 +134,27 @@ describe('社区圈子接口', () => {
         data: {
           status: 200,
           message: '更新成功',
-          data: { id: 'group-123', name: '更新后的圈子', keyword: '测试', description: '更新后的描述', memberCount: 10, createdAt: '2024-01-01' }
+          data: {
+            id: 'group-123',
+            name: '更新后的圈子',
+            keyword: '测试',
+            description: '更新后的描述',
+            memberCount: 10,
+            createdAt: '2024-01-01'
+          }
         }
       } as AxiosResponse
       mockService.put.mockResolvedValue(mockResponse)
 
-      const result = await updateGroup('group-123', { name: '更新后的圈子', description: '更新后的描述' })
+      const result = await updateGroup('group-123', {
+        name: '更新后的圈子',
+        description: '更新后的描述'
+      })
 
-      expect(mockService.put).toHaveBeenCalledWith('/community/groups/group-123', { name: '更新后的圈子', description: '更新后的描述' })
+      expect(mockService.put).toHaveBeenCalledWith('/community/groups/group-123', {
+        name: '更新后的圈子',
+        description: '更新后的描述'
+      })
       expect(result.data.data.name).toBe('更新后的圈子')
     })
   })
@@ -161,7 +194,73 @@ describe('社区圈子接口', () => {
 
       await quitGroup('group-123')
 
-      expect(mockService.delete).toHaveBeenCalledWith('/community/groups/group-123/quit')
+      expect(mockService.delete).toHaveBeenCalledWith('/community/groups/group-123/join')
+    })
+  })
+
+  describe('getMyGroups', () => {
+    it('应该正确调用获取我加入的圈子列表接口', async () => {
+      const mockResponse = {
+        data: {
+          status: 200,
+          message: '获取成功',
+          data: [
+            {
+              id: 'member-123',
+              group: {
+                id: 'group-123',
+                name: '测试圈子',
+                keyword: '测试',
+                description: '测试描述'
+              },
+              role: 'member',
+              joinedAt: '2024-01-01'
+            }
+          ]
+        }
+      } as AxiosResponse
+      mockService.get.mockResolvedValue(mockResponse)
+
+      const result = await getMyGroups()
+
+      expect(mockService.get).toHaveBeenCalledWith('/community/groups/my')
+      expect(result.data.data).toHaveLength(1)
+    })
+  })
+
+  describe('getGroupMemberCount', () => {
+    it('应该正确调用获取圈子成员数接口', async () => {
+      const mockResponse = {
+        data: {
+          status: 200,
+          message: '获取成功',
+          data: { count: 50 }
+        }
+      } as AxiosResponse
+      mockService.get.mockResolvedValue(mockResponse)
+
+      const result = await getGroupMemberCount('group-123')
+
+      expect(mockService.get).toHaveBeenCalledWith('/community/groups/group-123/members/count')
+      expect(result.data.data.count).toBe(50)
+    })
+  })
+
+  describe('checkGroupMembership', () => {
+    it('应该正确调用检查圈子成员状态接口', async () => {
+      const mockResponse = {
+        data: {
+          status: 200,
+          message: '获取成功',
+          data: { member: true }
+        }
+      } as AxiosResponse
+      mockService.get.mockResolvedValue(mockResponse)
+
+      const result = await checkGroupMembership('group-123')
+
+      expect(mockService.get).toHaveBeenCalledWith('/community/groups/group-123/check')
+      expect(result.data.data.member).toBe(true)
     })
   })
 
@@ -171,7 +270,14 @@ describe('社区圈子接口', () => {
         data: {
           status: 200,
           message: '获取成功',
-          data: [{ id: 'member-123', user: { id: 1, username: '张三' }, role: 'admin', joinedAt: '2024-01-01' }]
+          data: [
+            {
+              id: 'member-123',
+              user: { id: 1, username: '张三' },
+              role: 'admin',
+              joinedAt: '2024-01-01'
+            }
+          ]
         }
       } as AxiosResponse
       mockService.get.mockResolvedValue(mockResponse)
@@ -192,7 +298,9 @@ describe('社区圈子接口', () => {
 
       await removeGroupMember('group-123', 'member-123')
 
-      expect(mockService.delete).toHaveBeenCalledWith('/community/groups/group-123/members/member-123')
+      expect(mockService.delete).toHaveBeenCalledWith(
+        '/community/groups/group-123/members/member-123'
+      )
     })
   })
 
@@ -205,7 +313,10 @@ describe('社区圈子接口', () => {
 
       await updateGroupMemberRole('group-123', 'member-123', { role: 'admin' })
 
-      expect(mockService.put).toHaveBeenCalledWith('/community/groups/group-123/members/member-123/role', { role: 'admin' })
+      expect(mockService.put).toHaveBeenCalledWith(
+        '/community/groups/group-123/members/member-123/role',
+        { role: 'admin' }
+      )
     })
   })
 })
