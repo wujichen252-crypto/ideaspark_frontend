@@ -253,11 +253,11 @@
                     <template #icon>
                       <n-icon :component="post.isLiked ? Heart : HeartOutline" />
                     </template>
-                    {{ post.stats.likes }}
+                    {{ post.stats?.likes }}
                   </n-button>
                   <n-button text class="action-btn" @click.stop="handleOpenComments(post.id)">
                     <template #icon><n-icon :component="ChatbubbleOutline" /></template>
-                    {{ post.stats.comments }}
+                    {{ post.stats?.comments }}
                   </n-button>
                   <n-button text class="action-btn" @click.stop="handleSharePost(post.id)">
                     <template #icon><n-icon :component="ShareSocialOutline" /></template>
@@ -571,7 +571,7 @@ import {
   getMyFollowing,
   checkFollowing
 } from '@/api/follow'
-import type { Post, Group, FollowRelation } from '@/api/types'
+import type { Post, Group, MyFollowingItem, PostVisibility } from '@/api/types'
 
 const userStore = useUserStore()
 const loading = ref(false)
@@ -620,7 +620,7 @@ const formValue = reactive({
   title: '',
   content: '',
   topics: [],
-  visibility: 'public'
+  visibility: 'PUBLIC'
 })
 
 const fileList = ref<UploadFileInfo[]>([])
@@ -694,8 +694,8 @@ async function loadFollowing() {
   try {
     const res = await getMyFollowing()
     if (res.data.status === 0 && res.data.data) {
-      const relations = res.data.data as FollowRelation[]
-      followedUserIds.value = new Set(relations.map((r) => r.followingId))
+      // 新的简化格式：followingId, followingName, followingAvatar
+      followedUserIds.value = new Set(res.data.data.map((item) => item.followingId))
     }
   } catch (error) {
     console.error('加载关注列表失败:', error)
@@ -736,8 +736,8 @@ const openCreateModal = () => {
 
 const postSearchKeyword = ref('')
 const activeFeedKey = ref<FeedKey>('recommend')
-const activeGroupId = ref<number | null>(null)
-const joinedGroupIds = ref<Set<number>>(new Set([1]))
+const activeGroupId = ref<string | null>(null)
+const joinedGroupIds = ref<Set<string>>(new Set(['1']))
 
 /**
  * 统一规范化文本，用于搜索匹配（去首尾空格并转小写）。
@@ -760,12 +760,12 @@ function openExploreGroupsModal(): void {
  * @param post - 动态数据
  */
 function buildPostSearchText(post: {
-  author: { name: string }
+  author: { name?: string; username: string }
   content: string
   tags?: string[]
 }): string {
   const tagText = (post.tags || []).join(' ')
-  return `${post.author.name} ${post.content} ${tagText}`
+  return `${post.author.name || post.author.username} ${post.content} ${tagText}`
 }
 
 /**
@@ -775,7 +775,7 @@ function buildPostSearchText(post: {
  */
 function isPostMatched(
   keyword: string,
-  post: { author: { name: string }; content: string; tags?: string[] }
+  post: { author: { name?: string; username: string }; content: string; tags?: string[] }
 ): boolean {
   if (!keyword) return true
   return normalizeSearchText(buildPostSearchText(post)).includes(keyword)
@@ -812,7 +812,7 @@ const filteredPosts = computed(() => {
     (p) => isPostInFeed(p) && isPostInActiveGroup(p) && isPostMatched(keyword, p)
   )
   if (activeFeedKey.value !== 'hot') return base
-  return [...base].sort((a, b) => b.stats.likes - a.stats.likes)
+  return [...base].sort((a, b) => (b.stats?.likes || 0) - (a.stats?.likes || 0))
 })
 
 /**
@@ -838,7 +838,7 @@ const handleSubmit = async () => {
       content: formValue.content,
       tags: formValue.topics as string[],
       images: fileList.value.map((f) => f.url || '').filter(Boolean),
-      visibility: formValue.visibility as 'public' | 'followers' | 'private'
+      visibility: formValue.visibility as PostVisibility
     })
 
     if (res.data.status === 0 && res.data.data) {
@@ -883,7 +883,7 @@ const menuOptions: MenuOption[] = [
  * 跳转到社区动态详情页
  * @param id 动态ID
  */
-function goToPost(id: number) {
+function goToPost(id: string) {
   router.push(`/community/post/${id}`)
 }
 
@@ -891,8 +891,8 @@ function goToPost(id: number) {
  * 根据圈子ID获取圈子信息（我的圈子 + 可逛圈子）。
  * @param groupId - 圈子ID
  */
-function getGroupById(groupId: number): CommunityGroup | undefined {
-  return myGroups.find((g) => g.id === groupId) || discoverGroups.find((g) => g.id === groupId)
+function getGroupById(groupId: string): CommunityGroup | undefined {
+  return myGroups.value.find((g) => g.id === groupId) || discoverGroups.value.find((g) => g.id === groupId)
 }
 
 // 数据状态
@@ -914,8 +914,8 @@ const isActiveGroupJoined = computed<boolean>(() => {
 
 const filteredDiscoverGroups = computed(() => {
   const keyword = normalizeSearchText(exploreGroupKeyword.value)
-  if (!keyword) return discoverGroups
-  return discoverGroups.filter((g) =>
+  if (!keyword) return discoverGroups.value
+  return discoverGroups.value.filter((g) =>
     normalizeSearchText(`${g.name} ${g.description} ${g.keyword}`).includes(keyword)
   )
 })
@@ -924,9 +924,9 @@ const filteredDiscoverGroups = computed(() => {
  * 进入圈子：展示圈子英雄页，并联动圈子筛选。
  * @param groupId - 圈子ID
  */
-function handleSelectGroup(groupId: number): void {
+function handleSelectGroup(groupId: string): void {
   activeGroupId.value = groupId
-  const group = myGroups.find((g) => g.id === groupId)
+  const group = myGroups.value.find((g) => g.id === groupId)
   if (!group) return
   activeFeedKey.value = 'recommend'
   postSearchKeyword.value = ''
@@ -937,7 +937,7 @@ function handleSelectGroup(groupId: number): void {
  * 从“逛圈子”弹窗进入圈子，并关闭弹窗。
  * @param groupId - 圈子ID
  */
-function handleEnterExploreGroup(groupId: number): void {
+function handleEnterExploreGroup(groupId: string): void {
   const group = getGroupById(groupId)
   if (!group) return
   activeGroupId.value = groupId
@@ -996,7 +996,7 @@ const recommendedUsers = ref<RecommendedUser[]>([])
  * 点赞/取消点赞动态
  * @param postId - 动态 ID
  */
-async function handleToggleLike(postId: number): Promise<void> {
+async function handleToggleLike(postId: string): Promise<void> {
   const target = posts.value.find((p) => p.id === postId)
   if (!target) return
 
@@ -1005,13 +1005,15 @@ async function handleToggleLike(postId: number): Promise<void> {
       // 取消点赞
       await unlikePost(postId)
       target.isLiked = false
-      target.stats.likes = Math.max(0, target.stats.likes - 1)
+      target.stats = target.stats || { views: 0, likes: 0, comments: 0 }
+      target.stats.likes = Math.max(0, (target.stats.likes || 0) - 1)
       message.success('已取消点赞')
     } else {
       // 点赞
       await likePost(postId)
       target.isLiked = true
-      target.stats.likes += 1
+      target.stats = target.stats || { views: 0, likes: 0, comments: 0 }
+      target.stats.likes = (target.stats.likes || 0) + 1
       message.success('点赞成功')
     }
   } catch (error) {
@@ -1019,7 +1021,8 @@ async function handleToggleLike(postId: number): Promise<void> {
     message.error('操作失败，请重试')
     // 恢复状态
     target.isLiked = !target.isLiked
-    target.stats.likes += target.isLiked ? 1 : -1
+    target.stats = target.stats || { views: 0, likes: 0, comments: 0 }
+    target.stats.likes = (target.stats.likes || 0) + (target.isLiked ? 1 : -1)
   }
 }
 
@@ -1027,7 +1030,7 @@ async function handleToggleLike(postId: number): Promise<void> {
  * 打开评论区：跳转到动态详情页。
  * @param postId - 动态ID
  */
-function handleOpenComments(postId: number): void {
+function handleOpenComments(postId: string): void {
   goToPost(postId)
 }
 
@@ -1035,7 +1038,7 @@ function handleOpenComments(postId: number): void {
  * 获取动态分享链接。
  * @param postId - 动态ID
  */
-function getPostShareLink(postId: number): string {
+function getPostShareLink(postId: string): string {
   const origin = typeof window !== 'undefined' ? window.location.origin : ''
   return `${origin}/community/post/${postId}`
 }
@@ -1073,7 +1076,7 @@ async function copyToClipboard(text: string): Promise<boolean> {
  * 分享动态：复制链接并提示结果。
  * @param postId - 动态ID
  */
-async function handleSharePost(postId: number): Promise<void> {
+async function handleSharePost(postId: string): Promise<void> {
   const link = getPostShareLink(postId)
   const ok = await copyToClipboard(link)
   if (ok) message.success('链接已复制')
@@ -1110,7 +1113,7 @@ function handleMoreTopics(): void {
 function getPostActionOptions(post: CommunityPost): MenuOption[] {
   const isMine =
     String(post.author.id) === String(userStore.userInfo?.id || 'me') ||
-    post.author.name === (userStore.userInfo?.username || '我')
+    (post.author.name || post.author.username) === (userStore.userInfo?.username || '我')
   const base: MenuOption[] = [
     { label: '复制链接', key: 'copy-link' },
     { label: '举报', key: 'report' }
@@ -1126,7 +1129,7 @@ function getPostActionOptions(post: CommunityPost): MenuOption[] {
  * @param key - 操作key
  * @param postId - 动态ID
  */
-function handlePostActionSelect(key: string | number, postId: number): void {
+function handlePostActionSelect(key: string | number, postId: string): void {
   if (key === 'copy-link') {
     void handleSharePost(postId)
     return
@@ -1138,7 +1141,7 @@ function handlePostActionSelect(key: string | number, postId: number): void {
   if (key === 'delete') {
     void (async () => {
       try {
-        await deletePost(String(postId))
+        await deletePost(postId)
         posts.value = posts.value.filter((p) => p.id !== postId)
         message.success('已删除')
       } catch (error) {

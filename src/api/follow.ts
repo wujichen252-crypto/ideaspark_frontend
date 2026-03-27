@@ -4,7 +4,12 @@
  */
 import service from './request'
 import type { ApiResponse } from './types'
-import type { FollowRelation, FollowCountResult, FollowCheckResult } from './types'
+import type {
+  MyFollowingItem,
+  MyFollowerItem,
+  FollowCountResult,
+  FollowCheckResult
+} from './types'
 
 /**
  * 关注用户
@@ -26,14 +31,14 @@ export function unfollowUser(followingId: number) {
  * 获取我的关注列表
  */
 export function getMyFollowing() {
-  return service.get<ApiResponse<FollowRelation[]>>('/follows/my/following')
+  return service.get<ApiResponse<MyFollowingItem[]>>('/follows/my/following')
 }
 
 /**
  * 获取我的粉丝列表
  */
 export function getMyFollowers() {
-  return service.get<ApiResponse<FollowRelation[]>>('/follows/my/followers')
+  return service.get<ApiResponse<MyFollowerItem[]>>('/follows/my/followers')
 }
 
 /**
@@ -63,7 +68,7 @@ export function checkFollowing(followingId: number) {
  * @param userId - 用户 ID
  */
 export function getUserFollowing(userId: number) {
-  return service.get<ApiResponse<FollowRelation[]>>(`/follows/user/${userId}/following`)
+  return service.get<ApiResponse<MyFollowingItem[]>>(`/follows/user/${userId}/following`)
 }
 
 /**
@@ -71,7 +76,7 @@ export function getUserFollowing(userId: number) {
  * @param userId - 用户 ID
  */
 export function getUserFollowers(userId: number) {
-  return service.get<ApiResponse<FollowRelation[]>>(`/follows/user/${userId}/followers`)
+  return service.get<ApiResponse<MyFollowerItem[]>>(`/follows/user/${userId}/followers`)
 }
 
 /**

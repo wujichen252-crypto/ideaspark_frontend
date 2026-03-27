@@ -301,7 +301,7 @@ export interface GetMarketProjectsParams extends PaginationParams {
 /**
  * 帖子可见性枚举
  */
-export type PostVisibility = 'PUBLIC' | 'PRIVATE'
+export type PostVisibility = 'PUBLIC' | 'PRIVATE' | 'FOLLOWERS'
 
 /**
  * 帖子作者信息
@@ -309,6 +309,8 @@ export type PostVisibility = 'PUBLIC' | 'PRIVATE'
 export interface PostAuthor {
   id: number
   username: string
+  name?: string
+  avatar?: string
 }
 
 /**
@@ -317,6 +319,15 @@ export interface PostAuthor {
 export interface PostProject {
   id: string
   name: string
+}
+
+/**
+ * 帖子统计数据
+ */
+export interface PostStats {
+  views: number
+  likes: number
+  comments: number
 }
 
 /**
@@ -331,14 +342,19 @@ export interface Post {
   likesCount: number
   commentsCount: number
   createdAt: string
+  images?: string[]
+  tags?: string[]
+  stats?: PostStats
+  publishTime?: string
+  isLiked?: boolean
 }
 
 /**
  * 帖子详情
  */
 export interface PostDetail extends Post {
-  images: string
-  tags: string
+  images?: string[]
+  tags?: string[]
   channel: string
   visibility: PostVisibility
   project?: PostProject
@@ -351,8 +367,8 @@ export interface PostDetail extends Post {
 export interface CreatePostParams {
   title: string
   content: string
-  images?: string
-  tags?: string
+  images?: string[]
+  tags?: string[]
   channel?: string
   visibility?: PostVisibility
   projectId?: string
@@ -364,8 +380,8 @@ export interface CreatePostParams {
 export interface UpdatePostParams {
   title?: string
   content?: string
-  images?: string
-  tags?: string
+  images?: string[]
+  tags?: string[]
   visibility?: PostVisibility
 }
 
@@ -461,6 +477,10 @@ export interface Group {
   description: string
   memberCount: number
   createdAt: string
+  icon?: string
+  cover?: string
+  activeCount?: number
+  postCount?: number
 }
 
 /**
@@ -541,12 +561,34 @@ export interface FollowUser {
 }
 
 /**
- * 关注关系信息
+ * 我的关注列表项（简化格式）
+ */
+export interface MyFollowingItem {
+  id: string
+  followingId: number
+  followingName: string
+  followingAvatar: string
+  createdAt: string
+}
+
+/**
+ * 我的粉丝列表项（简化格式）
+ */
+export interface MyFollowerItem {
+  id: string
+  followerId: number
+  followerName: string
+  followerAvatar: string
+  createdAt: string
+}
+
+/**
+ * 关注关系信息（旧格式，保留兼容）
  */
 export interface FollowRelation {
   id: string
-  follower: FollowUser
-  following: FollowUser
+  followerId: number
+  followingId: number
   createdAt: string
 }
 
