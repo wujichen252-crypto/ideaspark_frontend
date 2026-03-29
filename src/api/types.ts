@@ -142,17 +142,24 @@ export interface Team {
  * 团队详情
  */
 export interface TeamDetail extends Team {
-  ownerId: number
+  owner: {
+    id: number
+    username: string
+    avatar?: string
+  }
+  projectCount: number
   createdAt: string
+  myRole?: TeamRole
 }
 
 /**
  * 团队成员
  */
 export interface TeamMember {
-  id: number
+  id: string
+  userId: number
   username: string
-  email: string
+  avatar?: string
   role: TeamRole
   joinedAt: string
 }
@@ -197,8 +204,8 @@ export interface UpdateTeamParams {
  * 邀请成员参数
  */
 export interface InviteParams {
-  emails: string[]
-  role: 'ADMIN' | 'MEMBER'
+  inviteeIds: number[]
+  message?: string
 }
 
 /**
@@ -229,8 +236,9 @@ export interface Project {
   id: string
   name: string
   description: string
-  status: ProjectStatus
-  memberCount: number
+  coverImage?: string
+  status: string
+  teamName?: string
   createdAt: string
 }
 
@@ -261,20 +269,28 @@ export interface MarketProject {
   id: string
   name: string
   description: string
+  coverImage?: string
   category: string
-  likeCount: number
-  viewCount: number
+  likesCount: number
+  viewsCount: number
+  author?: {
+    id: number
+    username: string
+    avatar?: string
+  }
 }
 
 /**
  * 市场项目详情
  */
 export interface MarketProjectDetail extends MarketProject {
+  images?: string[]
+  tags?: string[]
   createdAt: string
-  updatedAt: string
   author: {
     id: number
     username: string
+    avatar?: string
   }
 }
 
@@ -322,43 +338,31 @@ export interface PostProject {
 }
 
 /**
- * 帖子统计数据
- */
-export interface PostStats {
-  views: number
-  likes: number
-  comments: number
-}
-
-/**
  * 帖子基本信息
  */
 export interface Post {
   id: string
   title: string
   content: string
-  author: PostAuthor
-  viewsCount: number
-  likesCount: number
-  commentsCount: number
-  createdAt: string
   images?: string[]
   tags?: string[]
-  stats?: PostStats
-  publishTime?: string
-  isLiked?: boolean
+  channel?: string
+  visibility?: PostVisibility
+  likesCount: number
+  commentsCount: number
+  viewsCount: number
+  createdAt: string
+  author: PostAuthor
 }
 
 /**
  * 帖子详情
  */
 export interface PostDetail extends Post {
-  images?: string[]
-  tags?: string[]
   channel: string
   visibility: PostVisibility
-  project?: PostProject
   updatedAt: string
+  project?: PostProject
 }
 
 /**
@@ -367,8 +371,8 @@ export interface PostDetail extends Post {
 export interface CreatePostParams {
   title: string
   content: string
-  images?: string[]
-  tags?: string[]
+  images?: string
+  tags?: string
   channel?: string
   visibility?: PostVisibility
   projectId?: string
@@ -380,42 +384,12 @@ export interface CreatePostParams {
 export interface UpdatePostParams {
   title?: string
   content?: string
-  images?: string[]
-  tags?: string[]
+  images?: string
+  tags?: string
   visibility?: PostVisibility
 }
 
-/**
- * 更新点赞数参数
- */
-export interface UpdateLikesParams {
-  likesCount: number
-}
-
-/**
- * 更新评论数参数
- */
-export interface UpdateCommentsParams {
-  commentsCount: number
-}
-
 // ==================== 社区评论模块类型 ====================
-
-/**
- * 评论用户信息
- */
-export interface CommentUser {
-  id: number
-  username: string
-}
-
-/**
- * 评论关联帖子信息
- */
-export interface CommentPost {
-  id: string
-  title: string
-}
 
 /**
  * 评论基本信息
@@ -423,10 +397,11 @@ export interface CommentPost {
 export interface Comment {
   id: string
   content: string
-  user: CommentUser
+  userId: number
+  username: string
+  avatar?: string
   likesCount: number
   createdAt: string
-  replies?: Comment[]
 }
 
 /**
@@ -477,8 +452,8 @@ export interface Group {
   description: string
   memberCount: number
   createdAt: string
-  icon?: string
-  cover?: string
+  iconUrl?: string
+  coverUrl?: string
   activeCount?: number
   postCount?: number
 }
@@ -519,10 +494,9 @@ export interface UpdateGroupParams {
  */
 export interface GroupMember {
   id: string
-  user: {
-    id: number
-    username: string
-  }
+  userId: number
+  username: string
+  avatar?: string
   role: GroupMemberRole
   joinedAt: string
 }
@@ -539,12 +513,9 @@ export interface UpdateGroupMemberRoleParams {
  */
 export interface MyGroupItem {
   id: string
-  group: {
-    id: string
-    name: string
-    keyword: string
-    description: string
-  }
+  groupId: string
+  groupName: string
+  groupIcon?: string
   role: GroupMemberRole
   joinedAt: string
 }
@@ -653,11 +624,9 @@ export interface UploadResult {
  */
 export interface InvitationValidateResult {
   valid: boolean
-  team: {
-    uuid: string
-    name: string
-  }
-  role: string
+  teamId?: string
+  teamName?: string
+  inviterName?: string
 }
 
 // ==================== 系统接口类型 ====================

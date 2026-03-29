@@ -207,12 +207,9 @@ describe('社区圈子接口', () => {
           data: [
             {
               id: 'member-123',
-              group: {
-                id: 'group-123',
-                name: '测试圈子',
-                keyword: '测试',
-                description: '测试描述'
-              },
+              groupId: 'group-123',
+              groupName: '测试圈子',
+              groupIcon: '',
               role: 'member',
               joinedAt: '2024-01-01'
             }
@@ -273,7 +270,9 @@ describe('社区圈子接口', () => {
           data: [
             {
               id: 'member-123',
-              user: { id: 1, username: '张三' },
+              userId: 1,
+              username: '张三',
+              avatar: '',
               role: 'admin',
               joinedAt: '2024-01-01'
             }

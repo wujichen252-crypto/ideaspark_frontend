@@ -131,26 +131,26 @@ describe('社区帖子接口', () => {
   describe('updatePostLikes', () => {
     it('应该正确调用更新点赞数接口', async () => {
       const mockResponse = {
-        data: { status: 200, message: '更新成功', data: null }
+        data: { status: 200, message: '更新成功', data: { id: 'post-123', likesCount: 10 } }
       } as AxiosResponse
       mockService.put.mockResolvedValue(mockResponse)
 
-      await updatePostLikes('post-123', { likesCount: 10 })
+      await updatePostLikes('post-123', 10)
 
-      expect(mockService.put).toHaveBeenCalledWith('/community/posts/post-123/likes', { likesCount: 10 })
+      expect(mockService.put).toHaveBeenCalledWith('/community/posts/post-123/likes', null, { params: { count: 10 } })
     })
   })
 
   describe('updatePostComments', () => {
     it('应该正确调用更新评论数接口', async () => {
       const mockResponse = {
-        data: { status: 200, message: '更新成功', data: null }
+        data: { status: 200, message: '更新成功', data: { id: 'post-123', commentsCount: 5 } }
       } as AxiosResponse
       mockService.put.mockResolvedValue(mockResponse)
 
-      await updatePostComments('post-123', { commentsCount: 5 })
+      await updatePostComments('post-123', 5)
 
-      expect(mockService.put).toHaveBeenCalledWith('/community/posts/post-123/comments', { commentsCount: 5 })
+      expect(mockService.put).toHaveBeenCalledWith('/community/posts/post-123/comments', null, { params: { count: 5 } })
     })
   })
 })

@@ -64,7 +64,16 @@ describe('团队管理接口', () => {
         data: {
           status: 200,
           message: '获取成功',
-          data: { uuid: 'team-123', name: '开发团队', description: '', memberCount: 5, role: 'OWNER', ownerId: 1, createdAt: '2024-01-01' }
+          data: {
+            uuid: 'team-123',
+            name: '开发团队',
+            description: '',
+            memberCount: 5,
+            role: 'OWNER',
+            owner: { id: 1, username: '张三', avatar: '' },
+            projectCount: 2,
+            createdAt: '2024-01-01'
+          }
         }
       } as AxiosResponse
       mockService.get.mockResolvedValue(mockResponse)
@@ -100,7 +109,16 @@ describe('团队管理接口', () => {
         data: {
           status: 201,
           message: '创建成功',
-          data: { uuid: 'team-456', name: '新团队', description: '', memberCount: 1, role: 'OWNER', ownerId: 1, createdAt: '2024-01-01' }
+          data: {
+            uuid: 'team-456',
+            name: '新团队',
+            description: '',
+            memberCount: 1,
+            role: 'OWNER',
+            owner: { id: 1, username: '张三', avatar: '' },
+            projectCount: 0,
+            createdAt: '2024-01-01'
+          }
         }
       } as AxiosResponse
       mockService.post.mockResolvedValue(mockResponse)
@@ -132,7 +150,7 @@ describe('团队管理接口', () => {
           status: 200,
           message: '获取成功',
           data: {
-            members: [{ id: 1, username: '张三', email: 'test@example.com', role: 'OWNER', joinedAt: '2024-01-01' }],
+            members: [{ id: 'member-1', userId: 1, username: '张三', avatar: '', role: 'OWNER', joinedAt: '2024-01-01' }],
             total: 1,
             page: 1,
             size: 10
@@ -203,15 +221,23 @@ describe('团队管理接口', () => {
   describe('sendInvitation', () => {
     it('应该正确调用发送邀请接口', async () => {
       const mockResponse = {
-        data: { status: 201, message: '邀请成功', data: { uuid: 'team-123', invitedCount: 2 } }
+        data: {
+          status: 201,
+          message: '邀请成功',
+          data: {
+            invitations: [
+              { id: 'inv-1', inviteeId: 2, status: 'pending', token: 'token-xxx', createdAt: '2024-01-01' }
+            ]
+          }
+        }
       } as AxiosResponse
       mockService.post.mockResolvedValue(mockResponse)
 
-      await sendInvitation('team-123', { emails: ['test@example.com'], role: 'MEMBER' })
+      await sendInvitation('team-123', { inviteeIds: [2, 3], message: '欢迎加入' })
 
       expect(mockService.post).toHaveBeenCalledWith('/teams/team-123/invitations', {
-        emails: ['test@example.com'],
-        role: 'MEMBER'
+        inviteeIds: [2, 3],
+        message: '欢迎加入'
       })
     })
   })

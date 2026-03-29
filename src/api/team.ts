@@ -135,12 +135,23 @@ export function transferOwnership(uuid: string, params: TransferOwnershipParams)
 }
 
 /**
+ * 邀请结果项
+ */
+export interface InvitationItem {
+  id: string
+  inviteeId: number
+  status: string
+  token: string
+  createdAt: string
+}
+
+/**
  * 发送团队邀请
  * @param uuid - 团队 UUID
  * @param params - 邀请参数
  */
 export function sendInvitation(uuid: string, params: InviteParams) {
-  return service.post<ApiResponse<{ uuid: string; invitedCount: number }>>(
+  return service.post<ApiResponse<{ invitations: InvitationItem[] }>>(
     `/teams/${uuid}/invitations`,
     params
   )

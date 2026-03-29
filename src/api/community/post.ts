@@ -8,9 +8,7 @@ import type {
   Post,
   PostDetail,
   CreatePostParams,
-  UpdatePostParams,
-  UpdateLikesParams,
-  UpdateCommentsParams
+  UpdatePostParams
 } from '../types'
 
 /**
@@ -56,17 +54,25 @@ export function deletePost(postId: string) {
 /**
  * 更新帖子点赞数
  * @param postId - 帖子 ID
- * @param params - 点赞数参数
+ * @param count - 点赞数
  */
-export function updatePostLikes(postId: string, params: UpdateLikesParams) {
-  return service.put<ApiResponse<null>>(`/community/posts/${postId}/likes`, params)
+export function updatePostLikes(postId: string, count: number) {
+  return service.put<ApiResponse<{ id: string; likesCount: number }>>(
+    `/community/posts/${postId}/likes`,
+    null,
+    { params: { count } }
+  )
 }
 
 /**
  * 更新帖子评论数
  * @param postId - 帖子 ID
- * @param params - 评论数参数
+ * @param count - 评论数
  */
-export function updatePostComments(postId: string, params: UpdateCommentsParams) {
-  return service.put<ApiResponse<null>>(`/community/posts/${postId}/comments`, params)
+export function updatePostComments(postId: string, count: number) {
+  return service.put<ApiResponse<{ id: string; commentsCount: number }>>(
+    `/community/posts/${postId}/comments`,
+    null,
+    { params: { count } }
+  )
 }

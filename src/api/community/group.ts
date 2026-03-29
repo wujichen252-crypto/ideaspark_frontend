@@ -26,9 +26,10 @@ export function createGroup(params: CreateGroupParams) {
 
 /**
  * 获取圈子列表
+ * @description 后端直接返回数组，不包裹在 ApiResponse 中
  */
 export function getGroupList() {
-  return service.get<ApiResponse<Group[]>>('/community/groups')
+  return service.get<Group[]>('/community/groups')
 }
 
 /**

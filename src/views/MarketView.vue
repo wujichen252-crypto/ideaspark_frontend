@@ -345,8 +345,8 @@ function mapToUIProject(p: MarketProject) {
     authorId: p.id,
     avatar: getRealAvatarUrl(p.id),
     cover: `https://picsum.photos/seed/${hash % 900}/600/400`,
-    likes: p.likeCount,
-    views: p.viewCount,
+    likes: p.likesCount,
+    views: p.viewsCount,
     createTime: 0,
     category: p.category.toLowerCase(),
     tags: [p.category]

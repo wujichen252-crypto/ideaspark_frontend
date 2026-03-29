@@ -39,8 +39,10 @@ describe('社区评论接口', () => {
           message: '创建成功',
           data: {
             id: 'comment-123',
+            postId: 'post-123',
             content: '测试评论',
-            user: { id: 1, username: '张三' },
+            userId: 1,
+            username: '张三',
             parentId: null,
             likesCount: 0,
             createdAt: '2024-01-01'
@@ -65,8 +67,10 @@ describe('社区评论接口', () => {
           message: '创建成功',
           data: {
             id: 'comment-456',
+            postId: 'post-123',
             content: '回复内容',
-            user: { id: 1, username: '张三' },
+            userId: 1,
+            username: '张三',
             parentId: 'comment-123',
             likesCount: 0,
             createdAt: '2024-01-01'
@@ -100,10 +104,11 @@ describe('社区评论接口', () => {
             {
               id: 'comment-123',
               content: '测试评论',
-              user: { id: 1, username: '张三' },
+              userId: 1,
+              username: '张三',
+              avatar: '',
               likesCount: 5,
-              createdAt: '2024-01-01',
-              replies: []
+              createdAt: '2024-01-01'
             }
           ]
         }
@@ -127,7 +132,9 @@ describe('社区评论接口', () => {
             {
               id: 'comment-123',
               content: '测试评论',
-              user: { id: 1, username: '张三' },
+              userId: 1,
+              username: '张三',
+              avatar: '',
               parentId: null,
               likesCount: 5,
               createdAt: '2024-01-01'
@@ -135,7 +142,9 @@ describe('社区评论接口', () => {
             {
               id: 'comment-456',
               content: '回复',
-              user: { id: 2, username: '李四' },
+              userId: 2,
+              username: '李四',
+              avatar: '',
               parentId: 'comment-123',
               likesCount: 2,
               createdAt: '2024-01-01'
@@ -162,7 +171,9 @@ describe('社区评论接口', () => {
             {
               id: 'comment-456',
               content: '回复',
-              user: { id: 2, username: '李四' },
+              userId: 2,
+              username: '李四',
+              avatar: '',
               likesCount: 2,
               createdAt: '2024-01-01'
             }
@@ -187,9 +198,7 @@ describe('社区评论接口', () => {
           data: {
             id: 'comment-123',
             content: '更新后的评论',
-            user: { id: 1, username: '张三' },
-            likesCount: 5,
-            createdAt: '2024-01-01'
+            updatedAt: '2024-01-02'
           }
         }
       } as AxiosResponse
@@ -223,21 +232,15 @@ describe('社区评论接口', () => {
         data: {
           status: 200,
           message: '更新成功',
-          data: {
-            id: 'comment-123',
-            content: '测试评论',
-            user: { id: 1, username: '张三' },
-            likesCount: 10,
-            createdAt: '2024-01-01'
-          }
+          data: { id: 'comment-123', likesCount: 10 }
         }
       } as AxiosResponse
       mockService.put.mockResolvedValue(mockResponse)
 
-      const result = await updateCommentLikes('comment-123', { count: 10 })
+      const result = await updateCommentLikes('comment-123', 10)
 
-      expect(mockService.put).toHaveBeenCalledWith('/community/comments/comment-123/likes', {
-        count: 10
+      expect(mockService.put).toHaveBeenCalledWith('/community/comments/comment-123/likes', null, {
+        params: { count: 10 }
       })
       expect(result.data.data.likesCount).toBe(10)
     })

@@ -15,7 +15,13 @@
 
             <n-card title="我的圈子" :bordered="false" size="small" class="mt-4 group-card">
               <template #header-extra>
-                <n-button text type="primary" size="small" color="#000" @click="openExploreGroupsModal">
+                <n-button
+                  text
+                  type="primary"
+                  size="small"
+                  color="#000"
+                  @click="openExploreGroupsModal"
+                >
                   去逛
                 </n-button>
               </template>
@@ -28,7 +34,14 @@
                   @click="handleSelectGroup(group.id)"
                 >
                   <template #prefix>
-                    <n-avatar :src="group.icon" size="small" shape="square" />
+                    <n-avatar
+                      :src="
+                        group.iconUrl ||
+                        `https://api.dicebear.com/7.x/identicon/svg?seed=${group.id}`
+                      "
+                      size="small"
+                      shape="square"
+                    />
                   </template>
                   <div class="group-item__main">
                     <span class="group-name">{{ group.name }}</span>
@@ -84,7 +97,9 @@
                   表情
                 </n-button>
               </n-space>
-              <n-button type="primary" size="small" round color="#000" @click="openCreateModal">发布</n-button>
+              <n-button type="primary" size="small" round color="#000" @click="openCreateModal"
+                >发布</n-button
+              >
             </div>
           </n-card>
 
@@ -118,13 +133,21 @@
           </div>
 
           <n-card v-if="activeGroup" :bordered="false" class="group-hero-card mb-6">
-            <div class="group-hero" :style="{ backgroundImage: `url(${activeGroup.cover})` }">
+            <div
+              class="group-hero"
+              :style="{
+                backgroundImage: `url(${activeGroup.coverUrl || 'https://placehold.co/600x200/e0e0e0/666?text=Group+Cover'})`
+              }"
+            >
               <div class="group-hero__overlay"></div>
               <div class="group-hero__content">
                 <div class="group-hero__top">
                   <div class="group-hero__meta">
                     <n-avatar
-                      :src="activeGroup.icon"
+                      :src="
+                        activeGroup.iconUrl ||
+                        `https://api.dicebear.com/7.x/identicon/svg?seed=${activeGroup.id}`
+                      "
                       size="large"
                       shape="square"
                       class="group-hero__avatar"
@@ -192,9 +215,16 @@
               <template #header>
                 <div class="post-header">
                   <div class="user-info">
-                    <n-avatar circle size="medium" :src="post.author.avatar" />
+                    <n-avatar
+                      circle
+                      size="medium"
+                      :src="
+                        post.author.avatar ||
+                        `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.author.id}`
+                      "
+                    />
                     <div class="meta">
-                      <span class="username">{{ post.author.name }}</span>
+                      <span class="username">{{ post.author.name || post.author.username }}</span>
                       <span class="time">{{ post.publishTime }}</span>
                     </div>
                   </div>
@@ -320,7 +350,9 @@
             <!-- 热门话题 -->
             <n-card title="热门话题" :bordered="false" size="small" class="mb-6">
               <template #header-extra>
-                <n-button text type="primary" size="small" color="#000" @click="handleMoreTopics">更多</n-button>
+                <n-button text type="primary" size="small" color="#000" @click="handleMoreTopics"
+                  >更多</n-button
+                >
               </template>
               <n-list hoverable clickable>
                 <n-list-item
@@ -414,10 +446,9 @@
         <n-form-item label="图片/视频" path="images">
           <n-upload
             v-model:file-list="fileList"
-            action="https://www.mocky.io/v2/5e4bafc63100007100d8b70f"
             list-type="image-card"
             :max="9"
-            @finish="handleUploadFinish"
+            :custom-request="handleCustomUpload"
           >
             点击上传
           </n-upload>
@@ -494,7 +525,11 @@
               @click="handleEnterExploreGroup(g.id)"
             >
               <div class="explore-group-item">
-                <n-avatar :src="g.icon" size="small" shape="square" />
+                <n-avatar
+                  :src="g.iconUrl || `https://api.dicebear.com/7.x/identicon/svg?seed=${g.id}`"
+                  size="small"
+                  shape="square"
+                />
                 <div class="explore-group-item__main">
                   <div class="explore-group-item__title">
                     <span class="name">{{ g.name }}</span>
@@ -557,20 +592,11 @@ import {
   CloseOutline
 } from '@vicons/ionicons5'
 import { useUserStore } from '@/store'
-import {
-  getPostList,
-  createPost,
-  deletePost,
-  updatePostLikes
-} from '@/api/community/post'
+import { getPostList, createPost, deletePost, updatePostLikes } from '@/api/community/post'
 import { getGroupList, joinGroup, quitGroup } from '@/api/community/group'
 import { likePost, unlikePost, checkPostLiked } from '@/api/community/like'
-import {
-  followUser,
-  unfollowUser,
-  getMyFollowing,
-  checkFollowing
-} from '@/api/follow'
+import { followUser, unfollowUser, getMyFollowing, checkFollowing } from '@/api/follow'
+import { uploadFile } from '@/api/file'
 import type { Post, Group, MyFollowingItem, PostVisibility } from '@/api/types'
 
 const userStore = useUserStore()
@@ -580,9 +606,19 @@ const message = useMessage()
 
 type FeedKey = 'recommend' | 'hot' | 'following' | 'qa'
 
-interface CommunityPost extends Post {
+interface PostStats {
+  views: number
+  likes: number
+  comments: number
+}
+
+interface CommunityPost extends Omit<Post, 'images' | 'tags'> {
   isLiked: boolean
   channel: Exclude<FeedKey, 'hot'>
+  stats: PostStats
+  publishTime: string
+  images: string[]
+  tags: string[]
 }
 
 interface CommunityGroup extends Group {
@@ -636,25 +672,51 @@ const rules = {
 const topicOptions = COMMUNITY_TOPIC_OPTIONS
 
 /**
- * 处理上传结束事件（Mock）
- * @param payload - 上传完成的文件信息
+ * 自定义上传处理函数
+ * @param options - 上传选项
  */
-const handleUploadFinish = ({ file }: { file: UploadFileInfo; event?: ProgressEvent }) => {
-  message.success('上传成功 (Mock)')
-  return file
+const handleCustomUpload = async ({ file, onFinish, onError }: any) => {
+  try {
+    const res = await uploadFile(file.file)
+    if (res.data.status === 200 && res.data.data) {
+      // 将返回的 URL 设置到 file 对象上
+      file.url = res.data.data.url
+      message.success('上传成功')
+      onFinish()
+    } else {
+      message.error('上传失败')
+      onError()
+    }
+  } catch (error) {
+    console.error('上传失败:', error)
+    message.error('上传失败')
+    onError()
+  }
 }
 
+/**
+ * 加载帖子列表
+ */
 /**
  * 加载帖子列表
  */
 async function loadPosts() {
   try {
     const res = await getPostList()
-    if (res.data.status === 0 && res.data.data) {
+    if (res.data.status === 200 && res.data.data) {
       posts.value = (res.data.data as Post[]).map((post) => ({
         ...post,
         isLiked: false,
-        channel: post.tags?.includes('问答') ? 'qa' : 'recommend'
+        channel: (post.tags || []).includes('问答') ? 'qa' : 'recommend',
+        stats: {
+          views: post.viewsCount || 0,
+          likes: post.likesCount || 0,
+          comments: post.commentsCount || 0
+        },
+        publishTime: post.createdAt,
+        // 清理图片 URL 中的反引号、换行和多余空格
+        images: (post.images || []).map((url: string) => url.replace(/[`\s\n\r]/g, '').trim()),
+        tags: post.tags || []
       }))
     }
   } catch (error) {
@@ -668,19 +730,27 @@ async function loadPosts() {
  */
 async function loadGroups() {
   try {
+    console.log('开始加载圈子列表...')
     const res = await getGroupList()
-    if (res.data.status === 0 && res.data.data) {
-      const groups = res.data.data as Group[]
-      // 前 3 个作为我的圈子，其余作为发现圈子
-      myGroups.value = groups.slice(0, 3).map((group) => ({
-        ...group,
-        activeUsers: []
-      }))
-      discoverGroups.value = groups.slice(3).map((group) => ({
-        ...group,
-        activeUsers: []
-      }))
-    }
+    console.log('圈子列表接口返回:', res.data)
+
+    const groups = Array.isArray(res.data) ? res.data : []
+    console.log('获取到圈子数量:', groups.length)
+
+    // 为圈子数据补充缺失的字段
+    const mapGroup = (group: Group): CommunityGroup => ({
+      ...group,
+      memberCount: group.memberCount ?? 0,
+      activeCount: group.activeCount ?? 0,
+      postCount: group.postCount ?? 0,
+      activeUsers: []
+    })
+
+    myGroups.value = groups.slice(0, 3).map(mapGroup)
+    discoverGroups.value = groups.slice(3).map(mapGroup)
+
+    console.log('我的圈子:', myGroups.value)
+    console.log('发现圈子:', discoverGroups.value)
   } catch (error) {
     console.error('加载圈子列表失败:', error)
     message.error('加载圈子列表失败')
@@ -693,7 +763,7 @@ async function loadGroups() {
 async function loadFollowing() {
   try {
     const res = await getMyFollowing()
-    if (res.data.status === 0 && res.data.data) {
+    if (res.data.status === 200 && res.data.data) {
       // 新的简化格式：followingId, followingName, followingAvatar
       followedUserIds.value = new Set(res.data.data.map((item) => item.followingId))
     }
@@ -824,6 +894,9 @@ function handleFeedChange(key: string): void {
   activeGroupId.value = null
 }
 
+/**
+ * 处理发布帖子提交
+ */
 const handleSubmit = async () => {
   if (!formValue.content) {
     message.warning('请输入正文内容')
@@ -833,15 +906,22 @@ const handleSubmit = async () => {
   submitting.value = true
   try {
     // 调用创建帖子 API
+    // 将标签数组转换为 JSON 字符串，以符合后端数据库 JSON 字段要求
+    const topicsArray = (formValue.topics as string[]) || []
+    const tagsJson = topicsArray.length > 0 ? JSON.stringify(topicsArray) : undefined
+    // 将图片 URL 数组转换为 JSON 字符串，以符合后端数据库 JSON 字段要求
+    const imagesUrls = fileList.value.map((f) => f.url || '').filter(Boolean)
+    const imagesJson = imagesUrls.length > 0 ? JSON.stringify(imagesUrls) : undefined
+
     const res = await createPost({
       title: formValue.title || '',
       content: formValue.content,
-      tags: formValue.topics as string[],
-      images: fileList.value.map((f) => f.url || '').filter(Boolean),
+      ...(tagsJson && { tags: tagsJson }),
+      ...(imagesJson && { images: imagesJson }),
       visibility: formValue.visibility as PostVisibility
     })
 
-    if (res.data.status === 0 && res.data.data) {
+    if ((res.data.status === 200 || res.data.status === 201) && res.data.data) {
       message.success('发布成功！')
       showCreateModal.value = false
 
@@ -892,7 +972,10 @@ function goToPost(id: string) {
  * @param groupId - 圈子ID
  */
 function getGroupById(groupId: string): CommunityGroup | undefined {
-  return myGroups.value.find((g) => g.id === groupId) || discoverGroups.value.find((g) => g.id === groupId)
+  return (
+    myGroups.value.find((g) => g.id === groupId) ||
+    discoverGroups.value.find((g) => g.id === groupId)
+  )
 }
 
 // 数据状态

@@ -65,6 +65,10 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   (response: AxiosResponse) => {
     const res = response.data as Result<unknown>
+    // 如果响应是数组或直接数据（没有 status 字段），直接返回
+    if (Array.isArray(res) || (typeof res === 'object' && res !== null && !('status' in res))) {
+      return response
+    }
     // Backend returns status=200 for success, other values indicate errors
     if (res.status !== 200 && res.status !== 201) {
       const msg = res.message || '请求失败'
