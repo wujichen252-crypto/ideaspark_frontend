@@ -42,7 +42,7 @@ describe('社区帖子接口', () => {
 
       const result = await createPost({ title: '测试帖子', content: '帖子内容' })
 
-      expect(mockService.post).toHaveBeenCalledWith('/community/posts', { title: '测试帖子', content: '帖子内容' })
+      expect(mockService.post).toHaveBeenCalledWith('/api/community/posts', { title: '测试帖子', content: '帖子内容' })
       expect(result.data.data.id).toBe('post-123')
     })
   })
@@ -60,7 +60,7 @@ describe('社区帖子接口', () => {
 
       const result = await getPostList()
 
-      expect(mockService.get).toHaveBeenCalledWith('/community/posts')
+      expect(mockService.get).toHaveBeenCalledWith('/api/community/posts')
       expect(result.data.data).toHaveLength(1)
     })
   })
@@ -92,7 +92,7 @@ describe('社区帖子接口', () => {
 
       const result = await getPostDetail('post-123')
 
-      expect(mockService.get).toHaveBeenCalledWith('/community/posts/post-123')
+      expect(mockService.get).toHaveBeenCalledWith('/api/community/posts/post-123')
       expect(result.data.data.id).toBe('post-123')
     })
   })
@@ -110,7 +110,7 @@ describe('社区帖子接口', () => {
 
       const result = await updatePost('post-123', { title: '更新后的标题' })
 
-      expect(mockService.put).toHaveBeenCalledWith('/community/posts/post-123', { title: '更新后的标题' })
+      expect(mockService.put).toHaveBeenCalledWith('/api/community/posts/post-123', { title: '更新后的标题' })
       expect(result.data.data.title).toBe('更新后的标题')
     })
   })
@@ -124,7 +124,7 @@ describe('社区帖子接口', () => {
 
       await deletePost('post-123')
 
-      expect(mockService.delete).toHaveBeenCalledWith('/community/posts/post-123')
+      expect(mockService.delete).toHaveBeenCalledWith('/api/community/posts/post-123')
     })
   })
 
@@ -137,7 +137,7 @@ describe('社区帖子接口', () => {
 
       await updatePostLikes('post-123', 10)
 
-      expect(mockService.put).toHaveBeenCalledWith('/community/posts/post-123/likes', null, { params: { count: 10 } })
+      expect(mockService.put).toHaveBeenCalledWith('/api/community/posts/post-123/likes', null, { params: { count: 10 } })
     })
   })
 
@@ -150,7 +150,7 @@ describe('社区帖子接口', () => {
 
       await updatePostComments('post-123', 5)
 
-      expect(mockService.put).toHaveBeenCalledWith('/community/posts/post-123/comments', null, { params: { count: 5 } })
+      expect(mockService.put).toHaveBeenCalledWith('/api/community/posts/post-123/comments', null, { params: { count: 5 } })
     })
   })
 })

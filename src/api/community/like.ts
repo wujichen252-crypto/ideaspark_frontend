@@ -11,7 +11,7 @@ import type { LikeCountResult, LikeCheckResult } from '../types'
  * @param postId - 帖子 ID
  */
 export function likePost(postId: string) {
-  return service.post<ApiResponse<null>>(`/community/likes/post/${postId}`)
+  return service.post<ApiResponse<null>>(`/api/community/likes/post/${postId}`)
 }
 
 /**
@@ -19,7 +19,7 @@ export function likePost(postId: string) {
  * @param postId - 帖子 ID
  */
 export function unlikePost(postId: string) {
-  return service.delete<ApiResponse<null>>(`/community/likes/post/${postId}`)
+  return service.delete<ApiResponse<null>>(`/api/community/likes/post/${postId}`)
 }
 
 /**
@@ -27,7 +27,7 @@ export function unlikePost(postId: string) {
  * @param postId - 帖子 ID
  */
 export function getPostLikeCount(postId: string) {
-  return service.get<ApiResponse<LikeCountResult>>(`/community/likes/post/${postId}/count`)
+  return service.get<ApiResponse<LikeCountResult>>(`/api/community/likes/post/${postId}/count`)
 }
 
 /**
@@ -35,7 +35,7 @@ export function getPostLikeCount(postId: string) {
  * @param postId - 帖子 ID
  */
 export function checkPostLiked(postId: string) {
-  return service.get<ApiResponse<LikeCheckResult>>(`/community/likes/post/${postId}/check`)
+  return service.get<ApiResponse<LikeCheckResult>>(`/api/community/likes/post/${postId}/check`)
 }
 
 /**
@@ -43,7 +43,7 @@ export function checkPostLiked(postId: string) {
  * @param commentId - 评论 ID
  */
 export function likeComment(commentId: string) {
-  return service.post<ApiResponse<null>>(`/community/likes/comment/${commentId}`)
+  return service.post<ApiResponse<null>>(`/api/community/likes/comment/${commentId}`)
 }
 
 /**
@@ -51,7 +51,7 @@ export function likeComment(commentId: string) {
  * @param commentId - 评论 ID
  */
 export function unlikeComment(commentId: string) {
-  return service.delete<ApiResponse<null>>(`/community/likes/comment/${commentId}`)
+  return service.delete<ApiResponse<null>>(`/api/community/likes/comment/${commentId}`)
 }
 
 /**
@@ -59,7 +59,7 @@ export function unlikeComment(commentId: string) {
  * @param commentId - 评论 ID
  */
 export function getCommentLikeCount(commentId: string) {
-  return service.get<ApiResponse<LikeCountResult>>(`/community/likes/comment/${commentId}/count`)
+  return service.get<ApiResponse<LikeCountResult>>(`/api/community/likes/comment/${commentId}/count`)
 }
 
 /**
@@ -67,5 +67,5 @@ export function getCommentLikeCount(commentId: string) {
  * @param commentId - 评论 ID
  */
 export function checkCommentLiked(commentId: string) {
-  return service.get<ApiResponse<LikeCheckResult>>(`/community/likes/comment/${commentId}/check`)
+  return service.get<ApiResponse<LikeCheckResult>>(`/api/community/likes/comment/${commentId}/check`)
 }

@@ -36,3 +36,6 @@ export * from './system'
 
 // 社区模块
 export * from './community'
+
+// 报名审核统计
+export * from './sign'

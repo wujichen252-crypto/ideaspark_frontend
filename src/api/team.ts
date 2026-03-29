@@ -14,7 +14,11 @@ import type {
   UpdateTeamParams,
   InviteParams,
   UpdateMemberRoleParams,
-  TransferOwnershipParams
+  TransferOwnershipParams,
+  InvitationItem,
+  TeamInvitationSendParams,
+  TeamMemberRoleUpdateParams,
+  TeamTransferOwnershipParams
 } from './types'
 
 /**
@@ -47,7 +51,7 @@ export interface TeamProjectsResult {
  * @param params - 分页参数
  */
 export function getMyTeams(params?: { page?: number; size?: number }) {
-  return service.get<ApiResponse<TeamListResult>>('/teams/my', { params })
+  return service.get<ApiResponse<TeamListResult>>('/api/teams/my', { params })
 }
 
 /**
@@ -55,7 +59,7 @@ export function getMyTeams(params?: { page?: number; size?: number }) {
  * @param uuid - 团队 UUID
  */
 export function getTeamDetail(uuid: string) {
-  return service.get<ApiResponse<TeamDetail>>(`/teams/${uuid}`)
+  return service.get<ApiResponse<TeamDetail>>(`/api/teams/detail?uuid=${uuid}`)
 }
 
 /**
@@ -64,7 +68,7 @@ export function getTeamDetail(uuid: string) {
  * @param params - 更新参数
  */
 export function updateTeam(uuid: string, params: UpdateTeamParams) {
-  return service.put<ApiResponse<Team>>(`/teams/${uuid}`, params)
+  return service.put<ApiResponse<Team>>('/api/teams/update', { uuid, ...params })
 }
 
 /**
@@ -72,7 +76,7 @@ export function updateTeam(uuid: string, params: UpdateTeamParams) {
  * @param params - 创建参数
  */
 export function createCollaborationTeam(params: CreateTeamParams) {
-  return service.post<ApiResponse<TeamDetail>>('/teams/collaboration', params)
+  return service.post<ApiResponse<TeamDetail>>('/api/teams/collaboration', params)
 }
 
 /**
@@ -80,7 +84,7 @@ export function createCollaborationTeam(params: CreateTeamParams) {
  * @param uuid - 团队 UUID
  */
 export function dissolveTeam(uuid: string) {
-  return service.delete<ApiResponse<{ uuid: string }>>(`/teams/${uuid}`)
+  return service.delete<ApiResponse<{ uuid: string }>>('/api/teams/dissolve', { data: { uuid } })
 }
 
 /**
@@ -89,7 +93,9 @@ export function dissolveTeam(uuid: string) {
  * @param params - 分页参数
  */
 export function getTeamMembers(uuid: string, params?: { page?: number; size?: number }) {
-  return service.get<ApiResponse<TeamMembersResult>>(`/teams/${uuid}/members`, { params })
+  return service.get<ApiResponse<TeamMembersResult>>('/api/teams/members', { 
+    params: { uuid, ...params } 
+  })
 }
 
 /**
@@ -100,8 +106,8 @@ export function getTeamMembers(uuid: string, params?: { page?: number; size?: nu
  */
 export function updateMemberRole(uuid: string, memberId: string | number, params: UpdateMemberRoleParams) {
   return service.put<ApiResponse<{ memberId: string; role: string }>>(
-    `/teams/${uuid}/members/${memberId}/role`,
-    params
+    '/api/teams/members/role',
+    { uuid, memberId, ...params }
   )
 }
 
@@ -111,7 +117,9 @@ export function updateMemberRole(uuid: string, memberId: string | number, params
  * @param memberId - 成员 ID
  */
 export function removeMember(uuid: string, memberId: string | number) {
-  return service.delete<ApiResponse<{ memberId: string }>>(`/teams/${uuid}/members/${memberId}`)
+  return service.delete<ApiResponse<{ memberId: string }>>('/api/teams/members/remove', {
+    data: { uuid, memberId }
+  })
 }
 
 /**
@@ -119,7 +127,9 @@ export function removeMember(uuid: string, memberId: string | number) {
  * @param uuid - 团队 UUID
  */
 export function leaveTeam(uuid: string) {
-  return service.delete<ApiResponse<{ uuid: string }>>(`/teams/${uuid}/members/self`)
+  return service.delete<ApiResponse<{ uuid: string }>>('/api/teams/members/exit', {
+    data: { uuid }
+  })
 }
 
 /**
@@ -129,20 +139,9 @@ export function leaveTeam(uuid: string) {
  */
 export function transferOwnership(uuid: string, params: TransferOwnershipParams) {
   return service.post<ApiResponse<{ uuid: string; newOwnerId: number }>>(
-    `/teams/${uuid}/transfer-ownership`,
-    params
+    '/api/teams/transfer-ownership',
+    { uuid, ...params }
   )
-}
-
-/**
- * 邀请结果项
- */
-export interface InvitationItem {
-  id: string
-  inviteeId: number
-  status: string
-  token: string
-  createdAt: string
 }
 
 /**
@@ -152,8 +151,8 @@ export interface InvitationItem {
  */
 export function sendInvitation(uuid: string, params: InviteParams) {
   return service.post<ApiResponse<{ invitations: InvitationItem[] }>>(
-    `/teams/${uuid}/invitations`,
-    params
+    '/api/teams/invitations',
+    { uuid, ...params }
   )
 }
 
@@ -163,5 +162,5 @@ export function sendInvitation(uuid: string, params: InviteParams) {
  * @param params - 分页参数
  */
 export function getTeamProjects(uuid: string, params?: { page?: number; size?: number }) {
-  return service.get<ApiResponse<TeamProjectsResult>>(`/teams/${uuid}/projects`, { params })
+  return service.get<ApiResponse<TeamProjectsResult>>(`/api/teams/${uuid}/projects`, { params })
 }

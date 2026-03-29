@@ -18,7 +18,7 @@ export type { MarketProject, MarketProjectDetail, MarketProjectListResult, GetMa
  * @param params - 查询参数
  */
 export function getProjectList(params?: GetMarketProjectsParams) {
-  return service.get<ApiResponse<MarketProjectListResult>>('/market/projects/list', { params })
+  return service.get<ApiResponse<MarketProjectListResult>>('/api/market/projects/list', { params })
 }
 
 /**
@@ -26,5 +26,5 @@ export function getProjectList(params?: GetMarketProjectsParams) {
  * @param projectId - 项目 ID
  */
 export function getProjectDetail(projectId: string) {
-  return service.get<ApiResponse<MarketProjectDetail>>(`/market/projects/${projectId}`)
+  return service.get<ApiResponse<MarketProjectDetail>>(`/api/market/projects/detail?project_id=${projectId}`)
 }

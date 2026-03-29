@@ -7,98 +7,113 @@
         </n-button>
       </div>
 
-      <n-card v-if="post" :bordered="false" class="detail-card">
-        <div class="detail-header-main">
-          <n-avatar circle size="large" :src="post.author.avatar" />
-          <div class="meta">
-            <div class="username">{{ post.author.name }}</div>
-            <div class="time">{{ post.publishTime }}</div>
-          </div>
+      <!-- 加载状态 -->
+      <n-card v-if="loading" :bordered="false" class="detail-card">
+        <div class="loading-wrapper">
+          <n-spin size="medium" />
+          <p class="loading-text">加载中...</p>
         </div>
+      </n-card>
 
-        <div class="detail-content">
-          <p class="text">
-            {{ post.content }}
-          </p>
-          <div
-            v-if="post.images && post.images.length"
-            class="image-grid"
-            :class="`grid-${Math.min(post.images.length, 3)}`"
-          >
+      <!-- 帖子详情 -->
+      <template v-else-if="post">
+        <n-card :bordered="false" class="detail-card">
+          <div class="detail-header-main">
+            <n-avatar circle size="large" :src="post.author.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.author.id}`" />
+            <div class="meta">
+              <div class="username">{{ post.author.name || post.author.username }}</div>
+              <div class="time">{{ formatTime(post.createdAt) }}</div>
+            </div>
+          </div>
+
+          <div class="detail-content">
+            <h2 v-if="post.title" class="post-title">{{ post.title }}</h2>
+            <p class="text">{{ post.content }}</p>
             <div
-              v-for="(img, idx) in post.images"
-              :key="idx"
-              class="image-item"
-              :style="{ backgroundImage: `url(${img})` }"
-            ></div>
-          </div>
-          <div v-if="post.tags && post.tags.length" class="tags">
-            <n-tag v-for="tag in post.tags" :key="tag" size="small" round :bordered="false">
-              # {{ tag }}
-            </n-tag>
-          </div>
-        </div>
-
-        <div class="detail-footer">
-          <div class="stat" :class="{ active: post.isLiked }" @click="togglePostLike">
-            <n-icon :component="post.isLiked ? Heart : HeartOutline" />
-            <span>{{ post.stats.likes }} 赞</span>
-          </div>
-          <div class="stat">
-            <n-icon :component="ChatbubbleOutline" />
-            <span>{{ post.stats.comments }} 评论</span>
-          </div>
-        </div>
-      </n-card>
-
-      <!-- 评论区 -->
-      <n-card v-if="post" :bordered="false" class="detail-card mt-4">
-        <div class="comments-section">
-          <h3 class="section-title">评论 ({{ comments.length }})</h3>
-          
-          <!-- 发送评论 -->
-          <div class="comment-input-area">
-            <n-avatar circle size="medium" :src="currentUserAvatar" />
-            <div class="input-wrapper">
-              <n-input
-                v-model:value="newCommentContent"
-                type="textarea"
-                placeholder="写下你的评论..."
-                :autosize="{ minRows: 2, maxRows: 4 }"
-              />
-              <div class="input-actions">
-                <n-button type="primary" size="small" color="#000" :disabled="!newCommentContent.trim()" @click="submitComment">
-                  发布
-                </n-button>
-              </div>
+              v-if="post.images && post.images.length"
+              class="image-grid"
+              :class="`grid-${Math.min(post.images.length, 3)}`"
+            >
+              <div
+                v-for="(img, idx) in post.images"
+                :key="idx"
+                class="image-item"
+                :style="{ backgroundImage: `url(${img})` }"
+              ></div>
+            </div>
+            <div v-if="post.tags && post.tags.length" class="tags">
+              <n-tag v-for="tag in post.tags" :key="tag" size="small" round :bordered="false">
+                # {{ tag }}
+              </n-tag>
             </div>
           </div>
 
-          <!-- 评论列表 -->
-          <div class="comment-list">
-            <div v-for="comment in comments" :key="comment.id" class="comment-item">
-              <n-avatar circle size="medium" :src="comment.user.avatar" />
-              <div class="comment-content">
-                <div class="comment-header">
-                  <span class="username">{{ comment.user.name }}</span>
-                  <span class="time">{{ comment.time }}</span>
-                </div>
-                <p class="text">{{ comment.content }}</p>
-                <div class="comment-actions">
-                  <n-button text size="tiny" :color="comment.isLiked ? '#000' : undefined" @click="toggleCommentLike(comment)">
-                    <template #icon>
-                      <n-icon :component="comment.isLiked ? Heart : HeartOutline" />
-                    </template>
-                    {{ comment.likes || 0 }}
+          <div class="detail-footer">
+            <div class="stat" :class="{ active: post.isLiked }" @click="togglePostLike">
+              <n-icon :component="post.isLiked ? Heart : HeartOutline" />
+              <span>{{ post.likesCount || 0 }} 赞</span>
+            </div>
+            <div class="stat">
+              <n-icon :component="ChatbubbleOutline" />
+              <span>{{ post.commentsCount || 0 }} 评论</span>
+            </div>
+            <div class="stat">
+              <n-icon :component="EyeOutline" />
+              <span>{{ post.viewsCount || 0 }} 浏览</span>
+            </div>
+          </div>
+        </n-card>
+
+        <!-- 评论区 -->
+        <n-card :bordered="false" class="detail-card mt-4">
+          <div class="comments-section">
+            <h3 class="section-title">评论 ({{ comments.length }})</h3>
+            
+            <!-- 发送评论 -->
+            <div class="comment-input-area">
+              <n-avatar circle size="medium" :src="currentUserAvatar" />
+              <div class="input-wrapper">
+                <n-input
+                  v-model:value="newCommentContent"
+                  type="textarea"
+                  placeholder="写下你的评论..."
+                  :autosize="{ minRows: 2, maxRows: 4 }"
+                />
+                <div class="input-actions">
+                  <n-button type="primary" size="small" color="#000" :disabled="!newCommentContent.trim()" @click="submitComment">
+                    发布
                   </n-button>
-                  <n-button text size="tiny">回复</n-button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 评论列表 -->
+            <div class="comment-list">
+              <div v-for="comment in comments" :key="comment.id" class="comment-item">
+                <n-avatar circle size="medium" :src="comment.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${comment.userId}`" />
+                <div class="comment-content">
+                  <div class="comment-header">
+                    <span class="username">{{ comment.username }}</span>
+                    <span class="time">{{ formatTime(comment.createdAt) }}</span>
+                  </div>
+                  <p class="text">{{ comment.content }}</p>
+                  <div class="comment-actions">
+                    <n-button text size="tiny" :color="comment.isLiked ? '#000' : undefined" @click="toggleCommentLike(comment)">
+                      <template #icon>
+                        <n-icon :component="comment.isLiked ? Heart : HeartOutline" />
+                      </template>
+                      {{ comment.likesCount || 0 }}
+                    </n-button>
+                    <n-button text size="tiny">回复</n-button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </n-card>
+        </n-card>
+      </template>
 
+      <!-- 帖子不存在 -->
       <n-card v-else :bordered="false" class="detail-card">
         <p>这条动态不存在或已被删除。</p>
         <n-button type="primary" size="small" color="#000" @click="goBack">
@@ -110,158 +125,173 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useMessage } from 'naive-ui'
-import { HeartOutline, ChatbubbleOutline, Heart } from '@vicons/ionicons5'
+import { HeartOutline, ChatbubbleOutline, Heart, EyeOutline } from '@vicons/ionicons5'
+import { getPostDetail } from '@/api/community/post'
+import { getPostComments, createComment } from '@/api/community/comment'
+import { likePost, unlikePost } from '@/api/community/like'
+import type { PostDetail, Comment } from '@/api/types'
+import { useUserStore } from '@/store/user'
 
 const route = useRoute()
 const router = useRouter()
 const message = useMessage()
+const userStore = useUserStore()
 
-interface PostAuthor {
-  name: string
-  avatar: string
-}
+const postId = computed(() => route.params.id as string)
 
-interface PostStats {
-  likes: number
-  comments: number
-}
-
-interface CommunityPost {
-  id: number
-  author: PostAuthor
-  publishTime: string
-  content: string
-  images?: string[]
-  tags?: string[]
-  stats: PostStats
-  isLiked: boolean
-}
-
-interface CommentUser {
-  name: string
-  avatar: string
-}
-
-interface Comment {
-  id: number
-  user: CommentUser
-  content: string
-  time: string
-  likes: number
-  isLiked?: boolean
-}
-
-const currentUserAvatar = ref('https://api.dicebear.com/7.x/avataaars/svg?seed=Guest')
+const post = ref<PostDetail | null>(null)
+const comments = ref<Comment[]>([])
+const loading = ref(false)
 const newCommentContent = ref('')
 
-const comments = ref<Comment[]>([
-  {
-    id: 101,
-    user: { name: 'Alice', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice' },
-    content: '这个功能真的很实用！',
-    time: '1小时前',
-    likes: 5,
-    isLiked: false
-  },
-  {
-    id: 102,
-    user: { name: 'Bob', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Bob' },
-    content: '期待更多更新~',
-    time: '30分钟前',
-    likes: 2,
-    isLiked: false
+const currentUserAvatar = computed(() => {
+  return userStore.userInfo?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Guest'
+})
+
+/**
+ * 格式化时间显示
+ * @param time - 时间字符串
+ */
+function formatTime(time: string): string {
+  if (!time) return ''
+  const date = new Date(time)
+  const now = new Date()
+  const diff = now.getTime() - date.getTime()
+  
+  // 小于1小时显示"x分钟前"
+  if (diff < 60 * 60 * 1000) {
+    const minutes = Math.floor(diff / (60 * 1000))
+    return minutes < 1 ? '刚刚' : `${minutes}分钟前`
   }
-])
-
-const posts = ref<CommunityPost[]>([
-  {
-    id: 1,
-    author: { name: 'TechHunter', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=TechHunter' },
-    publishTime: '2小时前',
-    content:
-      '刚才试用了一下 IdeaSpark 的 AI Logo 生成器，效果出乎意料的好！直接生成了矢量图，省了我找设计师的钱 😂 强烈推荐给大家尝试一下！',
-    images: ['https://picsum.photos/seed/logo1/400/300', 'https://picsum.photos/seed/logo2/400/300'],
-    tags: ['AI', '设计', '效率工具'],
-    stats: { likes: 124, comments: 45 },
-    isLiked: true
-  },
-  {
-    id: 2,
-    author: { name: 'FrontendMaster', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Frontend' },
-    publishTime: '5小时前',
-    content:
-      'Vue 3.4 发布的 defineModel 宏真的太好用了，双向绑定代码量减少了至少 30%。分享一段我封装的通用 Input 组件代码，大家看看有没有改进空间。',
-    images: [],
-    tags: ['Vue3', '前端', '经验分享'],
-    stats: { likes: 89, comments: 12 },
-    isLiked: false
-  },
-  {
-    id: 3,
-    author: { name: 'DesignDaily', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Design' },
-    publishTime: '昨天',
-    content:
-      '分享一组极简主义风格的 UI 配色方案，适合用在后台管理系统或者 SaaS 产品中。#UI设计 #配色',
-    images: [
-      'https://picsum.photos/seed/color1/400/300',
-      'https://picsum.photos/seed/color2/400/300',
-      'https://picsum.photos/seed/color3/400/300'
-    ],
-    tags: ['UI', '素材'],
-    stats: { likes: 256, comments: 33 },
-    isLiked: false
+  
+  // 小于24小时显示"x小时前"
+  if (diff < 24 * 60 * 60 * 1000) {
+    const hours = Math.floor(diff / (60 * 60 * 1000))
+    return `${hours}小时前`
   }
-])
+  
+  // 小于7天显示"x天前"
+  if (diff < 7 * 24 * 60 * 60 * 1000) {
+    const days = Math.floor(diff / (24 * 60 * 60 * 1000))
+    return `${days}天前`
+  }
+  
+  // 否则显示具体日期
+  return date.toLocaleDateString('zh-CN')
+}
 
-const postId = computed(() => Number(route.params.id))
+/**
+ * 获取帖子详情
+ */
+async function fetchPostDetail() {
+  if (!postId.value) return
+  
+  loading.value = true
+  try {
+    const res = await getPostDetail(postId.value)
+    
+    // 处理后端返回数组的情况（如错误信息 ["这条动态不存在或已被删除。"]）
+    if (Array.isArray(res.data)) {
+      console.error('获取帖子详情失败:', res.data[0])
+      post.value = null
+      return
+    }
+    
+      // 处理标准响应格式 { status, message, data }
+      if (res.data.status === 200 && res.data.data) {
+        post.value = {
+          ...res.data.data,
+          isLiked: false
+        }
+        // 获取评论列表
+        await fetchComments()
+      } else {
+        post.value = null
+      }
+  } catch (error) {
+    console.error('获取帖子详情失败:', error)
+    post.value = null
+  } finally {
+    loading.value = false
+  }
+}
 
-const post = computed<CommunityPost | undefined>(() =>
-  posts.value.find(item => item.id === postId.value)
-)
+/**
+ * 获取评论列表
+ */
+async function fetchComments() {
+  if (!postId.value) return
+  
+  try {
+    const res = await getPostComments(postId.value)
+    // 评论接口直接返回数组（非标准包装格式）
+    comments.value = res.data.map((comment: Comment) => ({
+      ...comment,
+      isLiked: false
+    }))
+  } catch (error) {
+    console.error('获取评论列表失败:', error)
+    comments.value = []
+  }
+}
 
 /**
  * 点赞/取消点赞帖子
  */
-function togglePostLike() {
+async function togglePostLike() {
   if (!post.value) return
-  const targetPost = posts.value.find(p => p.id === post.value?.id)
-  if (targetPost) {
-    targetPost.isLiked = !targetPost.isLiked
-    targetPost.stats.likes += targetPost.isLiked ? 1 : -1
+  
+  try {
+    if (post.value.isLiked) {
+      await unlikePost(post.value.id)
+      post.value.isLiked = false
+      post.value.likesCount--
+    } else {
+      await likePost(post.value.id)
+      post.value.isLiked = true
+      post.value.likesCount++
+    }
+  } catch (error) {
+    console.error('点赞操作失败:', error)
+    message.error('操作失败，请重试')
   }
 }
 
 /**
  * 点赞/取消点赞评论
  */
-function toggleCommentLike(comment: Comment) {
+function toggleCommentLike(comment: Comment & { isLiked?: boolean }) {
   comment.isLiked = !comment.isLiked
-  comment.likes += comment.isLiked ? 1 : -1
+  comment.likesCount += comment.isLiked ? 1 : -1
 }
 
 /**
  * 发布评论
  */
-function submitComment() {
-  if (!newCommentContent.value.trim()) return
-
-  const newComment: Comment = {
-    id: Date.now(),
-    user: {
-      name: '我',
-      avatar: currentUserAvatar.value
-    },
-    content: newCommentContent.value,
-    time: '刚刚',
-    likes: 0
+async function submitComment() {
+  if (!newCommentContent.value.trim() || !post.value) return
+  
+  try {
+    const res = await createComment({
+      postId: post.value.id,
+      content: newCommentContent.value.trim()
+    })
+    
+    if (res.data.status === 200) {
+      message.success('评论发布成功')
+      newCommentContent.value = ''
+      // 刷新评论列表
+      await fetchComments()
+      // 更新评论数
+      post.value.commentsCount++
+    }
+  } catch (error) {
+    console.error('发布评论失败:', error)
+    message.error('发布失败，请重试')
   }
-
-  comments.value.unshift(newComment)
-  newCommentContent.value = ''
-  message.success('评论发布成功')
 }
 
 /**
@@ -270,6 +300,10 @@ function submitComment() {
 function goBack() {
   router.push('/community')
 }
+
+onMounted(() => {
+  void fetchPostDetail()
+})
 </script>
 
 <style scoped lang="scss">
@@ -300,6 +334,20 @@ function goBack() {
   border-radius: 12px;
 }
 
+.loading-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+}
+
+.loading-text {
+  margin-top: 16px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
 .detail-header-main {
   display: flex;
   align-items: center;
@@ -323,11 +371,20 @@ function goBack() {
   color: #9ca3af;
 }
 
+.detail-content .post-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
 .detail-content .text {
   font-size: 15px;
   line-height: 1.8;
   color: #374151;
   margin-bottom: 16px;
+  white-space: pre-wrap;
 }
 
 .image-grid {
@@ -459,4 +516,3 @@ function goBack() {
   gap: 16px;
 }
 </style>
-

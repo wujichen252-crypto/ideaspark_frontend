@@ -41,7 +41,7 @@ describe('社区点赞接口', () => {
 
         await likePost('post-123')
 
-        expect(mockService.post).toHaveBeenCalledWith('/community/likes/post/post-123')
+        expect(mockService.post).toHaveBeenCalledWith('/api/community/likes/post/post-123')
       })
     })
 
@@ -54,7 +54,7 @@ describe('社区点赞接口', () => {
 
         await unlikePost('post-123')
 
-        expect(mockService.delete).toHaveBeenCalledWith('/community/likes/post/post-123')
+        expect(mockService.delete).toHaveBeenCalledWith('/api/community/likes/post/post-123')
       })
     })
 
@@ -67,7 +67,7 @@ describe('社区点赞接口', () => {
 
         const result = await getPostLikeCount('post-123')
 
-        expect(mockService.get).toHaveBeenCalledWith('/community/likes/post/post-123/count')
+        expect(mockService.get).toHaveBeenCalledWith('/api/community/likes/post/post-123/count')
         expect(result.data.data.count).toBe(20)
       })
     })
@@ -81,7 +81,7 @@ describe('社区点赞接口', () => {
 
         const result = await checkPostLiked('post-123')
 
-        expect(mockService.get).toHaveBeenCalledWith('/community/likes/post/post-123/check')
+        expect(mockService.get).toHaveBeenCalledWith('/api/community/likes/post/post-123/check')
         expect(result.data.data.liked).toBe(true)
       })
     })
@@ -97,7 +97,7 @@ describe('社区点赞接口', () => {
 
         await likeComment('comment-123')
 
-        expect(mockService.post).toHaveBeenCalledWith('/community/likes/comment/comment-123')
+        expect(mockService.post).toHaveBeenCalledWith('/api/community/likes/comment/comment-123')
       })
     })
 
@@ -110,7 +110,7 @@ describe('社区点赞接口', () => {
 
         await unlikeComment('comment-123')
 
-        expect(mockService.delete).toHaveBeenCalledWith('/community/likes/comment/comment-123')
+        expect(mockService.delete).toHaveBeenCalledWith('/api/community/likes/comment/comment-123')
       })
     })
 
@@ -123,7 +123,7 @@ describe('社区点赞接口', () => {
 
         const result = await getCommentLikeCount('comment-123')
 
-        expect(mockService.get).toHaveBeenCalledWith('/community/likes/comment/comment-123/count')
+        expect(mockService.get).toHaveBeenCalledWith('/api/community/likes/comment/comment-123/count')
         expect(result.data.data.count).toBe(5)
       })
     })
@@ -137,7 +137,7 @@ describe('社区点赞接口', () => {
 
         const result = await checkCommentLiked('comment-123')
 
-        expect(mockService.get).toHaveBeenCalledWith('/community/likes/comment/comment-123/check')
+        expect(mockService.get).toHaveBeenCalledWith('/api/community/likes/comment/comment-123/check')
         expect(result.data.data.liked).toBe(false)
       })
     })

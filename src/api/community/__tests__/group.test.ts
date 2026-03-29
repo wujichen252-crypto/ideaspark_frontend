@@ -64,7 +64,7 @@ describe('社区圈子接口', () => {
         description: '测试描述'
       })
 
-      expect(mockService.post).toHaveBeenCalledWith('/community/groups', {
+      expect(mockService.post).toHaveBeenCalledWith('/api/community/groups', {
         name: '测试圈子',
         keyword: '测试',
         description: '测试描述'
@@ -95,7 +95,7 @@ describe('社区圈子接口', () => {
 
       const result = await getGroupList()
 
-      expect(mockService.get).toHaveBeenCalledWith('/community/groups')
+      expect(mockService.get).toHaveBeenCalledWith('/api/community/groups')
       expect(result.data.data).toHaveLength(1)
     })
   })
@@ -123,7 +123,7 @@ describe('社区圈子接口', () => {
 
       const result = await getGroupDetail('group-123')
 
-      expect(mockService.get).toHaveBeenCalledWith('/community/groups/group-123')
+      expect(mockService.get).toHaveBeenCalledWith('/api/community/groups/group-123')
       expect(result.data.data.id).toBe('group-123')
     })
   })
@@ -151,7 +151,7 @@ describe('社区圈子接口', () => {
         description: '更新后的描述'
       })
 
-      expect(mockService.put).toHaveBeenCalledWith('/community/groups/group-123', {
+      expect(mockService.put).toHaveBeenCalledWith('/api/community/groups/group-123', {
         name: '更新后的圈子',
         description: '更新后的描述'
       })
@@ -168,7 +168,7 @@ describe('社区圈子接口', () => {
 
       await deleteGroup('group-123')
 
-      expect(mockService.delete).toHaveBeenCalledWith('/community/groups/group-123')
+      expect(mockService.delete).toHaveBeenCalledWith('/api/community/groups/group-123')
     })
   })
 
@@ -181,7 +181,7 @@ describe('社区圈子接口', () => {
 
       await joinGroup('group-123')
 
-      expect(mockService.post).toHaveBeenCalledWith('/community/groups/group-123/join')
+      expect(mockService.post).toHaveBeenCalledWith('/api/community/groups/group-123/join')
     })
   })
 
@@ -194,7 +194,7 @@ describe('社区圈子接口', () => {
 
       await quitGroup('group-123')
 
-      expect(mockService.delete).toHaveBeenCalledWith('/community/groups/group-123/join')
+      expect(mockService.delete).toHaveBeenCalledWith('/api/community/groups/group-123/join')
     })
   })
 
@@ -220,7 +220,7 @@ describe('社区圈子接口', () => {
 
       const result = await getMyGroups()
 
-      expect(mockService.get).toHaveBeenCalledWith('/community/groups/my')
+      expect(mockService.get).toHaveBeenCalledWith('/api/community/groups/my')
       expect(result.data.data).toHaveLength(1)
     })
   })
@@ -238,7 +238,7 @@ describe('社区圈子接口', () => {
 
       const result = await getGroupMemberCount('group-123')
 
-      expect(mockService.get).toHaveBeenCalledWith('/community/groups/group-123/members/count')
+      expect(mockService.get).toHaveBeenCalledWith('/api/community/groups/group-123/members/count')
       expect(result.data.data.count).toBe(50)
     })
   })
@@ -256,7 +256,7 @@ describe('社区圈子接口', () => {
 
       const result = await checkGroupMembership('group-123')
 
-      expect(mockService.get).toHaveBeenCalledWith('/community/groups/group-123/check')
+      expect(mockService.get).toHaveBeenCalledWith('/api/community/groups/group-123/check')
       expect(result.data.data.member).toBe(true)
     })
   })
@@ -283,7 +283,7 @@ describe('社区圈子接口', () => {
 
       const result = await getGroupMembers('group-123')
 
-      expect(mockService.get).toHaveBeenCalledWith('/community/groups/group-123/members')
+      expect(mockService.get).toHaveBeenCalledWith('/api/community/groups/group-123/members')
       expect(result.data.data).toHaveLength(1)
     })
   })
@@ -298,7 +298,7 @@ describe('社区圈子接口', () => {
       await removeGroupMember('group-123', 'member-123')
 
       expect(mockService.delete).toHaveBeenCalledWith(
-        '/community/groups/group-123/members/member-123'
+        '/api/community/groups/group-123/members/member-123'
       )
     })
   })
@@ -313,7 +313,7 @@ describe('社区圈子接口', () => {
       await updateGroupMemberRole('group-123', 'member-123', { role: 'admin' })
 
       expect(mockService.put).toHaveBeenCalledWith(
-        '/community/groups/group-123/members/member-123/role',
+        '/api/community/groups/group-123/members/member-123/role',
         { role: 'admin' }
       )
     })

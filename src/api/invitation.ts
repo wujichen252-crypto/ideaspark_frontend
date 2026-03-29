@@ -11,5 +11,5 @@ import type { InvitationValidateResult } from './types'
  * @param token - 邀请令牌
  */
 export function validateInvitation(token: string) {
-  return service.get<ApiResponse<InvitationValidateResult>>('/invitations/validate', { params: { token } })
+  return service.get<ApiResponse<InvitationValidateResult>>('/api/invitations/validate', { params: { token } })
 }

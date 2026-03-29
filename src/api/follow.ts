@@ -16,7 +16,7 @@ import type {
  * @param followingId - 被关注用户 ID
  */
 export function followUser(followingId: number) {
-  return service.post<ApiResponse<null>>(`/follows/${followingId}`)
+  return service.post<ApiResponse<null>>('/api/follows', { followingId })
 }
 
 /**
@@ -24,35 +24,35 @@ export function followUser(followingId: number) {
  * @param followingId - 被取消关注的用户 ID
  */
 export function unfollowUser(followingId: number) {
-  return service.delete<ApiResponse<null>>(`/follows/${followingId}`)
+  return service.delete<ApiResponse<null>>('/api/follows', { data: { followingId } })
 }
 
 /**
  * 获取我的关注列表
  */
 export function getMyFollowing() {
-  return service.get<ApiResponse<MyFollowingItem[]>>('/follows/my/following')
+  return service.get<ApiResponse<MyFollowingItem[]>>('/api/follows/my/following')
 }
 
 /**
  * 获取我的粉丝列表
  */
 export function getMyFollowers() {
-  return service.get<ApiResponse<MyFollowerItem[]>>('/follows/my/followers')
+  return service.get<ApiResponse<MyFollowerItem[]>>('/api/follows/my/followers')
 }
 
 /**
  * 获取我的关注数
  */
 export function getMyFollowingCount() {
-  return service.get<ApiResponse<FollowCountResult>>('/follows/my/following/count')
+  return service.get<ApiResponse<FollowCountResult>>('/api/follows/my/following/count')
 }
 
 /**
  * 获取我的粉丝数
  */
 export function getMyFollowersCount() {
-  return service.get<ApiResponse<FollowCountResult>>('/follows/my/followers/count')
+  return service.get<ApiResponse<FollowCountResult>>('/api/follows/my/followers/count')
 }
 
 /**
@@ -60,7 +60,7 @@ export function getMyFollowersCount() {
  * @param followingId - 被检查的用户 ID
  */
 export function checkFollowing(followingId: number) {
-  return service.get<ApiResponse<FollowCheckResult>>(`/follows/check/${followingId}`)
+  return service.get<ApiResponse<FollowCheckResult>>('/api/follows/check', { params: { followingId } })
 }
 
 /**
@@ -68,7 +68,7 @@ export function checkFollowing(followingId: number) {
  * @param userId - 用户 ID
  */
 export function getUserFollowing(userId: number) {
-  return service.get<ApiResponse<MyFollowingItem[]>>(`/follows/user/${userId}/following`)
+  return service.get<ApiResponse<MyFollowingItem[]>>(`/api/follows/user/${userId}/following`)
 }
 
 /**
@@ -76,7 +76,7 @@ export function getUserFollowing(userId: number) {
  * @param userId - 用户 ID
  */
 export function getUserFollowers(userId: number) {
-  return service.get<ApiResponse<MyFollowerItem[]>>(`/follows/user/${userId}/followers`)
+  return service.get<ApiResponse<MyFollowerItem[]>>(`/api/follows/user/${userId}/followers`)
 }
 
 /**
@@ -84,7 +84,7 @@ export function getUserFollowers(userId: number) {
  * @param userId - 用户 ID
  */
 export function getUserFollowingCount(userId: number) {
-  return service.get<ApiResponse<FollowCountResult>>(`/follows/user/${userId}/following/count`)
+  return service.get<ApiResponse<FollowCountResult>>(`/api/follows/user/${userId}/following/count`)
 }
 
 /**
@@ -92,5 +92,5 @@ export function getUserFollowingCount(userId: number) {
  * @param userId - 用户 ID
  */
 export function getUserFollowersCount(userId: number) {
-  return service.get<ApiResponse<FollowCountResult>>(`/follows/user/${userId}/followers/count`)
+  return service.get<ApiResponse<FollowCountResult>>(`/api/follows/user/${userId}/followers/count`)
 }

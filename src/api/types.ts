@@ -356,13 +356,14 @@ export interface Post {
 }
 
 /**
- * 帖子详情
+ * 帖子详情（包含前端状态）
  */
 export interface PostDetail extends Post {
   channel: string
   visibility: PostVisibility
   updatedAt: string
   project?: PostProject
+  isLiked?: boolean
 }
 
 /**
@@ -392,7 +393,7 @@ export interface UpdatePostParams {
 // ==================== 社区评论模块类型 ====================
 
 /**
- * 评论基本信息
+ * 评论基本信息（包含前端状态）
  */
 export interface Comment {
   id: string
@@ -402,6 +403,7 @@ export interface Comment {
   avatar?: string
   likesCount: number
   createdAt: string
+  isLiked?: boolean
 }
 
 /**
@@ -646,4 +648,76 @@ export interface HealthCheckResult {
   status: number
   message: string
   data: string
+}
+
+// ==================== 团队邀请模块类型 ====================
+
+/**
+ * 团队邀请项
+ */
+export interface InvitationItem {
+  id: string
+  inviteeId: number
+  status: string
+  token: string
+  createdAt: string
+}
+
+/**
+ * 发送团队邀请参数
+ */
+export interface TeamInvitationSendParams {
+  uuid: string
+  emails: string[]
+  role: 'ADMIN' | 'MEMBER'
+}
+
+/**
+ * 更新团队成员角色参数
+ */
+export interface TeamMemberRoleUpdateParams {
+  uuid: string
+  memberId: string
+  role: 'OWNER' | 'ADMIN' | 'MEMBER'
+}
+
+/**
+ * 转让团队所有权参数
+ */
+export interface TeamTransferOwnershipParams {
+  uuid: string
+  newOwnerId: number
+}
+
+// ==================== 报名审核统计模块类型 ====================
+
+/**
+ * 报名审核统计摘要
+ */
+export interface SignApplicationStatsSummary {
+  total: number
+  rejected: number
+  pending: number
+  approved: number
+}
+
+/**
+ * 报名审核统计响应
+ */
+export interface SignApplicationStatsResponse {
+  overall: SignApplicationStatsSummary
+  groups: {
+    primary?: SignApplicationStatsSummary
+    middle?: SignApplicationStatsSummary
+  }
+}
+
+/**
+ * 获取报名审核统计参数
+ */
+export interface GetSignApplicationStatsParams {
+  start_date?: string
+  end_date?: string
+  groups?: ('primary' | 'middle')[]
+  include_overall?: boolean
 }

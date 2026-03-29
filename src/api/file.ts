@@ -13,7 +13,7 @@ import type { UploadResult } from './types'
 export function uploadFile(file: File) {
   const formData = new FormData()
   formData.append('file', file)
-  return service.post<ApiResponse<UploadResult>>('/file/upload', formData, {
+  return service.post<ApiResponse<UploadResult>>('/api/file/upload', formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   })
 }

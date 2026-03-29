@@ -21,7 +21,7 @@ import type {
  * @param params - 圈子创建参数
  */
 export function createGroup(params: CreateGroupParams) {
-  return service.post<ApiResponse<GroupDetail>>('/community/groups', params)
+  return service.post<ApiResponse<GroupDetail>>('/api/community/groups', params)
 }
 
 /**
@@ -29,7 +29,7 @@ export function createGroup(params: CreateGroupParams) {
  * @description 后端直接返回数组，不包裹在 ApiResponse 中
  */
 export function getGroupList() {
-  return service.get<Group[]>('/community/groups')
+  return service.get<Group[]>('/api/community/groups')
 }
 
 /**
@@ -37,7 +37,7 @@ export function getGroupList() {
  * @param groupId - 圈子 ID
  */
 export function getGroupDetail(groupId: string) {
-  return service.get<ApiResponse<GroupDetail>>(`/community/groups/${groupId}`)
+  return service.get<ApiResponse<GroupDetail>>(`/api/community/groups/${groupId}`)
 }
 
 /**
@@ -46,7 +46,7 @@ export function getGroupDetail(groupId: string) {
  * @param params - 更新参数
  */
 export function updateGroup(groupId: string, params: UpdateGroupParams) {
-  return service.put<ApiResponse<GroupDetail>>(`/community/groups/${groupId}`, params)
+  return service.put<ApiResponse<GroupDetail>>(`/api/community/groups/${groupId}`, params)
 }
 
 /**
@@ -54,7 +54,7 @@ export function updateGroup(groupId: string, params: UpdateGroupParams) {
  * @param groupId - 圈子 ID
  */
 export function deleteGroup(groupId: string) {
-  return service.delete<ApiResponse<null>>(`/community/groups/${groupId}`)
+  return service.delete<ApiResponse<null>>(`/api/community/groups/${groupId}`)
 }
 
 /**
@@ -62,7 +62,7 @@ export function deleteGroup(groupId: string) {
  * @param groupId - 圈子 ID
  */
 export function joinGroup(groupId: string) {
-  return service.post<ApiResponse<null>>(`/community/groups/${groupId}/join`)
+  return service.post<ApiResponse<null>>(`/api/community/groups/${groupId}/join`)
 }
 
 /**
@@ -70,14 +70,14 @@ export function joinGroup(groupId: string) {
  * @param groupId - 圈子 ID
  */
 export function quitGroup(groupId: string) {
-  return service.delete<ApiResponse<null>>(`/community/groups/${groupId}/join`)
+  return service.delete<ApiResponse<null>>(`/api/community/groups/${groupId}/join`)
 }
 
 /**
  * 获取我加入的圈子列表
  */
 export function getMyGroups() {
-  return service.get<ApiResponse<MyGroupItem[]>>('/community/groups/my')
+  return service.get<ApiResponse<MyGroupItem[]>>('/api/community/groups/my')
 }
 
 /**
@@ -86,7 +86,7 @@ export function getMyGroups() {
  */
 export function getGroupMemberCount(groupId: string) {
   return service.get<ApiResponse<GroupMemberCountResult>>(
-    `/community/groups/${groupId}/members/count`
+    `/api/community/groups/${groupId}/members/count`
   )
 }
 
@@ -95,7 +95,7 @@ export function getGroupMemberCount(groupId: string) {
  * @param groupId - 圈子 ID
  */
 export function checkGroupMembership(groupId: string) {
-  return service.get<ApiResponse<GroupMembershipResult>>(`/community/groups/${groupId}/check`)
+  return service.get<ApiResponse<GroupMembershipResult>>(`/api/community/groups/${groupId}/check`)
 }
 
 /**
@@ -103,7 +103,7 @@ export function checkGroupMembership(groupId: string) {
  * @param groupId - 圈子 ID
  */
 export function getGroupMembers(groupId: string) {
-  return service.get<ApiResponse<GroupMember[]>>(`/community/groups/${groupId}/members`)
+  return service.get<ApiResponse<GroupMember[]>>(`/api/community/groups/${groupId}/members`)
 }
 
 /**
@@ -112,7 +112,7 @@ export function getGroupMembers(groupId: string) {
  * @param memberId - 成员 ID
  */
 export function removeGroupMember(groupId: string, memberId: string) {
-  return service.delete<ApiResponse<null>>(`/community/groups/${groupId}/members/${memberId}`)
+  return service.delete<ApiResponse<null>>(`/api/community/groups/${groupId}/members/${memberId}`)
 }
 
 /**
@@ -127,7 +127,7 @@ export function updateGroupMemberRole(
   params: UpdateGroupMemberRoleParams
 ) {
   return service.put<ApiResponse<{ memberId: string; role: string }>>(
-    `/community/groups/${groupId}/members/${memberId}/role`,
+    `/api/community/groups/${groupId}/members/${memberId}/role`,
     params
   )
 }

@@ -39,11 +39,9 @@ describe('社区评论接口', () => {
           message: '创建成功',
           data: {
             id: 'comment-123',
-            postId: 'post-123',
             content: '测试评论',
-            userId: 1,
-            username: '张三',
-            parentId: null,
+            postId: 'post-123',
+            author: { id: 1, username: '张三' },
             likesCount: 0,
             createdAt: '2024-01-01'
           }
@@ -53,7 +51,7 @@ describe('社区评论接口', () => {
 
       const result = await createComment({ postId: 'post-123', content: '测试评论' })
 
-      expect(mockService.post).toHaveBeenCalledWith('/community/comments', {
+      expect(mockService.post).toHaveBeenCalledWith('/api/community/comments', {
         postId: 'post-123',
         content: '测试评论'
       })
@@ -67,11 +65,10 @@ describe('社区评论接口', () => {
           message: '创建成功',
           data: {
             id: 'comment-456',
-            postId: 'post-123',
             content: '回复内容',
-            userId: 1,
-            username: '张三',
+            postId: 'post-123',
             parentId: 'comment-123',
+            author: { id: 1, username: '张三' },
             likesCount: 0,
             createdAt: '2024-01-01'
           }
@@ -85,12 +82,12 @@ describe('社区评论接口', () => {
         parentId: 'comment-123'
       })
 
-      expect(mockService.post).toHaveBeenCalledWith('/community/comments', {
+      expect(mockService.post).toHaveBeenCalledWith('/api/community/comments', {
         postId: 'post-123',
         content: '回复内容',
         parentId: 'comment-123'
       })
-      expect(result.data.data.parentId).toBe('comment-123')
+      expect(result.data.data.id).toBe('comment-456')
     })
   })
 
@@ -104,10 +101,9 @@ describe('社区评论接口', () => {
             {
               id: 'comment-123',
               content: '测试评论',
-              userId: 1,
-              username: '张三',
-              avatar: '',
-              likesCount: 5,
+              postId: 'post-123',
+              author: { id: 1, username: '张三' },
+              likesCount: 0,
               createdAt: '2024-01-01'
             }
           ]
@@ -117,7 +113,7 @@ describe('社区评论接口', () => {
 
       const result = await getPostComments('post-123')
 
-      expect(mockService.get).toHaveBeenCalledWith('/community/comments/post/post-123')
+      expect(mockService.get).toHaveBeenCalledWith('/api/community/comments/post?postId=post-123')
       expect(result.data.data).toHaveLength(1)
     })
   })
@@ -132,22 +128,21 @@ describe('社区评论接口', () => {
             {
               id: 'comment-123',
               content: '测试评论',
-              userId: 1,
-              username: '张三',
-              avatar: '',
-              parentId: null,
-              likesCount: 5,
-              createdAt: '2024-01-01'
-            },
-            {
-              id: 'comment-456',
-              content: '回复',
-              userId: 2,
-              username: '李四',
-              avatar: '',
-              parentId: 'comment-123',
-              likesCount: 2,
-              createdAt: '2024-01-01'
+              postId: 'post-123',
+              author: { id: 1, username: '张三' },
+              likesCount: 0,
+              createdAt: '2024-01-01',
+              replies: [
+                {
+                  id: 'comment-456',
+                  content: '回复内容',
+                  postId: 'post-123',
+                  parentId: 'comment-123',
+                  author: { id: 2, username: '李四' },
+                  likesCount: 0,
+                  createdAt: '2024-01-01'
+                }
+              ]
             }
           ]
         }
@@ -156,8 +151,8 @@ describe('社区评论接口', () => {
 
       const result = await getAllPostComments('post-123')
 
-      expect(mockService.get).toHaveBeenCalledWith('/community/comments/post/post-123/all')
-      expect(result.data.data).toHaveLength(2)
+      expect(mockService.get).toHaveBeenCalledWith('/api/community/comments/post/post-123/all')
+      expect(result.data.data).toHaveLength(1)
     })
   })
 
@@ -170,11 +165,11 @@ describe('社区评论接口', () => {
           data: [
             {
               id: 'comment-456',
-              content: '回复',
-              userId: 2,
-              username: '李四',
-              avatar: '',
-              likesCount: 2,
+              content: '回复内容',
+              postId: 'post-123',
+              parentId: 'comment-123',
+              author: { id: 2, username: '李四' },
+              likesCount: 0,
               createdAt: '2024-01-01'
             }
           ]
@@ -184,7 +179,7 @@ describe('社区评论接口', () => {
 
       const result = await getCommentReplies('comment-123')
 
-      expect(mockService.get).toHaveBeenCalledWith('/community/comments/replies/comment-123')
+      expect(mockService.get).toHaveBeenCalledWith('/api/community/comments/replies/comment-123')
       expect(result.data.data).toHaveLength(1)
     })
   })
@@ -198,7 +193,10 @@ describe('社区评论接口', () => {
           data: {
             id: 'comment-123',
             content: '更新后的评论',
-            updatedAt: '2024-01-02'
+            postId: 'post-123',
+            author: { id: 1, username: '张三' },
+            likesCount: 0,
+            createdAt: '2024-01-01'
           }
         }
       } as AxiosResponse
@@ -206,7 +204,7 @@ describe('社区评论接口', () => {
 
       const result = await updateComment('comment-123', { content: '更新后的评论' })
 
-      expect(mockService.put).toHaveBeenCalledWith('/community/comments/comment-123', {
+      expect(mockService.put).toHaveBeenCalledWith('/api/community/comments/comment-123', {
         content: '更新后的评论'
       })
       expect(result.data.data.content).toBe('更新后的评论')
@@ -222,7 +220,7 @@ describe('社区评论接口', () => {
 
       await deleteComment('comment-123')
 
-      expect(mockService.delete).toHaveBeenCalledWith('/community/comments/comment-123')
+      expect(mockService.delete).toHaveBeenCalledWith('/api/community/comments/comment-123')
     })
   })
 
@@ -239,9 +237,11 @@ describe('社区评论接口', () => {
 
       const result = await updateCommentLikes('comment-123', 10)
 
-      expect(mockService.put).toHaveBeenCalledWith('/community/comments/comment-123/likes', null, {
-        params: { count: 10 }
-      })
+      expect(mockService.put).toHaveBeenCalledWith(
+        '/api/community/comments/comment-123/likes',
+        null,
+        { params: { count: 10 } }
+      )
       expect(result.data.data.likesCount).toBe(10)
     })
   })

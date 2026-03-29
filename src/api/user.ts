@@ -20,7 +20,7 @@ import type {
  * @param params - 登录参数
  */
 export function login(params: LoginParams) {
-  return service.post<ApiResponse<LoginResult>>('/user/login', params)
+  return service.post<ApiResponse<LoginResult>>('/api/user/login', params)
 }
 
 /**
@@ -28,7 +28,7 @@ export function login(params: LoginParams) {
  * @param params - 注册参数
  */
 export function register(params: RegisterParams) {
-  return service.post<ApiResponse<User>>('/user/register', params)
+  return service.post<ApiResponse<User>>('/api/user/register', params)
 }
 
 /**
@@ -36,7 +36,7 @@ export function register(params: RegisterParams) {
  * @param params - 更新参数
  */
 export function updateUser(params: UpdateUserParams) {
-  return service.post<ApiResponse<User>>('/user/update', params)
+  return service.post<ApiResponse<User>>('/api/user/update', params)
 }
 
 /**
@@ -44,7 +44,7 @@ export function updateUser(params: UpdateUserParams) {
  * @param params - 查询参数
  */
 export function getAllUsers(params?: GetUsersParams) {
-  return service.get<ApiResponse<PageData<User>>>('/user/getAllUsers', { params })
+  return service.get<ApiResponse<PageData<User>>>('/api/user/getAllUsers', { params })
 }
 
 /**
@@ -52,5 +52,5 @@ export function getAllUsers(params?: GetUsersParams) {
  * @param params - 删除参数
  */
 export function deleteUsers(params: DeleteUsersParams) {
-  return service.post<ApiResponse<null>>('/user/deleteUsers', params)
+  return service.post<ApiResponse<null>>('/api/user/deleteUsers', params)
 }

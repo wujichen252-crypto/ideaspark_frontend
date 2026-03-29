@@ -11,5 +11,5 @@ import type { ProjectListResult, GetMyProjectsParams } from './types'
  * @param params - 分页和筛选参数
  */
 export function getMyProjects(params?: GetMyProjectsParams) {
-  return service.get<ApiResponse<ProjectListResult>>('/projects/my', { params })
+  return service.get<ApiResponse<ProjectListResult>>('/api/projects/my', { params })
 }

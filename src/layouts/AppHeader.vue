@@ -12,20 +12,31 @@ const userStore = useUserStore()
 const activeKey = ref<string | null>('home')
 const isScrolled = ref(false)
 
+// 防抖函数
+function debounce<T extends (...args: unknown[]) => void>(fn: T, delay: number) {
+  let timer: ReturnType<typeof setTimeout> | null = null
+  return function (this: ThisParameterType<T>, ...args: Parameters<T>) {
+    if (timer) clearTimeout(timer)
+    timer = setTimeout(() => fn.apply(this, args), delay)
+  }
+}
+
+// 静态菜单选项，避免频繁重新计算
+const allMenuOptions: MenuOption[] = [
+  { key: 'dashboard', label: '控制台' },
+  { key: 'workbench', label: '工作台' },
+  { key: 'market', label: '项目市场' },
+  { key: 'community', label: '社区动态' }
+]
+
 // 根据路由动态计算菜单选项
 const menuOptions = computed<MenuOption[]>(() => {
   // 首页只显示极简菜单（或者干脆不显示菜单，只显示登录按钮）
   if (route.path === '/') {
     return []
   }
-
   // 内部页面显示完整功能菜单
-  return [
-    { key: 'dashboard', label: '控制台' },
-    { key: 'workbench', label: '工作台' },
-    { key: 'market', label: '项目市场' },
-    { key: 'community', label: '社区动态' }
-  ]
+  return allMenuOptions
 })
 
 // 监听路由变化更新 activeKey
@@ -70,6 +81,9 @@ function handleScroll() {
   }
 }
 
+// 防抖处理的滚动事件
+const debouncedHandleScroll = debounce(handleScroll, 16) // 约60fps
+
 // 监听路由变化，及时更新 Header 状态
 watch(
   () => route.path,
@@ -81,11 +95,11 @@ watch(
 )
 
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll)
+  window.addEventListener('scroll', debouncedHandleScroll, { passive: true })
 })
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('scroll', debouncedHandleScroll)
 })
 
 // 删除动画相关的 DOM refs 与初始化逻辑
