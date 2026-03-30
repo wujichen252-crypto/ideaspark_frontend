@@ -1,7 +1,12 @@
 <template>
   <div class="ai-sidebar">
     <div class="sidebar-header">
-      <n-button block type="primary" dashed class="new-chat-btn" @click="handleNewChat">
+      <n-button
+block
+type="primary"
+dashed
+class="new-chat-btn"
+@click="handleNewChat">
         <template #icon>
           <n-icon><Add /></n-icon>
         </template>

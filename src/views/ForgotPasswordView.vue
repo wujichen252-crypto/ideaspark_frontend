@@ -15,7 +15,11 @@
 
         <div class="input-group">
           <div class="custom-input-wrapper">
-            <input v-model="email" type="email" placeholder="邮箱" class="custom-input" />
+            <input
+v-model="email"
+type="email"
+placeholder="邮箱"
+class="custom-input" />
             <span class="input-border"></span>
           </div>
         </div>

@@ -8,8 +8,8 @@
           把创业，从想法推进到<span class="highlight">可交付</span>
         </h1>
         <p class="hero-subtitle">
-          AI 工坊（AI Workshop）是一个面向独立开发者与初创团队的 AI 创业执行平台。<br>
-          它不是聊天机器人，也不是单一的代码生成器。<br>
+          AI 工坊（AI Workshop）是一个面向独立开发者与初创团队的 AI 创业执行平台。<br/>
+          它不是聊天机器人，也不是单一的代码生成器。<br/>
           它的目标只有一个：用 AI，把你的创业想法，真正“做出来”。
         </p>
 
@@ -17,11 +17,19 @@
 
 
         <div class="hero-actions">
-          <n-button type="primary" size="large" class="cta-button" @click="router.push('/ai/workshop/start')">
+          <n-button
+type="primary"
+size="large"
+class="cta-button"
+@click="router.push('/ai/workshop/start')">
             🎯 开始你的第一个项目
             <template #icon><n-icon><ArrowForward /></n-icon></template>
           </n-button>
-          <n-button size="large" secondary class="secondary-button" @click="scrollToWhy">
+          <n-button
+size="large"
+secondary
+class="secondary-button"
+@click="scrollToWhy">
             了解更多
           </n-button>
         </div>
@@ -210,7 +218,7 @@
     <div class="cta-section">
       <h2 class="cta-title">让创业这件事，变得更可控</h2>
       <p class="cta-subtitle">
-        如果你希望更快把想法变成现实，更少走弯路，更专注于真正重要的决策。<br>
+        如果你希望更快把想法变成现实，更少走弯路，更专注于真正重要的决策。<br/>
         那么，AI 工坊，就是你创业路上的执行引擎。
       </p>
       
@@ -220,7 +228,11 @@
         <div class="step">👉 把想法，真正做出来</div>
       </div>
 
-      <n-button type="primary" size="large" class="final-cta-button" @click="router.push('/ai/workshop')">
+      <n-button
+type="primary"
+size="large"
+class="final-cta-button"
+@click="router.push('/ai/workshop')">
         🎯 开始你的第一个项目
       </n-button>
       

@@ -6,12 +6,20 @@
           <h1>AI 创新工坊</h1>
           <p>
             从灵感到落地，全流程 AI 辅助创作平台
-            <n-button text type="primary" size="small" @click="router.push('/ai/intro')">
+            <n-button
+text
+type="primary"
+size="small"
+@click="router.push('/ai/intro')">
               (了解更多)
             </n-button>
           </p>
         </div>
-        <n-button type="primary" size="large" class="create-btn" @click="router.push('/ai/workshop/start')">
+        <n-button
+type="primary"
+size="large"
+class="create-btn"
+@click="router.push('/ai/workshop/start')">
           <template #icon><n-icon><Add /></n-icon></template>
           创建新项目
         </n-button>
@@ -63,7 +71,11 @@
           </div>
           <div class="filters">
             <div class="left-filters">
-              <n-input v-model:value="searchQuery" placeholder="搜索项目..." clearable class="search-input">
+              <n-input
+v-model:value="searchQuery"
+placeholder="搜索项目..."
+clearable
+class="search-input">
                 <template #prefix><n-icon><Search /></n-icon></template>
               </n-input>
               <n-select v-model:value="sortBy" :options="sortOptions" class="sort-select" />

@@ -16,7 +16,11 @@
         
         <div class="project-header">
           <div class="header-main">
-            <n-tag :type="projectData.category === 'ai' ? 'success' : 'info'" size="small" round class="category-tag">
+            <n-tag
+:type="projectData.category === 'ai' ? 'success' : 'info'"
+size="small"
+round
+class="category-tag">
               {{ projectData.categoryLabel }}
             </n-tag>
             <h1 class="project-title">{{ projectData.title }}</h1>
@@ -49,18 +53,35 @@
           </div>
           
           <div class="header-actions">
-            <n-button type="primary" size="large" round class="action-btn">
+            <n-button
+type="primary"
+size="large"
+round
+class="action-btn">
               <template #icon><n-icon :component="PlayOutline" /></template>
               运行演示
             </n-button>
-            <n-button size="large" round class="action-btn" ghost color="#fff">
+            <n-button
+size="large"
+round
+class="action-btn"
+ghost
+color="#fff">
               <template #icon><n-icon :component="CodeSlashOutline" /></template>
               查看源码
             </n-button>
-            <n-button circle size="large" secondary type="error">
+            <n-button
+circle
+size="large"
+secondary
+type="error">
               <template #icon><n-icon :component="HeartOutline" /></template>
             </n-button>
-            <n-button circle size="large" ghost color="#fff">
+            <n-button
+circle
+size="large"
+ghost
+color="#fff">
               <template #icon><n-icon :component="ShareSocialOutline" /></template>
             </n-button>
           </div>
@@ -91,7 +112,11 @@
           <!-- 功能特性 -->
           <div class="section-card features-section">
             <h2 class="section-title">核心功能</h2>
-            <n-grid :x-gap="20" :y-gap="20" cols="1 s:2" responsive="screen">
+            <n-grid
+:x-gap="20"
+:y-gap="20"
+cols="1 s:2"
+responsive="screen">
               <n-grid-item v-for="(feature, index) in projectData.features" :key="index">
                 <div class="feature-item">
                   <div class="feature-icon">
@@ -113,7 +138,12 @@
           <div class="sidebar-card">
             <h3 class="sidebar-title">技术栈</h3>
             <div class="tech-tags">
-              <n-tag v-for="tech in projectData.techStack" :key="tech" :bordered="false" size="medium" round>
+              <n-tag
+v-for="tech in projectData.techStack"
+:key="tech"
+:bordered="false"
+size="medium"
+round>
                 {{ tech }}
               </n-tag>
             </div>
@@ -148,7 +178,13 @@
               </div>
             </div>
             <p class="author-bio">热爱开源，专注于 Vue3 生态与 AI 应用开发。欢迎关注我的 Github。</p>
-            <n-button block secondary type="primary" @click="router.push(`/user/${projectData.authorId}`)">关注作者</n-button>
+            <n-button
+block
+secondary
+type="primary"
+@click="router.push(`/user/${projectData.authorId}`)">
+关注作者
+</n-button>
           </div>
         </div>
       </div>

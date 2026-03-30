@@ -32,7 +32,11 @@
                   <n-icon :component="SearchOutline" />
                 </template>
               </n-input>
-              <n-button type="primary" color="#000" size="large" @click="handleSearch">
+              <n-button
+type="primary"
+color="#000"
+size="large"
+@click="handleSearch">
                 搜索
               </n-button>
             </n-input-group>
@@ -53,11 +57,22 @@
             <h1>发现无限创意<br/><span class="highlight">探索 AI 的可能性</span></h1>
             <p class="subtitle">汇聚全球开发者的智慧结晶，为您提供最前沿的 AI 应用与设计资源。在这里，每一个想法都值得被看见。</p>
             <div class="hero-actions">
-              <n-button type="primary" color="#000" size="large" round class="explore-btn" @click="$router.push('/ai/workshop')">
+              <n-button
+type="primary"
+color="#000"
+size="large"
+round
+class="explore-btn"
+@click="$router.push('/ai/workshop')">
                 立即创作
                 <template #icon><n-icon :component="ArrowForwardOutline" /></template>
               </n-button>
-              <n-button size="large" round ghost class="creator-btn" @click="$router.push('/create')">
+              <n-button
+size="large"
+round
+ghost
+class="creator-btn"
+@click="$router.push('/create')">
                 我是创作者
               </n-button>
             </div>
@@ -104,7 +119,11 @@
             >
               <div class="creator-bg" :style="{ backgroundImage: `url(${creator.bg})` }"></div>
               <div class="creator-info">
-                <n-avatar round :size="48" :src="creator.avatar" class="creator-avatar" />
+                <n-avatar
+round
+:size="48"
+:src="creator.avatar"
+class="creator-avatar" />
                 <span class="creator-name">{{ creator.name }}</span>
               </div>
             </div>
@@ -140,7 +159,11 @@
       </div>
 
       <n-spin :show="loading">
-        <n-grid :x-gap="24" :y-gap="24" cols="1 s:2 m:3 l:4 xl:4" responsive="screen">
+        <n-grid
+:x-gap="24"
+:y-gap="24"
+cols="1 s:2 m:3 l:4 xl:4"
+responsive="screen">
           <n-grid-item v-for="item in sortedProjectList" :key="item.id">
             <div class="project-card" @click="goToProject(item.id)">
               <div class="card-thumb" :style="{ backgroundImage: `url(${item.cover})` }">
@@ -148,7 +171,11 @@
                   <n-icon :component="Heart" /> 热门
                 </div>
                 <div class="card-overlay">
-                  <n-button quaternary circle color="#fff" @click.stop>
+                  <n-button
+quaternary
+circle
+color="#fff"
+@click.stop>
                     <template #icon><n-icon :component="HeartOutline" /></template>
                   </n-button>
                 </div>
@@ -165,7 +192,11 @@
                   </span>
                 </div>
                 <div class="card-tags">
-                  <n-tag v-for="tag in item.tags" :key="tag" size="small" :bordered="false">
+                  <n-tag
+v-for="tag in item.tags"
+:key="tag"
+size="small"
+:bordered="false">
                     {{ tag }}
                   </n-tag>
                 </div>

@@ -43,7 +43,7 @@ describe('用户关注接口', () => {
 
       await followUser(2)
 
-      expect(mockService.post).toHaveBeenCalledWith('/follows/2')
+      expect(mockService.post).toHaveBeenCalledWith('/api/follows', { followingId: 2 })
     })
   })
 
@@ -56,7 +56,7 @@ describe('用户关注接口', () => {
 
       await unfollowUser(2)
 
-      expect(mockService.delete).toHaveBeenCalledWith('/follows/2')
+      expect(mockService.delete).toHaveBeenCalledWith('/api/follows', { data: { followingId: 2 } })
     })
   })
 
@@ -80,7 +80,7 @@ describe('用户关注接口', () => {
 
       const result = await getMyFollowing()
 
-      expect(mockService.get).toHaveBeenCalledWith('/follows/my/following')
+      expect(mockService.get).toHaveBeenCalledWith('/api/follows/my/following')
       expect(result.data.data).toHaveLength(1)
     })
   })
@@ -105,7 +105,7 @@ describe('用户关注接口', () => {
 
       const result = await getMyFollowers()
 
-      expect(mockService.get).toHaveBeenCalledWith('/follows/my/followers')
+      expect(mockService.get).toHaveBeenCalledWith('/api/follows/my/followers')
       expect(result.data.data).toHaveLength(1)
     })
   })
@@ -119,7 +119,7 @@ describe('用户关注接口', () => {
 
       const result = await getMyFollowingCount()
 
-      expect(mockService.get).toHaveBeenCalledWith('/follows/my/following/count')
+      expect(mockService.get).toHaveBeenCalledWith('/api/follows/my/following/count')
       expect(result.data.data.count).toBe(10)
     })
   })
@@ -133,7 +133,7 @@ describe('用户关注接口', () => {
 
       const result = await getMyFollowersCount()
 
-      expect(mockService.get).toHaveBeenCalledWith('/follows/my/followers/count')
+      expect(mockService.get).toHaveBeenCalledWith('/api/follows/my/followers/count')
       expect(result.data.data.count).toBe(20)
     })
   })
@@ -147,7 +147,7 @@ describe('用户关注接口', () => {
 
       const result = await checkFollowing(2)
 
-      expect(mockService.get).toHaveBeenCalledWith('/follows/check/2')
+      expect(mockService.get).toHaveBeenCalledWith('/api/follows/check', { params: { followingId: 2 } })
       expect(result.data.data.following).toBe(true)
     })
   })
@@ -172,7 +172,7 @@ describe('用户关注接口', () => {
 
       const result = await getUserFollowing(1)
 
-      expect(mockService.get).toHaveBeenCalledWith('/follows/user/1/following')
+      expect(mockService.get).toHaveBeenCalledWith('/api/follows/user/1/following')
       expect(result.data.data).toHaveLength(1)
     })
   })
@@ -197,7 +197,7 @@ describe('用户关注接口', () => {
 
       const result = await getUserFollowers(1)
 
-      expect(mockService.get).toHaveBeenCalledWith('/follows/user/1/followers')
+      expect(mockService.get).toHaveBeenCalledWith('/api/follows/user/1/followers')
       expect(result.data.data).toHaveLength(1)
     })
   })
@@ -211,7 +211,7 @@ describe('用户关注接口', () => {
 
       const result = await getUserFollowingCount(1)
 
-      expect(mockService.get).toHaveBeenCalledWith('/follows/user/1/following/count')
+      expect(mockService.get).toHaveBeenCalledWith('/api/follows/user/1/following/count')
       expect(result.data.data.count).toBe(10)
     })
   })
@@ -225,7 +225,7 @@ describe('用户关注接口', () => {
 
       const result = await getUserFollowersCount(1)
 
-      expect(mockService.get).toHaveBeenCalledWith('/follows/user/1/followers/count')
+      expect(mockService.get).toHaveBeenCalledWith('/api/follows/user/1/followers/count')
       expect(result.data.data.count).toBe(20)
     })
   })

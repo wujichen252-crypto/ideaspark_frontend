@@ -22,7 +22,11 @@
           <div class="spacer"></div>
 
           <!-- 卡片列表 (v-for) -->
-          <div v-for="card in cards" :key="card.id" class="card-item" :data-card-id="card.id">
+          <div
+v-for="card in cards"
+:key="card.id"
+class="card-item"
+:data-card-id="card.id">
             <div class="card-header">
               <span class="card-index">{{ card.id }}</span>
               <span class="card-title">{{ card.title }}</span>
@@ -30,7 +34,11 @@
             <div class="card-visual-placeholder">
               <!-- Priority 1: Image -->
               <picture v-if="card.image && isCardImageReady(card.id)" class="card-picture">
-                <source v-if="card.webpSrcset" type="image/webp" :srcset="card.webpSrcset" :sizes="card.sizes" />
+                <source
+v-if="card.webpSrcset"
+type="image/webp"
+:srcset="card.webpSrcset"
+:sizes="card.sizes" />
                 <img
                   :src="card.image"
                   :srcset="card.jpgSrcset"

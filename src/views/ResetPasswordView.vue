@@ -15,7 +15,11 @@
 
         <div class="input-group">
           <div class="custom-input-wrapper">
-            <input v-model="password" type="password" placeholder="新密码" class="custom-input" />
+            <input
+v-model="password"
+type="password"
+placeholder="新密码"
+class="custom-input" />
             <span class="input-border"></span>
           </div>
           <div class="custom-input-wrapper">

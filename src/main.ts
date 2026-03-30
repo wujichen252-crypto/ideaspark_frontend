@@ -4,6 +4,7 @@ import '@/styles/reset.scss'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+import { setupLazyload } from './plugins/lazyload'
 
 /**
  * 更新滚动条相关 CSS 变量
@@ -31,7 +32,11 @@ if (import.meta.hot) {
 
 const app = createApp(App)
 
+// 注册 Pinia 状态管理
 app.use(store)
+// 注册 Vue Router
 app.use(router)
+// 注册图片懒加载插件
+setupLazyload(app)
 
 app.mount('#app')

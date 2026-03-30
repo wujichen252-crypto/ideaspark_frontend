@@ -44,7 +44,11 @@
                     <n-badge :value="allProjects.length" type="info" class="group-count" />
                   </div>
                   <div class="header-right">
-                    <n-button type="primary" color="#000" size="small" @click="openCreateModal">
+                    <n-button
+type="primary"
+color="#000"
+size="small"
+@click="openCreateModal">
                       <template #icon><n-icon :component="AddOutline" /></template>
                       创建项目
                     </n-button>
@@ -61,8 +65,8 @@
                     v-for="project in allProjects"
                     :key="project.id"
                     class="project-row-card simple-file-row"
-                    @click="handleOpenProject(project.id)"
                     style="cursor: pointer"
+                    @click="handleOpenProject(project.id)"
                   >
                     <div class="file-icon">
                       <n-icon :component="DocumentText" color="#6b7280" size="24" />
@@ -150,7 +154,9 @@
                           type="info"
                           :bordered="false"
                           class="me-tag"
-                          >我</n-tag
+                          >
+我
+</n-tag
                         >
                       </div>
                       <span class="member-sub">{{ formatJoinTime(m.joinedAt) }}</span>
@@ -241,8 +247,13 @@
                 <n-empty :description="`暂无${resourceKindLabel}`">
                   <template #extra>
                     <n-space>
-                      <n-button type="primary" color="#000" @click="openCreateResourceModal"
-                        >新建{{ resourceKindLabel }}</n-button
+                      <n-button
+type="primary"
+color="#000"
+@click="openCreateResourceModal"
+                        >
+新建{{ resourceKindLabel }}
+</n-button
                       >
                       <n-button quaternary @click="resetResourceFilters">清除搜索</n-button>
                     </n-space>
@@ -281,8 +292,13 @@
                 <template #footer>
                   <n-space justify="end">
                     <n-button @click="showCreateResourceModal = false">取消</n-button>
-                    <n-button type="primary" color="#000" @click="handleCreateResource"
-                      >确认创建</n-button
+                    <n-button
+type="primary"
+color="#000"
+@click="handleCreateResource"
+                      >
+确认创建
+</n-button
                     >
                   </n-space>
                 </template>
@@ -332,12 +348,20 @@
           <n-tab-pane name="trash" tab="回收站">
             <div class="trash-container">
               <div class="trash-filter">
-                <n-button text class="filter-trigger"
-                  >所有类型 <n-icon :component="ChevronDownOutline"
-                /></n-button>
-                <n-button text class="filter-trigger"
-                  >删除时间 <n-icon :component="ChevronDownOutline"
-                /></n-button>
+                <n-button
+text
+class="filter-trigger"
+                  >
+所有类型 <n-icon :component="ChevronDownOutline"
+                />
+</n-button>
+                <n-button
+text
+class="filter-trigger"
+                  >
+删除时间 <n-icon :component="ChevronDownOutline"
+                />
+</n-button>
               </div>
               <div class="project-grid">
                 <!-- 示例回收站项目 -->

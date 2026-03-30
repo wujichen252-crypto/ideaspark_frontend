@@ -4,6 +4,10 @@ import globals from 'globals'
 import pluginVue from 'eslint-plugin-vue'
 import tseslint from 'typescript-eslint'
 
+/**
+ * ESLint 配置
+ * @description 配置代码规范规则，包含 TypeScript、Vue 和 Prettier 集成
+ */
 export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -17,10 +21,50 @@ export default tseslint.config(
       }
     },
     rules: {
+      // 基础规则
       'no-undef': 'off',
+      'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+      'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+
+      // TypeScript 规则
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-vars': 'warn',
-      'vue/multi-word-component-names': 'off'
+      '@typescript-eslint/explicit-function-return-type': 'warn',
+      '@typescript-eslint/no-non-null-assertion': 'warn',
+
+      // Vue 规则
+      'vue/multi-word-component-names': 'off',
+      'vue/require-default-prop': 'error',
+      'vue/require-prop-types': 'error',
+      'vue/prop-name-casing': 'error',
+      'vue/custom-event-name-casing': 'error',
+      'vue/attribute-hyphenation': 'error',
+      'vue/html-self-closing': [
+        'error',
+        {
+          html: {
+            void: 'always',
+            normal: 'never',
+            component: 'always'
+          },
+          svg: 'always',
+          math: 'always'
+        }
+      ],
+      'vue/max-attributes-per-line': [
+        'error',
+        {
+          singleline: 3,
+          multiline: 1
+        }
+      ],
+      'vue/singleline-html-element-content-newline': 'off',
+      'vue/multiline-html-element-content-newline': 'error',
+      'vue/no-unused-components': 'warn',
+      'vue/no-unused-vars': 'warn',
+      'vue/no-template-shadow': 'error',
+      'vue/require-component-is': 'error',
+      'vue/no-v-html': 'warn'
     }
   },
   {

@@ -25,7 +25,11 @@
             <div class="project-desc">{{ project.description || '暂无简介' }}</div>
           </div>
         </div>
-        <n-empty v-else description="项目不存在" size="small" class="project-empty" />
+        <n-empty
+v-else
+description="项目不存在"
+size="small"
+class="project-empty" />
 
         <n-divider />
 
@@ -40,7 +44,11 @@
           <div class="content-actions">
             <n-space size="small">
               <template v-if="activeMenuKey === 'home'">
-                <n-button v-if="!isHomeEditing" size="small" :disabled="!project" @click="startHomeEdit">
+                <n-button
+v-if="!isHomeEditing"
+size="small"
+:disabled="!project"
+@click="startHomeEdit">
                   编辑信息
                 </n-button>
                 <template v-else>
@@ -85,10 +93,18 @@
               </div>
             </div>
 
-            <n-grid :cols="24" :x-gap="16" :y-gap="16" class="home-grid">
+            <n-grid
+:cols="24"
+:x-gap="16"
+:y-gap="16"
+class="home-grid">
               <n-grid-item :span="24" :md-span="16">
                 <n-card size="small" class="section-card" title="项目信息">
-                  <n-form v-if="isHomeEditing" :model="homeForm" label-placement="left" label-width="90">
+                  <n-form
+v-if="isHomeEditing"
+:model="homeForm"
+label-placement="left"
+label-width="90">
                     <n-form-item label="项目名称" path="name">
                       <n-input v-model:value="homeForm.name" placeholder="请输入项目名称" />
                     </n-form-item>
@@ -137,7 +153,12 @@
                       <div class="label">标签</div>
                       <div class="value">
                         <n-space v-if="(project.tags || []).length" size="small">
-                          <n-tag v-for="t in project.tags" :key="t" size="small" round :bordered="false">
+                          <n-tag
+v-for="t in project.tags"
+:key="t"
+size="small"
+round
+:bordered="false">
                             {{ t }}
                           </n-tag>
                         </n-space>
@@ -148,7 +169,13 @@
                       <div class="label">关键要素</div>
                       <div class="value">
                         <n-space v-if="(project.techStack || []).length" size="small">
-                          <n-tag v-for="t in project.techStack" :key="t" size="small" round :bordered="false" type="success">
+                          <n-tag
+v-for="t in project.techStack"
+:key="t"
+size="small"
+round
+:bordered="false"
+type="success">
                             {{ t }}
                           </n-tag>
                         </n-space>
@@ -194,7 +221,11 @@
                         <div class="file-meta">{{ formatDateTime(f.updatedAt) }}</div>
                       </div>
                       <template #suffix>
-                        <n-tag size="small" round :bordered="false" :type="fileTypeTagType(f.type)">
+                        <n-tag
+size="small"
+round
+:bordered="false"
+:type="fileTypeTagType(f.type)">
                           {{ fileTypeLabel(f.type) }}
                         </n-tag>
                       </template>
@@ -217,7 +248,11 @@
 
           <div v-else-if="activeMenuKey === 'files'" class="panel">
             <div class="files-toolbar">
-              <n-input v-model:value="fileSearch" placeholder="搜索文件..." clearable class="files-search" />
+              <n-input
+v-model:value="fileSearch"
+placeholder="搜索文件..."
+clearable
+class="files-search" />
               <n-button type="primary" @click="openAddFileModal">新增文件</n-button>
             </div>
             <n-card size="small" title="文件列表" class="section-card">
@@ -235,7 +270,11 @@
                     </div>
                   </div>
                   <template #suffix>
-                    <n-tag size="small" round :bordered="false" :type="fileTypeTagType(f.type)">
+                    <n-tag
+size="small"
+round
+:bordered="false"
+:type="fileTypeTagType(f.type)">
                       {{ fileTypeLabel(f.type) }}
                     </n-tag>
                   </template>
@@ -318,7 +357,12 @@
                 </n-radio-group>
               </div>
               <div class="toolbar-right">
-                <n-input v-model:value="keyword" placeholder="搜索插件/工具..." clearable size="small" class="search-input" />
+                <n-input
+v-model:value="keyword"
+placeholder="搜索插件/工具..."
+clearable
+size="small"
+class="search-input" />
               </div>
             </div>
 
@@ -344,7 +388,13 @@
                     </div>
                     <template #footer>
                       <div class="plugin-footer">
-                        <n-tag size="small" round :bordered="false" type="success">已启用</n-tag>
+                        <n-tag
+size="small"
+round
+:bordered="false"
+type="success">
+已启用
+</n-tag>
                         <n-button size="tiny" secondary @click.stop="openPlugin(p.id)">使用</n-button>
                       </div>
                     </template>
@@ -374,7 +424,11 @@
                     </div>
                     <template #footer>
                       <div class="plugin-footer">
-                        <n-tag size="small" round :bordered="false" :type="p.source === 'official' ? 'info' : 'warning'">
+                        <n-tag
+size="small"
+round
+:bordered="false"
+:type="p.source === 'official' ? 'info' : 'warning'">
                           {{ p.source === 'official' ? '官方' : '社区' }}
                         </n-tag>
                         <n-button
@@ -401,7 +455,11 @@
         <n-drawer-content :title="activePlugin?.name || '工具'">
           <div v-if="activePlugin" class="tool-body">
             <n-space vertical size="small">
-              <n-tag size="small" round :bordered="false" :type="activePlugin.source === 'official' ? 'info' : 'warning'">
+              <n-tag
+size="small"
+round
+:bordered="false"
+:type="activePlugin.source === 'official' ? 'info' : 'warning'">
                 {{ activePlugin.source === 'official' ? '官方插件' : '社区插件' }}
               </n-tag>
 
@@ -419,7 +477,11 @@
                           AI 生成
                         </n-button>
                         <n-button size="tiny" secondary @click="addPptSlide">新增</n-button>
-                        <n-button size="tiny" tertiary :disabled="pptSlideBlocks.length <= 1" @click="removeActivePptSlide">
+                        <n-button
+size="tiny"
+tertiary
+:disabled="pptSlideBlocks.length <= 1"
+@click="removeActivePptSlide">
                           删除
                         </n-button>
                       </n-space>
@@ -448,7 +510,11 @@
                   </div>
                 </div>
 
-                <n-modal v-model:show="showPptAiModal" preset="dialog" title="AI 生成 PPT（可编辑）" :mask-closable="!pptAiGenerating">
+                <n-modal
+v-model:show="showPptAiModal"
+preset="dialog"
+title="AI 生成 PPT（可编辑）"
+:mask-closable="!pptAiGenerating">
                   <n-space vertical size="small">
                     <n-form :model="pptAiForm" label-placement="left" label-width="80">
                       <n-form-item label="主题" path="topic">

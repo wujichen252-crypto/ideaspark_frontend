@@ -18,18 +18,34 @@
             @blur="handleSaveTitle"
           />
         </div>
-        <n-tag v-if="saveStatus === 'saved'" type="success" size="small" :bordered="false">
+        <n-tag
+v-if="saveStatus === 'saved'"
+type="success"
+size="small"
+:bordered="false">
           已保存
         </n-tag>
-        <n-tag v-else-if="saveStatus === 'saving'" type="warning" size="small" :bordered="false">
+        <n-tag
+v-else-if="saveStatus === 'saving'"
+type="warning"
+size="small"
+:bordered="false">
           保存中...
         </n-tag>
       </div>
       <div class="header-right">
-        <n-button secondary type="primary" size="small" @click="handleExport">
+        <n-button
+secondary
+type="primary"
+size="small"
+@click="handleExport">
           导出
         </n-button>
-        <n-button secondary type="info" size="small" @click="showChat = !showChat">
+        <n-button
+secondary
+type="info"
+size="small"
+@click="showChat = !showChat">
           <template #icon>
             <n-icon :component="ChatboxEllipsesOutline" />
           </template>

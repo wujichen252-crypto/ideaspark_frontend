@@ -164,10 +164,16 @@ onUnmounted(() => {
           </n-dropdown>
 
           <!-- 未登录状态 -->
-          <n-button v-else quaternary class="login-btn" @click="router.push('/login')">
+          <n-button
+v-else
+quaternary
+class="login-btn"
+@click="router.push('/login')">
             <template #icon
-              ><n-icon><PersonOutline /></n-icon
-            ></template>
+              >
+<n-icon><PersonOutline /></n-icon
+            >
+</template>
             登录 / 注册
           </n-button>
         </n-space>

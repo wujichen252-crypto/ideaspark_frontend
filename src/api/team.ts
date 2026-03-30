@@ -59,7 +59,7 @@ export function getMyTeams(params?: { page?: number; size?: number }) {
  * @param uuid - 团队 UUID
  */
 export function getTeamDetail(uuid: string) {
-  return service.get<ApiResponse<TeamDetail>>(`/api/teams/detail?uuid=${uuid}`)
+  return service.get<ApiResponse<TeamDetail>>(`/api/teams/${uuid}`)
 }
 
 /**
@@ -68,7 +68,7 @@ export function getTeamDetail(uuid: string) {
  * @param params - 更新参数
  */
 export function updateTeam(uuid: string, params: UpdateTeamParams) {
-  return service.put<ApiResponse<Team>>('/api/teams/update', { uuid, ...params })
+  return service.put<ApiResponse<Team>>(`/api/teams/${uuid}`, params)
 }
 
 /**
@@ -84,7 +84,7 @@ export function createCollaborationTeam(params: CreateTeamParams) {
  * @param uuid - 团队 UUID
  */
 export function dissolveTeam(uuid: string) {
-  return service.delete<ApiResponse<{ uuid: string }>>('/api/teams/dissolve', { data: { uuid } })
+  return service.delete<ApiResponse<{ uuid: string }>>(`/api/teams/${uuid}`)
 }
 
 /**
@@ -93,9 +93,7 @@ export function dissolveTeam(uuid: string) {
  * @param params - 分页参数
  */
 export function getTeamMembers(uuid: string, params?: { page?: number; size?: number }) {
-  return service.get<ApiResponse<TeamMembersResult>>('/api/teams/members', { 
-    params: { uuid, ...params } 
-  })
+  return service.get<ApiResponse<TeamMembersResult>>(`/api/teams/${uuid}/members`, { params })
 }
 
 /**
@@ -106,8 +104,8 @@ export function getTeamMembers(uuid: string, params?: { page?: number; size?: nu
  */
 export function updateMemberRole(uuid: string, memberId: string | number, params: UpdateMemberRoleParams) {
   return service.put<ApiResponse<{ memberId: string; role: string }>>(
-    '/api/teams/members/role',
-    { uuid, memberId, ...params }
+    `/api/teams/${uuid}/members/${memberId}/role`,
+    params
   )
 }
 
@@ -117,9 +115,7 @@ export function updateMemberRole(uuid: string, memberId: string | number, params
  * @param memberId - 成员 ID
  */
 export function removeMember(uuid: string, memberId: string | number) {
-  return service.delete<ApiResponse<{ memberId: string }>>('/api/teams/members/remove', {
-    data: { uuid, memberId }
-  })
+  return service.delete<ApiResponse<{ memberId: string }>>(`/api/teams/${uuid}/members/${memberId}`)
 }
 
 /**
@@ -127,9 +123,7 @@ export function removeMember(uuid: string, memberId: string | number) {
  * @param uuid - 团队 UUID
  */
 export function leaveTeam(uuid: string) {
-  return service.delete<ApiResponse<{ uuid: string }>>('/api/teams/members/exit', {
-    data: { uuid }
-  })
+  return service.delete<ApiResponse<{ uuid: string }>>(`/api/teams/${uuid}/members/self`)
 }
 
 /**
@@ -139,8 +133,8 @@ export function leaveTeam(uuid: string) {
  */
 export function transferOwnership(uuid: string, params: TransferOwnershipParams) {
   return service.post<ApiResponse<{ uuid: string; newOwnerId: number }>>(
-    '/api/teams/transfer-ownership',
-    { uuid, ...params }
+    `/api/teams/${uuid}/transfer-ownership`,
+    params
   )
 }
 
@@ -151,8 +145,8 @@ export function transferOwnership(uuid: string, params: TransferOwnershipParams)
  */
 export function sendInvitation(uuid: string, params: InviteParams) {
   return service.post<ApiResponse<{ invitations: InvitationItem[] }>>(
-    '/api/teams/invitations',
-    { uuid, ...params }
+    `/api/teams/${uuid}/invitations`,
+    params
   )
 }
 

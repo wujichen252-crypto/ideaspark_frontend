@@ -5,7 +5,11 @@
       <n-grid-item>
         <n-card title="MVP 功能清单 (最小可行性产品)" size="small" class="h-full">
           <template #header-extra>
-            <n-button text size="tiny" type="primary" @click="askAI('帮我规划 MVP 的核心功能列表，只要最关键的 3-5 个')">
+            <n-button
+text
+size="tiny"
+type="primary"
+@click="askAI('帮我规划 MVP 的核心功能列表，只要最关键的 3-5 个')">
               <template #icon><n-icon><ListOutline /></n-icon></template>
               AI 规划
             </n-button>
@@ -31,7 +35,11 @@
       <n-grid-item>
         <n-card title="核心用户流程 (User Flow)" size="small" class="h-full">
           <template #header-extra>
-            <n-button text size="tiny" type="primary" @click="askAI('设计一个用户完成核心任务的标准流程步骤')">
+            <n-button
+text
+size="tiny"
+type="primary"
+@click="askAI('设计一个用户完成核心任务的标准流程步骤')">
               <template #icon><n-icon><GitNetworkOutline /></n-icon></template>
               AI 设计
             </n-button>
@@ -47,7 +55,13 @@
             <n-step title="结束" status="finish" />
           </n-steps>
           <div class="mt-2">
-            <n-button dashed size="small" block @click="userFlows.push('')">添加步骤</n-button>
+            <n-button
+dashed
+size="small"
+block
+@click="userFlows.push('')">
+添加步骤
+</n-button>
           </div>
         </n-card>
       </n-grid-item>
@@ -57,7 +71,11 @@
     <div class="structure-section mt-4">
       <n-card title="产品方案文档 (Output)" size="small">
         <template #header-extra>
-           <n-button size="small" type="primary" secondary @click="generateDoc">
+           <n-button
+size="small"
+type="primary"
+secondary
+@click="generateDoc">
              <template #icon><n-icon><DocumentTextOutline /></n-icon></template>
              生成方案文档
            </n-button>

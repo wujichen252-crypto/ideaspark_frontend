@@ -2,7 +2,11 @@
   <div class="workbench-container">
     <n-layout has-sider class="workbench-layout">
       <!-- 左侧菜单栏 -->
-      <n-layout-sider bordered width="240" :native-scrollbar="false" class="workbench-sider">
+      <n-layout-sider
+bordered
+width="240"
+:native-scrollbar="false"
+class="workbench-sider">
         <n-menu
           :value="activeKey"
           :options="menuOptions"

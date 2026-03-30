@@ -6,7 +6,11 @@
         <span class="view-subtitle">管理您的所有项目和文档</span>
       </div>
       <div class="header-right">
-        <n-button type="primary" color="#000" style="margin-right: 12px" @click="handleCreateClick">
+        <n-button
+type="primary"
+color="#000"
+style="margin-right: 12px"
+@click="handleCreateClick">
           <template #icon>
             <n-icon :component="AddOutline" />
           </template>
@@ -53,12 +57,28 @@
           >
             <div class="card-cover" :style="{ backgroundImage: project.cover ? `url(${project.cover})` : 'none' }">
               <div v-if="!project.cover" class="default-cover">
-                <n-icon v-if="project.category && project.category.includes('设计')" :component="ImageOutline" color="#f59e0b" size="32" />
-                <n-icon v-else-if="project.category && project.category.includes('代码')" :component="CodeSlashOutline" color="#3b82f6" size="32" />
-                <n-icon v-else :component="BulbOutline" color="#10b981" size="32" />
+                <n-icon
+v-if="project.category && project.category.includes('设计')"
+:component="ImageOutline"
+color="#f59e0b"
+size="32" />
+                <n-icon
+v-else-if="project.category && project.category.includes('代码')"
+:component="CodeSlashOutline"
+color="#3b82f6"
+size="32" />
+                <n-icon
+v-else
+:component="BulbOutline"
+color="#10b981"
+size="32" />
               </div>
               <div class="card-overlay">
-                <n-button ghost size="tiny" color="#fff" @click.stop="handleOpenProject(project.id)">
+                <n-button
+ghost
+size="tiny"
+color="#fff"
+@click.stop="handleOpenProject(project.id)">
                   进入
                 </n-button>
               </div>
@@ -73,7 +93,11 @@
                   @select="(key) => handleCardAction(key, project.id)"
                   @click.stop
                 >
-                  <n-button text size="tiny" class="more-btn" @click.stop>
+                  <n-button
+text
+size="tiny"
+class="more-btn"
+@click.stop>
                     <template #icon><n-icon :component="EllipsisHorizontal" /></template>
                   </n-button>
                 </n-dropdown>
@@ -82,7 +106,12 @@
               <p class="card-desc" :title="project.description">{{ project.description || '暂无描述' }}</p>
               
               <div class="card-footer">
-                <n-tag v-if="project.category" size="tiny" :bordered="false" type="info" class="category-tag">
+                <n-tag
+v-if="project.category"
+size="tiny"
+:bordered="false"
+type="info"
+class="category-tag">
                   {{ project.category }}
                 </n-tag>
                 <span class="time-text">{{ formatTime(project.updatedAt) }}</span>

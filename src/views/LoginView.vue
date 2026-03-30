@@ -16,18 +16,24 @@
           <div class="social-container">
             <n-button circle size="large" class="social-btn">
               <template #icon
-                ><n-icon><LogoGoogle /></n-icon
-              ></template>
+                >
+<n-icon><LogoGoogle /></n-icon
+              >
+</template>
             </n-button>
             <n-button circle size="large" class="social-btn">
               <template #icon
-                ><n-icon><LogoGithub /></n-icon
-              ></template>
+                >
+<n-icon><LogoGithub /></n-icon
+              >
+</template>
             </n-button>
             <n-button circle size="large" class="social-btn">
               <template #icon
-                ><n-icon><LogoLinkedin /></n-icon
-              ></template>
+                >
+<n-icon><LogoLinkedin /></n-icon
+              >
+</template>
             </n-button>
           </div>
           <span class="divider-text">或使用邮箱注册</span>
@@ -78,18 +84,24 @@
           <div class="social-container">
             <n-button circle size="large" class="social-btn">
               <template #icon
-                ><n-icon><LogoGoogle /></n-icon
-              ></template>
+                >
+<n-icon><LogoGoogle /></n-icon
+              >
+</template>
             </n-button>
             <n-button circle size="large" class="social-btn">
               <template #icon
-                ><n-icon><LogoGithub /></n-icon
-              ></template>
+                >
+<n-icon><LogoGithub /></n-icon
+              >
+</template>
             </n-button>
             <n-button circle size="large" class="social-btn">
               <template #icon
-                ><n-icon><LogoLinkedin /></n-icon
-              ></template>
+                >
+<n-icon><LogoLinkedin /></n-icon
+              >
+</template>
             </n-button>
           </div>
           <span class="divider-text">或使用您的账号</span>

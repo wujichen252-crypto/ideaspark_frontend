@@ -53,7 +53,7 @@ describe('团队管理接口', () => {
 
       const result = await getMyTeams({ page: 1, size: 10 })
 
-      expect(mockService.get).toHaveBeenCalledWith('/teams/my', { params: { page: 1, size: 10 } })
+      expect(mockService.get).toHaveBeenCalledWith('/api/teams/my', { params: { page: 1, size: 10 } })
       expect(result.data.data.teams).toHaveLength(1)
     })
   })
@@ -80,7 +80,7 @@ describe('团队管理接口', () => {
 
       const result = await getTeamDetail('team-123')
 
-      expect(mockService.get).toHaveBeenCalledWith('/teams/team-123')
+      expect(mockService.get).toHaveBeenCalledWith('/api/teams/team-123')
       expect(result.data.data.uuid).toBe('team-123')
     })
   })
@@ -98,7 +98,7 @@ describe('团队管理接口', () => {
 
       const result = await updateTeam('team-123', { name: '新团队名', description: '新描述' })
 
-      expect(mockService.put).toHaveBeenCalledWith('/teams/team-123', { name: '新团队名', description: '新描述' })
+      expect(mockService.put).toHaveBeenCalledWith('/api/teams/team-123', { name: '新团队名', description: '新描述' })
       expect(result.data.data.name).toBe('新团队名')
     })
   })
@@ -125,7 +125,7 @@ describe('团队管理接口', () => {
 
       const result = await createCollaborationTeam({ name: '新团队', description: '' })
 
-      expect(mockService.post).toHaveBeenCalledWith('/teams/collaboration', { name: '新团队', description: '' })
+      expect(mockService.post).toHaveBeenCalledWith('/api/teams/collaboration', { name: '新团队', description: '' })
       expect(result.data.data.uuid).toBe('team-456')
     })
   })
@@ -139,7 +139,7 @@ describe('团队管理接口', () => {
 
       await dissolveTeam('team-123')
 
-      expect(mockService.delete).toHaveBeenCalledWith('/teams/team-123')
+      expect(mockService.delete).toHaveBeenCalledWith('/api/teams/team-123')
     })
   })
 
@@ -161,7 +161,7 @@ describe('团队管理接口', () => {
 
       const result = await getTeamMembers('team-123', { page: 1, size: 10 })
 
-      expect(mockService.get).toHaveBeenCalledWith('/teams/team-123/members', { params: { page: 1, size: 10 } })
+      expect(mockService.get).toHaveBeenCalledWith('/api/teams/team-123/members', { params: { page: 1, size: 10 } })
       expect(result.data.data.members).toHaveLength(1)
     })
   })
@@ -175,7 +175,7 @@ describe('团队管理接口', () => {
 
       await updateMemberRole('team-123', '1', { role: 'ADMIN' })
 
-      expect(mockService.put).toHaveBeenCalledWith('/teams/team-123/members/1/role', { role: 'ADMIN' })
+      expect(mockService.put).toHaveBeenCalledWith('/api/teams/team-123/members/1/role', { role: 'ADMIN' })
     })
   })
 
@@ -188,7 +188,7 @@ describe('团队管理接口', () => {
 
       await removeMember('team-123', '2')
 
-      expect(mockService.delete).toHaveBeenCalledWith('/teams/team-123/members/2')
+      expect(mockService.delete).toHaveBeenCalledWith('/api/teams/team-123/members/2')
     })
   })
 
@@ -201,7 +201,7 @@ describe('团队管理接口', () => {
 
       await leaveTeam('team-123')
 
-      expect(mockService.delete).toHaveBeenCalledWith('/teams/team-123/members/self')
+      expect(mockService.delete).toHaveBeenCalledWith('/api/teams/team-123/members/self')
     })
   })
 
@@ -214,7 +214,7 @@ describe('团队管理接口', () => {
 
       await transferOwnership('team-123', { newOwnerId: 2 })
 
-      expect(mockService.post).toHaveBeenCalledWith('/teams/team-123/transfer-ownership', { newOwnerId: 2 })
+      expect(mockService.post).toHaveBeenCalledWith('/api/teams/team-123/transfer-ownership', { newOwnerId: 2 })
     })
   })
 
@@ -235,7 +235,7 @@ describe('团队管理接口', () => {
 
       await sendInvitation('team-123', { inviteeIds: [2, 3], message: '欢迎加入' })
 
-      expect(mockService.post).toHaveBeenCalledWith('/teams/team-123/invitations', {
+      expect(mockService.post).toHaveBeenCalledWith('/api/teams/team-123/invitations', {
         inviteeIds: [2, 3],
         message: '欢迎加入'
       })

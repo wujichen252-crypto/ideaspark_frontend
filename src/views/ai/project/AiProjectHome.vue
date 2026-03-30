@@ -6,7 +6,13 @@
       <div class="hero-content">
         <div class="project-badge">
           <n-tag type="primary" size="small" round>{{ store.projectInfo.category || '未分类' }}</n-tag>
-          <n-tag :type="statusType" size="small" round class="ml-2">{{ statusLabel }}</n-tag>
+          <n-tag
+:type="statusType"
+size="small"
+round
+class="ml-2">
+{{ statusLabel }}
+</n-tag>
         </div>
         <h1 class="hero-title">{{ store.projectInfo.name || '未命名项目' }}</h1>
         <p class="hero-subtitle">{{ store.projectInfo.description || '暂无简述' }}</p>
@@ -37,10 +43,18 @@
             <div class="tech-stack-section">
               <h3 class="section-title">技术栈</h3>
               <n-space>
-                <n-tag v-for="tech in store.projectInfo.techStack" :key="tech" type="info" secondary>
+                <n-tag
+v-for="tech in store.projectInfo.techStack"
+:key="tech"
+type="info"
+secondary>
                   {{ tech }}
                 </n-tag>
-                <n-tag v-if="(!store.projectInfo.techStack || store.projectInfo.techStack.length === 0)" type="default" disabled dashed>
+                <n-tag
+v-if="(!store.projectInfo.techStack || store.projectInfo.techStack.length === 0)"
+type="default"
+disabled
+dashed>
                   暂无技术栈信息
                 </n-tag>
               </n-space>
@@ -50,9 +64,22 @@
           <!-- Recent Activity (Mock) -->
           <n-card title="最近动态" class="content-card mt-4" :bordered="false">
             <n-timeline>
-              <n-timeline-item type="success" title="项目初始化" :time="formatDate(store.projectInfo.updatedAt)" content="创建了项目并完成了基础配置。" />
-              <n-timeline-item type="info" title="进入构思阶段" :time="formatDate(store.projectInfo.updatedAt + 100000)" content="AI 助手协助梳理了核心功能点。" />
-              <n-timeline-item v-if="store.currentModule !== 'idea'" type="warning" title="进入规划阶段" :time="formatDate(Date.now())" content="开始设计产品方案与细节。" />
+              <n-timeline-item
+type="success"
+title="项目初始化"
+:time="formatDate(store.projectInfo.updatedAt)"
+content="创建了项目并完成了基础配置。" />
+              <n-timeline-item
+type="info"
+title="进入构思阶段"
+:time="formatDate(store.projectInfo.updatedAt + 100000)"
+content="AI 助手协助梳理了核心功能点。" />
+              <n-timeline-item
+v-if="store.currentModule !== 'idea'"
+type="warning"
+title="进入规划阶段"
+:time="formatDate(Date.now())"
+content="开始设计产品方案与细节。" />
             </n-timeline>
           </n-card>
         </n-grid-item>
@@ -82,7 +109,12 @@
               </div>
             </div>
             
-            <n-button type="primary" block size="large" class="mt-6" @click="router.push({ name: 'AiProjectWorkbench' })">
+            <n-button
+type="primary"
+block
+size="large"
+class="mt-6"
+@click="router.push({ name: 'AiProjectWorkbench' })">
               进入工作台
               <template #icon>
                 <n-icon><ArrowForward /></n-icon>
@@ -91,7 +123,11 @@
           </n-card>
           
           <!-- Team Card -->
-          <n-card title="项目成员" class="sidebar-card mt-4" size="small" :bordered="false">
+          <n-card
+title="项目成员"
+class="sidebar-card mt-4"
+size="small"
+:bordered="false">
             <n-list>
               <n-list-item v-for="member in store.projectInfo.team" :key="member.id">
                 <template #prefix>
@@ -108,10 +144,20 @@
           </n-card>
 
           <!-- Artifacts Summary -->
-          <n-card title="产出物概览" class="sidebar-card mt-4" size="small" :bordered="false">
+          <n-card
+title="产出物概览"
+class="sidebar-card mt-4"
+size="small"
+:bordered="false">
             <n-empty v-if="!hasArtifacts" description="暂无产出物" size="small">
               <template #extra>
-                <n-button text type="primary" size="small" @click="router.push({ name: 'AiProjectWorkbench' })">去生成</n-button>
+                <n-button
+text
+type="primary"
+size="small"
+@click="router.push({ name: 'AiProjectWorkbench' })">
+去生成
+</n-button>
               </template>
             </n-empty>
             <div v-else>

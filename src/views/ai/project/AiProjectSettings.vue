@@ -51,7 +51,13 @@
                     <div v-if="formModel.cover" class="cover-preview mt-2">
                       <img :src="formModel.cover" alt="Cover Preview" @error="handleImageError" />
                       <div class="cover-actions">
-                        <n-button size="tiny" type="error" ghost @click="formModel.cover = ''">移除</n-button>
+                        <n-button
+size="tiny"
+type="error"
+ghost
+@click="formModel.cover = ''">
+移除
+</n-button>
                       </div>
                     </div>
                   </n-form-item-gi>

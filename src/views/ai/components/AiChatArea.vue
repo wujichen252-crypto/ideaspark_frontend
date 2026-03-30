@@ -3,7 +3,13 @@
     <div v-if="mode === 'full'" class="chat-header">
       <div class="model-selector">
         <span class="label">AI 导师在线</span>
-        <n-tag type="success" size="small" round bordered>已连接</n-tag>
+        <n-tag
+type="success"
+size="small"
+round
+bordered>
+已连接
+</n-tag>
       </div>
       <div class="header-actions">
         <n-button quaternary size="small" @click="emit('toggle-settings')">

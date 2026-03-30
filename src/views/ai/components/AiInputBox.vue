@@ -11,7 +11,11 @@
           上传文件 (暂未开放)
         </n-tooltip>
         
-        <n-popselect v-model:value="promptValue" :options="promptOptions" trigger="click" @update:value="onSelectPrompt">
+        <n-popselect
+v-model:value="promptValue"
+:options="promptOptions"
+trigger="click"
+@update:value="onSelectPrompt">
           <n-button quaternary circle size="small">
             <template #icon><n-icon><FlashOutline /></n-icon></template>
           </n-button>

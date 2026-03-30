@@ -37,7 +37,7 @@ describe('用户管理接口', () => {
 
       const result = await login({ email: 'test@example.com', password: 'password123' })
 
-      expect(mockService.post).toHaveBeenCalledWith('/user/login', {
+      expect(mockService.post).toHaveBeenCalledWith('/api/user/login', {
         email: 'test@example.com',
         password: 'password123'
       })
@@ -62,7 +62,7 @@ describe('用户管理接口', () => {
         password: 'password123'
       })
 
-      expect(mockService.post).toHaveBeenCalledWith('/user/register', {
+      expect(mockService.post).toHaveBeenCalledWith('/api/user/register', {
         username: '张三',
         email: 'test@example.com',
         password: 'password123'
@@ -84,7 +84,7 @@ describe('用户管理接口', () => {
 
       const result = await updateUser({ username: '李四', email: 'new@example.com' })
 
-      expect(mockService.post).toHaveBeenCalledWith('/user/update', {
+      expect(mockService.post).toHaveBeenCalledWith('/api/user/update', {
         username: '李四',
         email: 'new@example.com'
       })
@@ -111,7 +111,7 @@ describe('用户管理接口', () => {
 
       const result = await getAllUsers({ page: 1, size: 10 })
 
-      expect(mockService.get).toHaveBeenCalledWith('/user/getAllUsers', { params: { page: 1, size: 10 } })
+      expect(mockService.get).toHaveBeenCalledWith('/api/user/getAllUsers', { params: { page: 1, size: 10 } })
       expect(result.data.data.content).toHaveLength(1)
     })
   })
@@ -125,7 +125,7 @@ describe('用户管理接口', () => {
 
       await deleteUsers({ userIds: [1, 2, 3] })
 
-      expect(mockService.post).toHaveBeenCalledWith('/user/deleteUsers', { userIds: [1, 2, 3] })
+      expect(mockService.post).toHaveBeenCalledWith('/api/user/deleteUsers', { userIds: [1, 2, 3] })
     })
   })
 })

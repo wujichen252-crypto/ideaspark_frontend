@@ -33,8 +33,7 @@
       <!-- 筛选器 -->
       <div class="filter-bar">
         <n-space justify="space-between" align="center">
-
-          <!-- 左侧筛选 -->
+<!-- 左侧筛选 -->
           <n-space>
             <n-select
               v-model:value="sort"
@@ -78,7 +77,11 @@
       </div>
 
       <!-- 市场卡片内容区域 -->
-      <n-grid :cols="3" x-gap="20" y-gap="20" class="market-grid">
+      <n-grid
+:cols="3"
+x-gap="20"
+y-gap="20"
+class="market-grid">
         <n-gi v-for="item in items" :key="item.id">
           <n-card hoverable>
             <img :src="item.cover" class="cover" />

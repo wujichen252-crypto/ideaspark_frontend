@@ -1,7 +1,11 @@
 <template>
   <div class="create-post-container">
     <div class="create-content">
-      <n-card :bordered="false" title="发布新动态" size="large" class="editor-card">
+      <n-card
+:bordered="false"
+title="发布新动态"
+size="large"
+class="editor-card">
         <template #header-extra>
           <n-button text @click="$router.back()">
             <template #icon><n-icon :component="CloseOutline" /></template>
@@ -73,7 +77,11 @@
         <template #action>
           <div class="form-actions">
             <n-button size="large" @click="$router.back()">取消</n-button>
-            <n-button type="primary" size="large" :loading="submitting" @click="handleSubmit">
+            <n-button
+type="primary"
+size="large"
+:loading="submitting"
+@click="handleSubmit">
               立即发布
             </n-button>
           </div>

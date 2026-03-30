@@ -25,7 +25,11 @@
           </n-radio-group>
         </div>
         <div class="filter-right">
-          <n-input v-model:value="officialSearch" placeholder="搜索官方插件..." clearable round>
+          <n-input
+v-model:value="officialSearch"
+placeholder="搜索官方插件..."
+clearable
+round>
             <template #prefix>
               <n-icon :component="SearchOutline" />
             </template>
@@ -33,7 +37,11 @@
         </div>
       </div>
       
-      <n-grid x-gap="20" y-gap="20" cols="1 s:2 m:3 l:4" responsive="screen">
+      <n-grid
+x-gap="20"
+y-gap="20"
+cols="1 s:2 m:3 l:4"
+responsive="screen">
         <n-grid-item v-for="item in filteredOfficialPlugins" :key="item.id">
           <PluginCard
             :title="item.title"
@@ -73,7 +81,11 @@
             />
         </div>
         <div class="filter-right">
-          <n-input v-model:value="communitySearch" placeholder="搜索社区插件..." clearable round>
+          <n-input
+v-model:value="communitySearch"
+placeholder="搜索社区插件..."
+clearable
+round>
             <template #prefix>
               <n-icon :component="SearchOutline" />
             </template>
@@ -81,7 +93,11 @@
         </div>
       </div>
 
-      <n-grid x-gap="16" y-gap="16" cols="1 s:2 m:3 l:4" responsive="screen">
+      <n-grid
+x-gap="16"
+y-gap="16"
+cols="1 s:2 m:3 l:4"
+responsive="screen">
         <n-grid-item v-for="plugin in filteredCommunityPlugins" :key="plugin.id">
           <PluginCard
             :title="plugin.name"

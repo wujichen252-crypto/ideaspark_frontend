@@ -65,7 +65,11 @@
           <div class="header-actions">
             <n-tooltip trigger="hover">
               <template #trigger>
-                <n-button circle quaternary size="small" @click="$router.push('/notifications')">
+                <n-button
+circle
+quaternary
+size="small"
+@click="$router.push('/notifications')">
                   <template #icon><n-icon :component="NotificationsOutline" /></template>
                 </n-button>
               </template>
@@ -108,7 +112,12 @@
             </div>
 
             <!-- 数据卡片 -->
-            <n-grid :x-gap="24" :y-gap="24" cols="1 s:2 m:4" responsive="screen" class="mb-8">
+            <n-grid
+:x-gap="24"
+:y-gap="24"
+cols="1 s:2 m:4"
+responsive="screen"
+class="mb-8">
               <n-grid-item>
                 <n-card size="small" class="stat-card" :bordered="false">
                   <div class="stat-header">
@@ -160,7 +169,11 @@
             </n-grid>
 
             <!-- 图表与列表 -->
-            <n-grid :x-gap="24" :y-gap="24" cols="1 l:3" responsive="screen">
+            <n-grid
+:x-gap="24"
+:y-gap="24"
+cols="1 l:3"
+responsive="screen">
               <n-grid-item span="2">
                 <n-card title="流量趋势" :bordered="false" class="chart-card">
                   <div ref="trafficChartRef" style="width: 100%; height: 320px"></div>
@@ -196,8 +209,10 @@
                 <div style="display: flex; gap: 12px">
                   <n-input placeholder="搜索项目..." size="small" style="width: 240px">
                     <template #prefix
-                      ><n-icon><Search /></n-icon
-                    ></template>
+                      >
+<n-icon><Search /></n-icon
+                    >
+</template>
                   </n-input>
                   <n-button
                     type="primary"
@@ -206,14 +221,20 @@
                     @click="$router.push('/create')"
                   >
                     <template #icon
-                      ><n-icon><AddOutline /></n-icon
-                    ></template>
+                      >
+<n-icon><AddOutline /></n-icon
+                    >
+</template>
                     新建
                   </n-button>
                 </div>
               </template>
 
-              <n-tabs v-model:value="projectTab" type="line" animated class="minimal-tabs">
+              <n-tabs
+v-model:value="projectTab"
+type="line"
+animated
+class="minimal-tabs">
                 <n-tab-pane name="all" tab="全部" />
                 <n-tab-pane name="active" tab="进行中" />
                 <n-tab-pane name="completed" tab="已完成" />
@@ -248,7 +269,12 @@
             </div>
 
             <!-- KPI Cards -->
-            <n-grid :x-gap="24" :y-gap="24" cols="1 s:2 m:4" responsive="screen" class="mb-8">
+            <n-grid
+:x-gap="24"
+:y-gap="24"
+cols="1 s:2 m:4"
+responsive="screen"
+class="mb-8">
               <n-grid-item>
                 <n-card size="small" :bordered="false" class="stat-card">
                   <n-statistic label="活跃用户数" value="18,930">

@@ -31,7 +31,11 @@
             </div>
             <h2 class="project-name">{{ projectInfo.name }}</h2>
             <div class="project-status">
-              <n-tag type="success" size="small" round bordered>
+              <n-tag
+type="success"
+size="small"
+round
+bordered>
                 <template #icon><n-icon><RadioButtonOn /></n-icon></template>
                 执行中
               </n-tag>
@@ -63,7 +67,11 @@
               <n-avatar-group :options="teamAvatars" :size="32" :max="3" />
             </div>
             <!-- 邀请按钮 -->
-            <n-button type="primary" secondary round @click="showInviteModal = true">
+            <n-button
+type="primary"
+secondary
+round
+@click="showInviteModal = true">
               <template #icon><n-icon><PersonAddOutline /></n-icon></template>
               邀请成员
             </n-button>
@@ -76,8 +84,7 @@
 
         <!-- 内容区域 -->
         <div class="content-body custom-scrollbar">
-          
-          <!-- 1. 任务看板 -->
+<!-- 1. 任务看板 -->
           <div v-if="activeKey === 'board'" class="view-wrapper board-view">
             <AiProjectBoard />
           </div>
@@ -166,13 +173,16 @@
           <div v-if="activeKey === 'settings'" class="view-wrapper settings-view">
             <AiProjectSettings embedded />
           </div>
-
-        </div>
+</div>
       </n-layout-content>
     </n-layout>
 
     <!-- 邀请弹窗 -->
-    <n-modal v-model:show="showInviteModal" preset="card" title="邀请新成员" style="width: 400px">
+    <n-modal
+v-model:show="showInviteModal"
+preset="card"
+title="邀请新成员"
+style="width: 400px">
       <div class="p-4">
         <p class="mb-2 text-gray-500">通过邮箱邀请成员加入项目协作</p>
         <n-input placeholder="user@example.com" size="large">

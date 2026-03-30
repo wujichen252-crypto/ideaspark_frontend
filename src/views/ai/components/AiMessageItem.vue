@@ -51,10 +51,18 @@
       </div>
       
       <div v-if="message.role === 'ai' && message.status !== 'loading'" class="message-actions">
-        <n-button size="tiny" quaternary circle @click="handleSaveText">
+        <n-button
+size="tiny"
+quaternary
+circle
+@click="handleSaveText">
           <template #icon><n-icon><SaveOutline /></n-icon></template>
         </n-button>
-        <n-button size="tiny" quaternary circle @click="copyMessage">
+        <n-button
+size="tiny"
+quaternary
+circle
+@click="copyMessage">
           <template #icon><n-icon><CopyOutline /></n-icon></template>
         </n-button>
         <n-button size="tiny" quaternary circle>

@@ -37,7 +37,11 @@
         <n-card :title="currentDoc?.title || '选择文档预览'" size="small" class="h-full">
           <template v-if="currentDoc" #header-extra>
             <n-space>
-              <n-button size="tiny" secondary type="primary" @click="askAI(`帮我润色这篇文档：${currentDoc.title}`)">
+              <n-button
+size="tiny"
+secondary
+type="primary"
+@click="askAI(`帮我润色这篇文档：${currentDoc.title}`)">
                 <template #icon><n-icon><SparklesOutline /></n-icon></template>
                 AI 润色
               </n-button>

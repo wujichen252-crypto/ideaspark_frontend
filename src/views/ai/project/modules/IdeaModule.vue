@@ -6,7 +6,11 @@
         <n-grid-item>
           <n-card title="用户痛点" size="small" class="analysis-card">
             <template #header-extra>
-              <n-button text size="tiny" type="primary" @click="askAI('帮我分析目标用户的核心痛点')">
+              <n-button
+text
+size="tiny"
+type="primary"
+@click="askAI('帮我分析目标用户的核心痛点')">
                 <template #icon><n-icon><BulbOutline /></n-icon></template>
                 AI 分析
               </n-button>
@@ -22,7 +26,11 @@
         <n-grid-item>
           <n-card title="目标用户" size="small" class="analysis-card">
             <template #header-extra>
-              <n-button text size="tiny" type="primary" @click="askAI('帮我描绘目标用户画像')">
+              <n-button
+text
+size="tiny"
+type="primary"
+@click="askAI('帮我描绘目标用户画像')">
                 <template #icon><n-icon><PeopleOutline /></n-icon></template>
                 AI 画像
               </n-button>
@@ -38,7 +46,11 @@
         <n-grid-item>
           <n-card title="核心价值" size="small" class="analysis-card">
              <template #header-extra>
-              <n-button text size="tiny" type="primary" @click="askAI('帮我提炼产品的核心价值主张')">
+              <n-button
+text
+size="tiny"
+type="primary"
+@click="askAI('帮我提炼产品的核心价值主张')">
                 <template #icon><n-icon><DiamondOutline /></n-icon></template>
                 AI 提炼
               </n-button>
@@ -76,7 +88,11 @@
     <div class="document-section mt-4">
       <n-card title="需求分析说明书 (Output)" size="small">
         <template #header-extra>
-           <n-button size="small" type="primary" secondary @click="generateDoc">
+           <n-button
+size="small"
+type="primary"
+secondary
+@click="generateDoc">
              <template #icon><n-icon><DocumentTextOutline /></n-icon></template>
              生成文档
            </n-button>

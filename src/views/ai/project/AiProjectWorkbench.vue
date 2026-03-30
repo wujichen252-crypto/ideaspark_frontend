@@ -7,7 +7,11 @@
       <div class="nav-sidebar" :class="{ 'collapsed': isSidebarCollapsed }">
         <div class="sidebar-header">
           <div class="header-controls">
-            <n-button quaternary circle size="small" @click="handleBackToList">
+            <n-button
+quaternary
+circle
+size="small"
+@click="handleBackToList">
               <template #icon><n-icon><ArrowBackOutline /></n-icon></template>
             </n-button>
             <n-button text @click="isSidebarCollapsed = !isSidebarCollapsed">
@@ -54,8 +58,7 @@
 
       <!-- 中间与右侧：分割面板布局 -->
       <div ref="splitLayoutRef" class="split-layout">
-        
-        <!-- 主工作区 -->
+<!-- 主工作区 -->
         <div class="main-panel" :style="{ flex: `1 1 0%` }">
           <div class="panel-header">
             <div class="module-info">
@@ -79,8 +82,19 @@
               <div class="project-header-card">
                 <div class="ph-content">
                   <div class="ph-badge">
-                    <n-tag type="primary" size="small" round bordered>{{ projectInfo.category || '未分类' }}</n-tag>
-                    <n-tag :type="projectInfo.status === 'completed' ? 'success' : 'info'" size="small" round bordered class="ml-2">
+                    <n-tag
+type="primary"
+size="small"
+round
+bordered>
+{{ projectInfo.category || '未分类' }}
+</n-tag>
+                    <n-tag
+:type="projectInfo.status === 'completed' ? 'success' : 'info'"
+size="small"
+round
+bordered
+class="ml-2">
                       {{ projectInfo.status === 'completed' ? '已完成' : (projectInfo.status === 'draft' ? '草稿' : '进行中') }}
                     </n-tag>
                   </div>
@@ -107,7 +121,11 @@
                 <div class="health-grid">
                   <div class="health-card">
                     <div class="label">想法清晰度</div>
-                    <n-progress type="dashboard" :percentage="85" color="#18a058" :size="100">
+                    <n-progress
+type="dashboard"
+:percentage="85"
+color="#18a058"
+:size="100">
                       <template #default>
                         <div class="score">8.5</div>
                       </template>
@@ -116,7 +134,11 @@
                   </div>
                   <div class="health-card">
                     <div class="label">可执行性</div>
-                    <n-progress type="dashboard" :percentage="60" color="#2080f0" :size="100">
+                    <n-progress
+type="dashboard"
+:percentage="60"
+color="#2080f0"
+:size="100">
                       <template #default>
                         <div class="score">6.0</div>
                       </template>
@@ -160,7 +182,11 @@
                         <span :class="{ 'completed': task.completed }">{{ task.label }}</span>
                       </div>
                       <template #suffix>
-                        <n-button size="tiny" quaternary circle @click.stop="askAI(task)">
+                        <n-button
+size="tiny"
+quaternary
+circle
+@click.stop="askAI(task)">
                           <template #icon><n-icon><ChatbubbleEllipsesOutline /></n-icon></template>
                         </n-button>
                       </template>
@@ -199,11 +225,21 @@
             <div class="flex items-center gap-2">
               <n-icon color="#18a058"><Sparkles /></n-icon>
               <span>AI 团队</span>
-              <n-tag size="small" type="success" round class="ml-2">{{ currentAIRole }}</n-tag>
+              <n-tag
+size="small"
+type="success"
+round
+class="ml-2">
+{{ currentAIRole }}
+</n-tag>
             </div>
             <div class="header-actions">
               <!-- 宽屏切换按钮 -->
-              <n-button size="tiny" quaternary circle @click="toggleWideMode">
+              <n-button
+size="tiny"
+quaternary
+circle
+@click="toggleWideMode">
                 <template #icon>
                    <n-icon><component :is="isWideMode ? ResizeOutline : ExpandOutline" /></n-icon>
                 </template>
@@ -220,8 +256,7 @@
             />
           </div>
         </div>
-
-      </div>
+</div>
     </div>
   </div>
 </template>

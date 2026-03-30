@@ -28,7 +28,11 @@
             <span class="stage-name">{{ modules[moduleKey].label }}</span>
             <n-badge :value="modules[moduleKey].checklist.length" type="info" />
           </div>
-          <n-button circle size="tiny" secondary @click="openAddModal(moduleKey)">
+          <n-button
+circle
+size="tiny"
+secondary
+@click="openAddModal(moduleKey)">
             <template #icon><n-icon><Add /></n-icon></template>
           </n-button>
         </div>
@@ -76,7 +80,12 @@
             <div v-if="item.description || item.dueDate || item.tags?.length" class="card-meta">
                <n-space size="small" align="center">
                  <n-icon v-if="item.description" color="#999"><DocumentTextOutline /></n-icon>
-                 <n-tag v-for="tag in item.tags" :key="tag" size="tiny" :bordered="false" type="default">
+                 <n-tag
+v-for="tag in item.tags"
+:key="tag"
+size="tiny"
+:bordered="false"
+type="default">
                    {{ tag }}
                  </n-tag>
                  <span v-if="item.dueDate" class="due-date">
@@ -94,7 +103,11 @@
     </div>
 
     <!-- 任务编辑/添加弹窗 -->
-    <n-modal v-model:show="showModal" preset="card" :title="isEditing ? '编辑任务' : '新建任务'" style="width: 500px">
+    <n-modal
+v-model:show="showModal"
+preset="card"
+:title="isEditing ? '编辑任务' : '新建任务'"
+style="width: 500px">
       <n-form label-placement="left" label-width="80">
         <n-form-item label="任务内容">
           <n-input v-model:value="formModel.label" placeholder="请输入任务名称" />
@@ -118,7 +131,13 @@
       </n-form>
       <template #footer>
         <div class="flex justify-between">
-          <n-button v-if="isEditing" type="error" ghost @click="handleDelete">删除任务</n-button>
+          <n-button
+v-if="isEditing"
+type="error"
+ghost
+@click="handleDelete">
+删除任务
+</n-button>
           <div v-else></div> <!-- Spacer -->
           <div class="flex gap-2">
             <n-button @click="showModal = false">取消</n-button>

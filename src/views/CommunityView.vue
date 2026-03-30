@@ -13,7 +13,11 @@
               />
             </n-card>
 
-            <n-card title="我的圈子" :bordered="false" size="small" class="mt-4 group-card">
+            <n-card
+title="我的圈子"
+:bordered="false"
+size="small"
+class="mt-4 group-card">
               <template #header-extra>
                 <n-button
                   text
@@ -97,8 +101,15 @@
                   表情
                 </n-button>
               </n-space>
-              <n-button type="primary" size="small" round color="#000" @click="openCreateModal"
-                >发布</n-button
+              <n-button
+type="primary"
+size="small"
+round
+color="#000"
+@click="openCreateModal"
+                >
+发布
+</n-button
               >
             </div>
           </n-card>
@@ -233,7 +244,11 @@
                     :options="getPostActionOptions(post)"
                     @select="(key) => handlePostActionSelect(key, post.id)"
                   >
-                    <n-button circle quaternary size="small" @click.stop>
+                    <n-button
+circle
+quaternary
+size="small"
+@click.stop>
                       <template #icon><n-icon :component="EllipsisHorizontal" /></template>
                     </n-button>
                   </n-dropdown>
@@ -348,10 +363,21 @@
             </n-card>
 
             <!-- 热门话题 -->
-            <n-card title="热门话题" :bordered="false" size="small" class="mb-6">
+            <n-card
+title="热门话题"
+:bordered="false"
+size="small"
+class="mb-6">
               <template #header-extra>
-                <n-button text type="primary" size="small" color="#000" @click="handleMoreTopics"
-                  >更多</n-button
+                <n-button
+text
+type="primary"
+size="small"
+color="#000"
+@click="handleMoreTopics"
+                  >
+更多
+</n-button
                 >
               </template>
               <n-list hoverable clickable>
@@ -533,7 +559,13 @@
                 <div class="explore-group-item__main">
                   <div class="explore-group-item__title">
                     <span class="name">{{ g.name }}</span>
-                    <n-tag size="small" round type="info" class="tag">#{{ g.keyword }}</n-tag>
+                    <n-tag
+size="small"
+round
+type="info"
+class="tag">
+#{{ g.keyword }}
+</n-tag>
                   </div>
                   <div class="explore-group-item__desc">{{ g.description }}</div>
                   <div class="explore-group-item__meta">

@@ -1,9 +1,9 @@
 import axios from 'axios'
 import type { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
-import { setActivePinia } from 'pinia'
 import { createDiscreteApi } from 'naive-ui'
 import router from '@/router'
-import store, { useUserStore } from '@/store'
+import { useUserStore } from '@/store'
+import { deduplicator, shouldDeduplicate } from './deduplicate'
 
 // Define response structure (matches backend: { status, message, data })
 export interface Result<T = unknown> {
@@ -30,7 +30,6 @@ function clearAuthState(): void {
   localStorage.removeItem('token')
   localStorage.removeItem('user')
   try {
-    setActivePinia(store)
     const userStore = useUserStore()
     userStore.logout()
   } catch {
@@ -46,10 +45,29 @@ const service: AxiosInstance = axios.create({
 // Request interceptor
 service.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    // 请求去重处理：GET/HEAD 请求如果正在执行中，则返回相同的 Promise
+    if (shouldDeduplicate(config) && deduplicator.has(config)) {
+      const pendingRequest = deduplicator.get(config)
+      if (pendingRequest) {
+        if (import.meta.env.DEV) {
+          console.log(`[Deduplicate] Reusing pending request: ${config.url}`)
+        }
+        // 返回一个新的 Promise，避免 Axios 内部处理冲突
+        return Promise.reject(new axios.Cancel('Request deduplicated'))
+      }
+    }
+
     const token = getAuthToken()
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
+
+    // 将请求添加到 pending 队列（用于去重）
+    if (shouldDeduplicate(config)) {
+      const requestPromise = Promise.resolve(config)
+      deduplicator.add(config, requestPromise as Promise<AxiosResponse>)
+    }
+
     return config
   },
   (error) => {
@@ -60,8 +78,11 @@ service.interceptors.request.use(
 // Response interceptor
 service.interceptors.response.use(
   (response: AxiosResponse) => {
+    // 请求完成后从 pending 队列移除
+    deduplicator.remove(response.config)
+
     const res = response.data as Result<unknown>
-    
+
     // 开发环境日志记录
     if (import.meta.env.DEV) {
       console.log(`[API] ${response.config.method?.toUpperCase()} ${response.config.url}`, {
@@ -73,16 +94,16 @@ service.interceptors.response.use(
         }
       })
     }
-    
+
     // 如果响应是数组或直接数据（没有 status 字段），直接返回
     if (Array.isArray(res) || (typeof res === 'object' && res !== null && !('status' in res))) {
       return response
     }
-    
+
     // Backend returns status=200 for success, other values indicate errors
     if (res.status !== 200 && res.status !== 201) {
       const msg = res.message || '请求失败'
-      
+
       // 根据状态码提供更友好的错误提示
       let userMessage = msg
       if (res.status === 400) {
@@ -94,14 +115,19 @@ service.interceptors.response.use(
       } else if (res.status >= 500) {
         userMessage = `服务器错误: ${msg}`
       }
-      
+
       message.error(userMessage)
       return Promise.reject(new Error(msg))
     }
-    
+
     return response
   },
   (error) => {
+    // 请求失败也从 pending 队列移除
+    if (error.config) {
+      deduplicator.remove(error.config)
+    }
+
     const axiosError = error as AxiosError
     const status = axiosError.response?.status
 
@@ -117,6 +143,11 @@ service.interceptors.response.use(
     }
 
     if (axiosError.code === 'ERR_CANCELED') {
+      return Promise.reject(error)
+    }
+
+    // 请求去重取消，不显示错误
+    if (axiosError.message === 'Request deduplicated') {
       return Promise.reject(error)
     }
 

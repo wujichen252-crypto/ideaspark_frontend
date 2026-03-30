@@ -28,13 +28,26 @@
             <span>保存时间：{{ formatTime(d.updatedAt) }}</span>
           </div>
           <div v-if="(d.plugins || []).length" class="tags">
-            <n-tag v-for="p in (d.plugins || [])" :key="p" size="small" round class="mr-2">{{ p }}</n-tag>
+            <n-tag
+v-for="p in (d.plugins || [])"
+:key="p"
+size="small"
+round
+class="mr-2">
+{{ p }}
+</n-tag>
           </div>
         </div>
         <div class="item-actions">
           <n-button size="small" type="primary" @click="continueProject(d.id)">继续</n-button>
           <n-button size="small" ghost @click="editSettings(d.id)">设置</n-button>
-          <n-button size="small" type="error" ghost @click="deleteDraft(d.id)">删除</n-button>
+          <n-button
+size="small"
+type="error"
+ghost
+@click="deleteDraft(d.id)">
+删除
+</n-button>
         </div>
       </n-card>
     </div>

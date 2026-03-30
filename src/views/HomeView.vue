@@ -12,7 +12,12 @@
           </p>
         </div>
 
-        <n-grid class="showcase-grid" cols="1 m:2" :x-gap="24" :y-gap="24" responsive="screen">
+        <n-grid
+class="showcase-grid"
+cols="1 m:2"
+:x-gap="24"
+:y-gap="24"
+responsive="screen">
           <n-grid-item>
             <n-card class="showcase-card" :bordered="false">
               <div class="card-head">
@@ -26,9 +31,16 @@
                 </div>
               </div>
               <div class="pill-row">
-                <n-tag v-for="t in conceptTags" :key="t" size="small" round :bordered="false">{{
+                <n-tag
+v-for="t in conceptTags"
+:key="t"
+size="small"
+round
+:bordered="false">
+{{
                   t
-                }}</n-tag>
+                }}
+</n-tag>
               </div>
             </n-card>
           </n-grid-item>

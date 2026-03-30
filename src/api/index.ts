@@ -1,6 +1,6 @@
 /**
  * API 统一导出
- * @description 导出所有 API 模块
+ * @description 导出所有 API 模块和工具
  */
 
 // 类型定义
@@ -9,6 +9,12 @@ export * from './types'
 // 请求实例
 export { default as service } from './request'
 export type { Result } from './request'
+
+// 缓存工具
+export { requestCache, withCache } from './cache'
+
+// 去重工具
+export { deduplicator, shouldDeduplicate } from './deduplicate'
 
 // 用户管理
 export * from './user'

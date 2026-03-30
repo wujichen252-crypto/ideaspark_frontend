@@ -5,7 +5,11 @@
       <n-grid-item :span="8">
         <n-card title="品牌核心 (Identity)" size="small" class="h-full">
            <template #header-extra>
-            <n-button text size="tiny" type="primary" @click="askAI('帮我想 5 个好听的中文产品名称，要朗朗上口')">
+            <n-button
+text
+size="tiny"
+type="primary"
+@click="askAI('帮我想 5 个好听的中文产品名称，要朗朗上口')">
               <template #icon><n-icon><SparklesOutline /></n-icon></template>
               AI 起名
             </n-button>
@@ -77,7 +81,11 @@
     <div class="deliverables-section mt-4">
       <n-card title="品牌手册 (Brand Guidelines)" size="small">
          <template #header-extra>
-           <n-button size="small" type="primary" secondary @click="generateManual">
+           <n-button
+size="small"
+type="primary"
+secondary
+@click="generateManual">
              <template #icon><n-icon><DocumentTextOutline /></n-icon></template>
              生成品牌手册
            </n-button>

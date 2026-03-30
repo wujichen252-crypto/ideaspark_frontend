@@ -113,7 +113,7 @@ describe('社区评论接口', () => {
 
       const result = await getPostComments('post-123')
 
-      expect(mockService.get).toHaveBeenCalledWith('/api/community/comments/post?postId=post-123')
+      expect(mockService.get).toHaveBeenCalledWith('/api/community/comments/post/post-123')
       expect(result.data.data).toHaveLength(1)
     })
   })

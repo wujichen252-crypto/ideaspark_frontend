@@ -4,7 +4,12 @@
       <n-card title="编辑个人资料" :bordered="false" size="large">
         <template #header-extra>
           <div style="display: flex; align-items: center; gap: 12px">
-            <n-tag v-if="hasUnsavedChanges" type="warning" size="small" bordered round>
+            <n-tag
+v-if="hasUnsavedChanges"
+type="warning"
+size="small"
+bordered
+round>
               未保存的修改
             </n-tag>
             <n-button text @click="$router.push('/profile')">

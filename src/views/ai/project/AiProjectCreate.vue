@@ -15,7 +15,11 @@
         </div>
         
         <div ref="messagesRef" class="messages-container">
-          <div v-for="msg in messages" :key="msg.id" class="message-item" :class="msg.role">
+          <div
+v-for="msg in messages"
+:key="msg.id"
+class="message-item"
+:class="msg.role">
             <div class="avatar">
               <n-avatar
 :src="msg.role === 'ai' ? 'https://api.dicebear.com/7.x/bottts/svg?seed=ai' : undefined" 
@@ -54,7 +58,11 @@
             :disabled="loading || isFinished"
             @keydown.enter.prevent="sendMessage"
           />
-          <n-button type="primary" class="send-btn" :disabled="!inputValue.trim() || loading || isFinished" @click="sendMessage">
+          <n-button
+type="primary"
+class="send-btn"
+:disabled="!inputValue.trim() || loading || isFinished"
+@click="sendMessage">
             <template #icon>
               <n-icon><PaperPlaneOutline /></n-icon>
             </template>
@@ -108,7 +116,11 @@
 
             <n-divider />
             <div class="draft-actions">
-              <n-button secondary block :loading="savingDraft" @click="saveDraft">
+              <n-button
+secondary
+block
+:loading="savingDraft"
+@click="saveDraft">
                 保存为草稿
               </n-button>
             </div>
@@ -118,7 +130,12 @@
               <n-alert title="项目信息已就绪" type="success" style="margin-bottom: 16px;">
                 AI 已收集足够信息，可以开始项目了。
               </n-alert>
-              <n-button type="primary" block size="large" :loading="creating" @click="createProject">
+              <n-button
+type="primary"
+block
+size="large"
+:loading="creating"
+@click="createProject">
                 生成项目并进入看板
               </n-button>
             </div>

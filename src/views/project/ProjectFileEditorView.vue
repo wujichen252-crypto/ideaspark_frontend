@@ -9,12 +9,37 @@
         </n-button>
         <n-divider vertical />
         <div class="file-title">{{ file?.name || '未找到文件' }}</div>
-        <n-tag v-if="saveStatus === 'saved'" type="success" size="small" :bordered="false">已保存</n-tag>
-        <n-tag v-else-if="saveStatus === 'saving'" type="warning" size="small" :bordered="false">保存中...</n-tag>
-        <n-tag v-else type="default" size="small" :bordered="false">未保存</n-tag>
+        <n-tag
+v-if="saveStatus === 'saved'"
+type="success"
+size="small"
+:bordered="false">
+已保存
+</n-tag>
+        <n-tag
+v-else-if="saveStatus === 'saving'"
+type="warning"
+size="small"
+:bordered="false">
+保存中...
+</n-tag>
+        <n-tag
+v-else
+type="default"
+size="small"
+:bordered="false">
+未保存
+</n-tag>
       </div>
       <div class="header-right">
-        <n-button secondary type="primary" size="small" :disabled="!file" @click="handleSave">保存</n-button>
+        <n-button
+secondary
+type="primary"
+size="small"
+:disabled="!file"
+@click="handleSave">
+保存
+</n-button>
       </div>
     </header>
 
@@ -38,7 +63,12 @@
 
               <n-tooltip trigger="hover">
                 <template #trigger>
-                  <n-button size="small" quaternary class="md-tool-btn" :disabled="!canMdUndo" @click="handleMdUndo">
+                  <n-button
+size="small"
+quaternary
+class="md-tool-btn"
+:disabled="!canMdUndo"
+@click="handleMdUndo">
                     <template #icon><n-icon :component="ArrowUndoOutline" /></template>
                   </n-button>
                 </template>
@@ -46,7 +76,12 @@
               </n-tooltip>
               <n-tooltip trigger="hover">
                 <template #trigger>
-                  <n-button size="small" quaternary class="md-tool-btn" :disabled="!canMdRedo" @click="handleMdRedo">
+                  <n-button
+size="small"
+quaternary
+class="md-tool-btn"
+:disabled="!canMdRedo"
+@click="handleMdRedo">
                     <template #icon><n-icon :component="ArrowRedoOutline" /></template>
                   </n-button>
                 </template>
@@ -57,19 +92,37 @@
 
               <n-tooltip trigger="hover">
                 <template #trigger>
-                  <n-button size="small" quaternary class="md-tool-btn md-tool-text md-tool-bold" @click="applyMdBold">B</n-button>
+                  <n-button
+size="small"
+quaternary
+class="md-tool-btn md-tool-text md-tool-bold"
+@click="applyMdBold">
+B
+</n-button>
                 </template>
                 加粗（Ctrl+B）
               </n-tooltip>
               <n-tooltip trigger="hover">
                 <template #trigger>
-                  <n-button size="small" quaternary class="md-tool-btn md-tool-text md-tool-italic" @click="applyMdItalic">I</n-button>
+                  <n-button
+size="small"
+quaternary
+class="md-tool-btn md-tool-text md-tool-italic"
+@click="applyMdItalic">
+I
+</n-button>
                 </template>
                 斜体（Ctrl+I）
               </n-tooltip>
               <n-tooltip trigger="hover">
                 <template #trigger>
-                  <n-button size="small" quaternary class="md-tool-btn md-tool-text md-tool-strike" @click="applyMdStrike">S</n-button>
+                  <n-button
+size="small"
+quaternary
+class="md-tool-btn md-tool-text md-tool-strike"
+@click="applyMdStrike">
+S
+</n-button>
                 </template>
                 删除线
               </n-tooltip>
@@ -87,7 +140,11 @@
 
               <n-tooltip trigger="hover">
                 <template #trigger>
-                  <n-button size="small" quaternary class="md-tool-btn" @click="applyMdQuote">
+                  <n-button
+size="small"
+quaternary
+class="md-tool-btn"
+@click="applyMdQuote">
                     <template #icon><n-icon :component="ChatboxEllipsesOutline" /></template>
                   </n-button>
                 </template>
@@ -96,7 +153,11 @@
 
               <n-tooltip trigger="hover">
                 <template #trigger>
-                  <n-button size="small" quaternary class="md-tool-btn" @click="applyMdUnorderedList">
+                  <n-button
+size="small"
+quaternary
+class="md-tool-btn"
+@click="applyMdUnorderedList">
                     <template #icon><n-icon :component="ListOutline" /></template>
                   </n-button>
                 </template>
@@ -104,7 +165,11 @@
               </n-tooltip>
               <n-tooltip trigger="hover">
                 <template #trigger>
-                  <n-button size="small" quaternary class="md-tool-btn" @click="applyMdOrderedList">
+                  <n-button
+size="small"
+quaternary
+class="md-tool-btn"
+@click="applyMdOrderedList">
                     <template #icon><n-icon :component="ReorderTwoOutline" /></template>
                   </n-button>
                 </template>
@@ -112,7 +177,11 @@
               </n-tooltip>
               <n-tooltip trigger="hover">
                 <template #trigger>
-                  <n-button size="small" quaternary class="md-tool-btn" @click="applyMdTaskList">
+                  <n-button
+size="small"
+quaternary
+class="md-tool-btn"
+@click="applyMdTaskList">
                     <template #icon><n-icon :component="CheckboxOutline" /></template>
                   </n-button>
                 </template>
@@ -123,7 +192,11 @@
 
               <n-tooltip trigger="hover">
                 <template #trigger>
-                  <n-button size="small" quaternary class="md-tool-btn" @click="applyMdInlineCode">
+                  <n-button
+size="small"
+quaternary
+class="md-tool-btn"
+@click="applyMdInlineCode">
                     <template #icon><n-icon :component="CodeOutline" /></template>
                   </n-button>
                 </template>
@@ -131,7 +204,11 @@
               </n-tooltip>
               <n-tooltip trigger="hover">
                 <template #trigger>
-                  <n-button size="small" quaternary class="md-tool-btn" @click="applyMdCodeBlock">
+                  <n-button
+size="small"
+quaternary
+class="md-tool-btn"
+@click="applyMdCodeBlock">
                     <template #icon><n-icon :component="CodeSlashOutline" /></template>
                   </n-button>
                 </template>
@@ -139,7 +216,11 @@
               </n-tooltip>
               <n-tooltip trigger="hover">
                 <template #trigger>
-                  <n-button size="small" quaternary class="md-tool-btn" @click="applyMdLink">
+                  <n-button
+size="small"
+quaternary
+class="md-tool-btn"
+@click="applyMdLink">
                     <template #icon><n-icon :component="LinkOutline" /></template>
                   </n-button>
                 </template>
@@ -147,7 +228,11 @@
               </n-tooltip>
               <n-tooltip trigger="hover">
                 <template #trigger>
-                  <n-button size="small" quaternary class="md-tool-btn" @click="pickMarkdownImage">
+                  <n-button
+size="small"
+quaternary
+class="md-tool-btn"
+@click="pickMarkdownImage">
                     <template #icon><n-icon :component="ImageOutline" /></template>
                   </n-button>
                 </template>
@@ -155,7 +240,11 @@
               </n-tooltip>
               <n-tooltip trigger="hover">
                 <template #trigger>
-                  <n-button size="small" quaternary class="md-tool-btn" @click="applyMdTable">
+                  <n-button
+size="small"
+quaternary
+class="md-tool-btn"
+@click="applyMdTable">
                     <template #icon><n-icon :component="GridOutline" /></template>
                   </n-button>
                 </template>
@@ -166,7 +255,11 @@
             <n-space align="center" size="small">
               <n-tooltip trigger="hover">
                 <template #trigger>
-                  <n-button size="small" quaternary class="md-tool-btn" @click="showAi = !showAi">
+                  <n-button
+size="small"
+quaternary
+class="md-tool-btn"
+@click="showAi = !showAi">
                     <template #icon><n-icon :component="showAi ? ChatbubbleEllipsesOutline : ChatbubbleOutline" /></template>
                   </n-button>
                 </template>
@@ -183,7 +276,13 @@
           </div>
 
           <div class="md-body" :class="{ 'preview-open': mdViewMode === 'split', 'ai-open': showAi }">
-            <input ref="markdownImageInputRef" class="md-hidden-file" type="file" accept="image/*" multiple @change="handleMarkdownImagePick" />
+            <input
+ref="markdownImageInputRef"
+class="md-hidden-file"
+type="file"
+accept="image/*"
+multiple
+@change="handleMarkdownImagePick" />
             <div ref="markdownEditorHostRef" class="md-editor">
               <div v-if="mdViewMode === 'typora'" class="md-wysiwyg" @click="focusMarkdown">
                 <div
@@ -208,7 +307,11 @@
             </div>
 
             <div v-if="mdViewMode === 'split'" class="md-preview">
-              <n-card size="small" :bordered="false" class="md-preview-card" title="预览">
+              <n-card
+size="small"
+:bordered="false"
+class="md-preview-card"
+title="预览">
                 <div ref="markdownPreviewRef" class="md-preview-content"></div>
               </n-card>
             </div>
@@ -234,8 +337,16 @@
             </n-radio-group>
           </div>
 
-          <n-card v-if="csvMode === 'preview'" size="small" :bordered="false" class="csv-preview-card">
-            <n-data-table :columns="csvColumns" :data="csvRows" :max-height="560" :striped="true" />
+          <n-card
+v-if="csvMode === 'preview'"
+size="small"
+:bordered="false"
+class="csv-preview-card">
+            <n-data-table
+:columns="csvColumns"
+:data="csvRows"
+:max-height="560"
+:striped="true" />
           </n-card>
 
           <div v-else class="csv-source">
@@ -256,7 +367,11 @@
               <div class="slides-sider-title">页列表</div>
               <n-space size="small">
                 <n-button size="tiny" secondary @click="addSlide">新增</n-button>
-                <n-button size="tiny" tertiary :disabled="slideBlocks.length <= 1" @click="removeSlide">
+                <n-button
+size="tiny"
+tertiary
+:disabled="slideBlocks.length <= 1"
+@click="removeSlide">
                   删除
                 </n-button>
               </n-space>

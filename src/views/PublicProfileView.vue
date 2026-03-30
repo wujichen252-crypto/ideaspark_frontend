@@ -17,7 +17,13 @@
         <div class="user-details">
           <div class="name-row">
             <h1 class="username">{{ userData.username }}</h1>
-            <n-tag type="info" size="small" round bordered>{{ userData.role }}</n-tag>
+            <n-tag
+type="info"
+size="small"
+round
+bordered>
+{{ userData.role }}
+</n-tag>
           </div>
           <p class="bio">{{ userData.bio }}</p>
           
@@ -90,7 +96,13 @@
               <div class="info-group">
                 <h3>技术栈</h3>
                 <div class="tech-tags">
-                  <n-tag v-for="tech in userData.techStack" :key="tech" size="small" round>{{ tech }}</n-tag>
+                  <n-tag
+v-for="tech in userData.techStack"
+:key="tech"
+size="small"
+round>
+{{ tech }}
+</n-tag>
                 </div>
               </div>
               <div class="info-group">

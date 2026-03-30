@@ -26,7 +26,7 @@ export function createComment(params: CreateCommentParams) {
  * @returns 直接返回评论数组（非标准包装格式）
  */
 export function getPostComments(postId: string) {
-  return service.get<Comment[]>(`/api/community/comments/post?postId=${postId}`)
+  return service.get<Comment[]>(`/api/community/comments/post/${postId}`)
 }
 
 /**

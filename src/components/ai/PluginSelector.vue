@@ -26,7 +26,13 @@
           <div class="chip-actions">
             <n-button text size="tiny" @click="moveUpInternal(id)">上移</n-button>
             <n-button text size="tiny" @click="moveDownInternal(id)">下移</n-button>
-            <n-button text size="tiny" type="error" @click="toggleInternal(id)">移除</n-button>
+            <n-button
+text
+size="tiny"
+type="error"
+@click="toggleInternal(id)">
+移除
+</n-button>
           </div>
         </div>
       </div>

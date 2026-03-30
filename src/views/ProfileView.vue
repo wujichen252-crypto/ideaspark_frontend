@@ -17,7 +17,13 @@
         <div class="user-details">
           <div class="name-row">
             <h1 class="username">{{ displayUserInfo.username }}</h1>
-            <n-tag :bordered="false" size="small" round class="role-tag">{{ displayUserInfo.role }}</n-tag>
+            <n-tag
+:bordered="false"
+size="small"
+round
+class="role-tag">
+{{ displayUserInfo.role }}
+</n-tag>
           </div>
           <p class="bio">{{ displayUserInfo.bio }}</p>
           
@@ -38,7 +44,13 @@
         </div>
 
         <div class="action-buttons">
-          <n-button type="primary" round ghost @click="router.push('/profile/edit')">编辑资料</n-button>
+          <n-button
+type="primary"
+round
+ghost
+@click="router.push('/profile/edit')">
+编辑资料
+</n-button>
           <n-button circle secondary @click="router.push('/profile/settings')">
             <template #icon><n-icon :component="SettingsOutline" /></template>
           </n-button>
@@ -119,7 +131,14 @@
               <div v-if="displayUserInfo.techStack && displayUserInfo.techStack.length" class="info-group">
                 <h3>技术栈</h3>
                 <div class="tech-tags">
-                  <n-tag v-for="tech in displayUserInfo.techStack" :key="tech" size="small" round :bordered="false">{{ tech }}</n-tag>
+                  <n-tag
+v-for="tech in displayUserInfo.techStack"
+:key="tech"
+size="small"
+round
+:bordered="false">
+{{ tech }}
+</n-tag>
                 </div>
               </div>
               <div class="info-group">

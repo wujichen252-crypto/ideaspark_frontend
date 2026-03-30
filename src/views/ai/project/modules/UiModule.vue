@@ -5,7 +5,11 @@
       <n-grid-item :span="10">
         <n-card title="视觉风格 (Visual Style)" size="small" class="h-full">
           <template #header-extra>
-            <n-button text size="tiny" type="primary" @click="askAI('根据我的产品定位，推荐 3 种合适的视觉风格')">
+            <n-button
+text
+size="tiny"
+type="primary"
+@click="askAI('根据我的产品定位，推荐 3 种合适的视觉风格')">
               <template #icon><n-icon><ColorPaletteOutline /></n-icon></template>
               AI 推荐
             </n-button>
@@ -46,7 +50,11 @@
         <n-flex vertical size="medium">
           <n-card title="Logo 概念设计" size="small">
              <template #header-extra>
-                <n-button text size="tiny" type="primary" @click="askAI('基于品牌名称和调性，生成 3 个 Logo 设计创意描述')">
+                <n-button
+text
+size="tiny"
+type="primary"
+@click="askAI('基于品牌名称和调性，生成 3 个 Logo 设计创意描述')">
                   <template #icon><n-icon><ShapesOutline /></n-icon></template>
                   AI 构思
                 </n-button>
@@ -61,7 +69,11 @@
 
           <n-card title="页面结构草案 (Layout)" size="small" class="flex-1">
              <template #header-extra>
-                <n-button text size="tiny" type="primary" @click="askAI('为首页规划一个高转化率的区块结构')">
+                <n-button
+text
+size="tiny"
+type="primary"
+@click="askAI('为首页规划一个高转化率的区块结构')">
                   <template #icon><n-icon><LayersOutline /></n-icon></template>
                   AI 规划
                 </n-button>
@@ -82,7 +94,11 @@
     <div class="deliverables-section mt-4">
       <n-card title="视觉方向说明书 (Visual Guide)" size="small">
           <template #header-extra>
-            <n-button size="small" type="primary" secondary @click="generateGuide">
+            <n-button
+size="small"
+type="primary"
+secondary
+@click="generateGuide">
               <template #icon><n-icon><DocumentTextOutline /></n-icon></template>
               生成视觉指南
             </n-button>

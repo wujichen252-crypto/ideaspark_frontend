@@ -3,7 +3,11 @@
     <div class="page-header">
       <div class="container header-content">
         <div class="header-left">
-          <n-button quaternary circle class="back-btn" @click="handleBack">
+          <n-button
+quaternary
+circle
+class="back-btn"
+@click="handleBack">
             <template #icon>
               <n-icon :component="ArrowBack" />
             </template>
@@ -20,7 +24,11 @@
             </template>
             一键已读
           </n-button>
-          <n-button secondary size="small" class="ml-2" @click="clearRead">
+          <n-button
+secondary
+size="small"
+class="ml-2"
+@click="clearRead">
             <template #icon>
               <n-icon :component="TrashOutline" />
             </template>
@@ -35,7 +43,11 @@
         <n-tabs type="line" animated>
           <n-tab-pane name="all" tab="全部">
             <div class="notification-list">
-              <div v-for="item in allNotifications" :key="item.id" class="notification-item" :class="{ unread: !item.read }">
+              <div
+v-for="item in allNotifications"
+:key="item.id"
+class="notification-item"
+:class="{ unread: !item.read }">
                 <div class="icon-wrapper" :class="item.type">
                   <n-icon v-if="item.type === 'system'" :component="NotificationsOutline" />
                   <n-icon v-else-if="item.type === 'comment'" :component="ChatbubbleOutline" />
@@ -50,7 +62,12 @@
                   <p class="description">{{ item.content }}</p>
                 </div>
                 <div class="actions">
-                  <n-button v-if="!item.read" size="tiny" secondary type="primary" @click="markAsRead(item.id)">
+                  <n-button
+v-if="!item.read"
+size="tiny"
+secondary
+type="primary"
+@click="markAsRead(item.id)">
                     标为已读
                   </n-button>
                 </div>
@@ -74,7 +91,11 @@
                   <p class="description">{{ item.content }}</p>
                 </div>
                 <div class="actions">
-                  <n-button size="tiny" secondary type="primary" @click="markAsRead(item.id)">
+                  <n-button
+size="tiny"
+secondary
+type="primary"
+@click="markAsRead(item.id)">
                     标为已读
                   </n-button>
                 </div>
@@ -84,7 +105,11 @@
           </n-tab-pane>
           <n-tab-pane name="system" tab="系统通知">
             <div class="notification-list">
-               <div v-for="item in systemNotifications" :key="item.id" class="notification-item" :class="{ unread: !item.read }">
+               <div
+v-for="item in systemNotifications"
+:key="item.id"
+class="notification-item"
+:class="{ unread: !item.read }">
                 <div class="icon-wrapper system">
                   <n-icon :component="NotificationsOutline" />
                 </div>

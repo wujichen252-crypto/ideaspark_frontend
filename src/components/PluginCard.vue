@@ -16,7 +16,14 @@
       <div class="plugin-users">
         <n-icon :component="PeopleOutline" /> {{ stats }}
       </div>
-      <n-button size="small" secondary type="success" class="install-btn" @click.stop="$emit('install')">安装</n-button>
+      <n-button
+size="small"
+secondary
+type="success"
+class="install-btn"
+@click.stop="$emit('install')">
+安装
+</n-button>
     </div>
   </n-card>
 </template>
